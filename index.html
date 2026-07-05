@@ -373,17 +373,13 @@
   </div>
 </div>
 
-<section class="shows-section" id="shows">
-  <div class="shows-grid">
-  </div>
-</section>
-
-<section class="shows-section" id="shows-controls-anchor" style="padding-bottom:0;">
+<section class="shows-section" id="shows" style="padding-bottom:0;">
   <div class="controls-card" style="margin-bottom:32px;">
     <div class="ctrl-group">
       <label class="ctrl-label" for="home-base-input">Your Home Base</label>
       <input id="home-base-input" class="ctrl-input" type="text"
-             placeholder="e.g. Pensacola, FL or 32501" autocomplete="off">
+             placeholder="e.g. Pensacola, FL or 32501" autocomplete="off"
+             onkeydown="if (event.key === 'Enter') { event.preventDefault(); setHomeBase(); }">
     </div>
     <div class="ctrl-group" style="flex:0 0 auto;">
       <label class="ctrl-label">&nbsp;</label>
@@ -393,10 +389,32 @@
       <label class="ctrl-label">&nbsp;</label>
       <button class="ctrl-btn secondary" type="button" onclick="clearHomeBase()">Clear</button>
     </div>
+    <div class="ctrl-group" style="flex:0 0 auto;">
+      <label class="ctrl-label" for="radius-filter">Within Distance</label>
+      <select id="radius-filter" class="ctrl-select" onchange="applyFilters()">
+        <option value="">Any distance</option>
+        <option value="25">25 miles</option>
+        <option value="50">50 miles</option>
+        <option value="100">100 miles</option>
+        <option value="200">200 miles</option>
+      </select>
+    </div>
     <div class="ctrl-group" style="flex:1 1 260px;">
       <label class="ctrl-label" for="search-input">Search Shows</label>
       <input id="search-input" class="ctrl-input" type="search"
              placeholder="Title, city, or venue…" oninput="applyFilters()" autocomplete="off">
+    </div>
+    <div class="ctrl-group" style="flex:0 0 auto;">
+      <label class="ctrl-label" for="state-filter">Filter by State</label>
+      <select id="state-filter" class="ctrl-select" onchange="applyFilters()">
+        <option value="">All States</option>
+      </select>
+    </div>
+    <div class="ctrl-group" style="flex:0 0 auto;">
+      <label class="ctrl-label" for="type-filter">Filter by Card Type</label>
+      <select id="type-filter" class="ctrl-select" onchange="applyFilters()">
+        <option value="">All Card Types</option>
+      </select>
     </div>
     <div class="ctrl-group" style="flex:0 0 auto;">
       <label class="ctrl-label">&nbsp;</label>
@@ -443,7 +461,7 @@
 <!-- MODAL -->
 <div class="modal-overlay" id="modal" onclick="closeModalOutside(event)">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal()">✕</button>
+    <button class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
     <h2 class="modal-title">Add Your Show 🎴</h2>
     <form id="show-form" action="https://formspree.io/f/xzdlvozp" method="POST" onsubmit="handleSubmit(event)">
     <div class="form-row">
@@ -527,7 +545,7 @@
 <!-- CONTACT MODAL -->
 <div class="modal-overlay" id="contact-modal" onclick="closeContactOutside(event)">
   <div class="modal" style="max-width:420px;">
-    <button class="modal-close" onclick="closeContact()">✕</button>
+    <button class="modal-close" onclick="closeContact()" aria-label="Close">✕</button>
     <div style="text-align:center; margin-bottom:24px;">
       <div style="font-size:52px; margin-bottom:8px;">🎴</div>
       <h2 class="modal-title" style="margin-bottom:4px;">Get in Touch</h2>
@@ -566,7 +584,7 @@
 <!-- REPORT ERROR MODAL -->
 <div class="modal-overlay" id="report-modal" onclick="closeReportOutside(event)">
   <div class="modal">
-    <button class="modal-close" onclick="closeReport()">✕</button>
+    <button class="modal-close" onclick="closeReport()" aria-label="Close">✕</button>
     <h2 class="modal-title">Report an Error 🚩</h2>
     <p style="font-size:14px; color:var(--muted); margin-bottom:18px;">
       Spot something wrong — bad date, wrong address, broken link? Let Zac know and he'll fix it.
@@ -579,6 +597,10 @@
       <div class="form-group">
         <label>What's wrong? *</label>
         <textarea name="error_description" placeholder="e.g. The date is wrong — the actual date is..." required></textarea>
+      </div>
+      <div class="form-group">
+        <label>Suggested Correction <span style="color:var(--muted); font-weight:400;">(optional — the correct info, if you know it)</span></label>
+        <textarea name="suggested_correction" placeholder="e.g. Correct date is Saturday, August 15th, 2026"></textarea>
       </div>
       <div class="form-group">
         <label>Your Email <span style="color:var(--muted); font-weight:400;">(optional, so Zac can follow up)</span></label>
@@ -1053,6 +1075,28 @@
       },
     },
     {
+      id: "evt-1783275820110",
+      name: "Gulf Coast Card Show",
+      startDate: "2026-10-31", endDate: "2026-10-31",
+      dateDisplay: "Saturday, October 31st, 2026",
+      time: "9:00AM to 5:00PM",
+      timeUnknown: false,
+      location: "72 Saraland Blvd South, Saraland, AL 36571",
+      lat: 30.820006, lng: -88.0707248,
+      entryFee: "$5", entryFree: false,
+      vendorFee: "",
+      websiteUrl: "https://www.facebook.com/gulfcoasthobby/photos/-the-gulf-coast-halloween-card-show-is-here-trade-in-your-tricks-for-some-seriou/1515444710346688/", websiteLabel: "📘 Facebook",
+      organizer: "Gulf Coast Hobby",
+      tbd: false,
+      authServices: { present: null, company: "" },
+      details: {
+        about: "Trade in your tricks for some serious treats! Join us for a massive day of collecting, competing, and spooky fun at the ultimate TCG event of the season. Whether you’re hunting for that elusive chase card or looking to trade with the community, this is where the magic happens!",
+        atAGlance: [{label:"Saturday Hours",value:"9:00AM to 5:00PM"}, {label:"Entry Fee",value:"$5"}, {label:"Parking",value:"Free"}],
+        whatToExpect: ["Costume Contest!", "Pokemon", "Magic: The Gathering", "Yu-Gi-Oh!", "Disney Lorcana", "Star Wars", "Marvel", "Comics", "Video Games", "Collectibles"],
+        locationNotes: "",
+      },
+    },
+    {
       id: "evt-023",
       name: "Mid-South Card Con",
       startDate: "2026-11-14", endDate: "2026-11-14",
@@ -1134,28 +1178,6 @@
         whatToExpect: [],
         locationNotes: "",
       },
-    },
-    {
-      id: "evt-1783275820110",
-      name: "Gulf Coast Card Show",
-      startDate: "2026-10-31", endDate: "2026-10-31",
-      dateDisplay: "Saturday, October 31st, 2026",
-      time: "9:00AM to 5:00PM",
-      timeUnknown: false,
-      location: "72 Saraland Blvd South, Saraland, AL 36571",
-      lat: 30.820006, lng: -88.0707248,
-      entryFee: "$5", entryFree: false,
-      vendorFee: "",
-      websiteUrl: "https://www.facebook.com/gulfcoasthobby/photos/-the-gulf-coast-halloween-card-show-is-here-trade-in-your-tricks-for-some-seriou/1515444710346688/", websiteLabel: "📘 Facebook",
-      organizer: "Gulf Coast Hobby",
-      tbd: false,
-      authServices: { present: null, company: "" },
-      details: {
-        about: "Trade in your tricks for some serious treats! Join us for a massive day of collecting, competing, and spooky fun at the ultimate TCG event of the season. Whether you’re hunting for that elusive chase card or looking to trade with the community, this is where the magic happens!",
-        atAGlance: [{label:"Saturday Hours",value:"9:00AM to 5:00PM"}, {label:"Entry Fee",value:"$5"}, {label:"Parking",value:"Free"}],
-        whatToExpect: ["Costume Contest!", "Pokemon", "Magic: The Gathering", "Yu-Gi-Oh!", "Disney Lorcana", "Star Wars", "Marvel", "Comics", "Video Games", "Collectibles"],
-        locationNotes: "",
-      },
     }
   ];
   /* ==EVENTS-DATA-END== */
@@ -1165,6 +1187,31 @@
     FL:'Florida', AL:'Alabama', MS:'Mississippi', TN:'Tennessee',
     GA:'Georgia', LA:'Louisiana', TX:'Texas'
   };
+
+  // Card types aren't a structured field — admins describe what's featured as
+  // free text in "What to Expect" (and sometimes "About"). Match against a
+  // curated set of common TCG/hobby categories so shows can still be filtered
+  // by type without changing the underlying data model.
+  const CARD_TYPES = [
+    { key: 'pokemon', label: 'Pokémon', match: /pok[eé]mon/i },
+    { key: 'sports',  label: 'Sports Cards', match: /sports?\s*cards?/i },
+    { key: 'mtg',     label: 'Magic: The Gathering', match: /magic:?\s*the\s*gathering|\bmtg\b/i },
+    { key: 'onepiece',label: 'One Piece TCG', match: /one\s*piece/i },
+    { key: 'yugioh',  label: 'Yu-Gi-Oh!', match: /yu-?\s*gi-?\s*oh/i },
+    { key: 'lorcana', label: 'Disney Lorcana', match: /lorcana/i },
+    { key: 'comics',  label: 'Comics & Toys', match: /\bcomics?\b|\btoys?\b|action\s*figures?/i },
+  ];
+  function eventCardTypeKeys(ev) {
+    const glanceText = (ev.details && Array.isArray(ev.details.atAGlance))
+      ? ev.details.atAGlance.map(g => (g && g.label) || '').join(' ') : '';
+    const text = [
+      ev.name || '',
+      (ev.details && ev.details.about) || '',
+      (ev.details && Array.isArray(ev.details.whatToExpect)) ? ev.details.whatToExpect.join(' ') : '',
+      glanceText,
+    ].join(' ');
+    return CARD_TYPES.filter(t => t.match.test(text)).map(t => t.key);
+  }
 
   function escapeHtml(s) {
     return String(s == null ? '' : s)
@@ -1301,7 +1348,7 @@
     // Clickability is wired via event delegation on #shows-grid (see renderShows).
     // Inline onclick/onkeydown attributes were fragile — the first card sometimes
     // failed to bind because of attribute escaping. Delegation guarantees every card works.
-    return `<div class="show-card${ev.tbd ? ' tbd' : ''} clickable" data-lat="${ev.lat}" data-lng="${ev.lng}" data-default-order="${idx}" data-sort-date="${sortTs}" data-end-date="${endTs}" data-event-id="${escapeHtml(ev.id || '')}" data-search="${escapeHtml(searchBlob)}" role="button" tabindex="0">
+    return `<div class="show-card${ev.tbd ? ' tbd' : ''} clickable" data-lat="${ev.lat}" data-lng="${ev.lng}" data-default-order="${idx}" data-sort-date="${sortTs}" data-end-date="${endTs}" data-event-id="${escapeHtml(ev.id || '')}" data-search="${escapeHtml(searchBlob)}" data-state="${st}" data-card-types="${eventCardTypeKeys(ev).join(' ')}" role="button" tabindex="0">
       <div class="show-card-header">
         <div class="header-badges">
           <span class="upcoming-badge">Upcoming</span>
@@ -1358,7 +1405,33 @@
     }
 
     computeNextShow();
+    populateFilterOptions();
     applyFilters();
+  }
+
+  // Builds the State and Card Type dropdown options from whatever is actually
+  // present in EVENTS, so the filters never show an option with zero matches.
+  function populateFilterOptions() {
+    const stateSel = document.getElementById('state-filter');
+    if (stateSel) {
+      const seen = new Set();
+      EVENTS.forEach(ev => seen.add(detectState(ev.location)));
+      const prev = stateSel.value;
+      stateSel.innerHTML = '<option value="">All States</option>' +
+        Object.keys(STATE_NAMES).filter(k => seen.has(k)).sort()
+          .map(k => `<option value="${k}">${STATE_NAMES[k]}</option>`).join('');
+      if ([...stateSel.options].some(o => o.value === prev)) stateSel.value = prev;
+    }
+    const typeSel = document.getElementById('type-filter');
+    if (typeSel) {
+      const seen = new Set();
+      EVENTS.forEach(ev => eventCardTypeKeys(ev).forEach(k => seen.add(k)));
+      const prev = typeSel.value;
+      typeSel.innerHTML = '<option value="">All Card Types</option>' +
+        CARD_TYPES.filter(t => seen.has(t.key))
+          .map(t => `<option value="${t.key}">${escapeHtml(t.label)}</option>`).join('');
+      if ([...typeSel.options].some(o => o.value === prev)) typeSel.value = prev;
+    }
   }
 
   function computeNextShow() {
@@ -1492,7 +1565,14 @@
     if (!grid) return;
     const q = (document.getElementById('search-input')?.value || '').trim().toLowerCase();
     const showPast = !!document.getElementById('show-past-toggle')?.checked;
+    const stateVal = document.getElementById('state-filter')?.value || '';
+    const typeVal = document.getElementById('type-filter')?.value || '';
+    const radiusVal = document.getElementById('radius-filter')?.value || '';
     const todayTs = (() => { const d = new Date(); d.setHours(0,0,0,0); return d.getTime(); })();
+
+    if (radiusVal && !homeBase) {
+      setStatus('Set a home base first to filter by distance.', true);
+    }
 
     let visible = 0;
     const visibleIds = new Set();
@@ -1501,7 +1581,15 @@
       const isPast = endTs > 0 && endTs < todayTs;
       const blob = card.dataset.search || '';
       const matches = !q || blob.includes(q);
-      const show = matches && (showPast || !isPast);
+      const stateOk = !stateVal || card.dataset.state === stateVal;
+      const types = (card.dataset.cardTypes || '').split(' ');
+      const typeOk = !typeVal || types.includes(typeVal);
+      let radiusOk = true;
+      if (radiusVal && homeBase) {
+        const dist = parseFloat(card.dataset.distance);
+        radiusOk = !isNaN(dist) && dist <= parseFloat(radiusVal);
+      }
+      const show = matches && (showPast || !isPast) && stateOk && typeOk && radiusOk;
       card.style.display = show ? '' : 'none';
       if (show) { visible++; visibleIds.add(card.dataset.eventId); }
     });
@@ -1522,7 +1610,7 @@
       }
       empty.textContent = q
         ? `No shows match "${q}"${showPast ? '' : ' — try enabling "Show past events"'}.`
-        : (showPast ? 'No shows listed yet.' : 'No upcoming shows — tick "Show past events" to see previous ones.');
+        : (showPast ? 'No shows listed yet.' : 'No upcoming shows match your filters — try widening them or enabling "Show past events".');
     } else if (empty) {
       empty.remove();
     }
@@ -1531,8 +1619,41 @@
   }
 
   // ===== Add Your Show modal =====
-  function openModal() { document.getElementById('modal').classList.add('open'); document.body.style.overflow = 'hidden'; }
-  function closeModal() { document.getElementById('modal').classList.remove('open'); document.body.style.overflow = ''; }
+  // ===== Modal focus trap =====
+  // Keyboard users could previously Tab out of an open modal into the blurred
+  // background content behind it. This keeps focus inside whichever modal is
+  // open and restores focus to the trigger element on close.
+  let modalReturnFocus = null;
+  function trapModalOpen(modalEl) {
+    if (!modalEl) return;
+    modalReturnFocus = document.activeElement;
+    const focusables = modalEl.querySelectorAll('button, a[href], input, textarea, select, [tabindex]:not([tabindex="-1"])');
+    if (focusables.length) setTimeout(() => focusables[0].focus(), 0);
+  }
+  function trapModalClose() {
+    if (modalReturnFocus && typeof modalReturnFocus.focus === 'function') {
+      modalReturnFocus.focus();
+    }
+    modalReturnFocus = null;
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab') return;
+    const openModalEl = document.querySelector('.modal-overlay.open');
+    if (!openModalEl) return;
+    const focusables = Array.from(
+      openModalEl.querySelectorAll('button, a[href], input, textarea, select, [tabindex]:not([tabindex="-1"])')
+    ).filter(el => el.offsetParent !== null);
+    if (!focusables.length) return;
+    const first = focusables[0], last = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault(); last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault(); first.focus();
+    }
+  });
+
+  function openModal() { const m = document.getElementById('modal'); m.classList.add('open'); document.body.style.overflow = 'hidden'; trapModalOpen(m); }
+  function closeModal() { document.getElementById('modal').classList.remove('open'); document.body.style.overflow = ''; trapModalClose(); }
   function closeModalOutside(e) { if (e.target === document.getElementById('modal')) closeModal(); }
   async function handleSubmit(e) {
     e.preventDefault();
@@ -1560,8 +1681,8 @@
   }
 
   // ===== Contact modal =====
-  function openContact() { document.getElementById('contact-modal').classList.add('open'); document.body.style.overflow = 'hidden'; }
-  function closeContact() { document.getElementById('contact-modal').classList.remove('open'); document.body.style.overflow = ''; }
+  function openContact() { const m = document.getElementById('contact-modal'); m.classList.add('open'); document.body.style.overflow = 'hidden'; trapModalOpen(m); }
+  function closeContact() { document.getElementById('contact-modal').classList.remove('open'); document.body.style.overflow = ''; trapModalClose(); }
   function closeContactOutside(e) { if (e.target === document.getElementById('contact-modal')) closeContact(); }
 
   // ===== Report modal =====
@@ -1574,10 +1695,12 @@
     }
     m.classList.add('open');
     document.body.style.overflow = 'hidden';
+    trapModalOpen(m);
   }
   function closeReport() {
     document.getElementById('report-modal').classList.remove('open');
     document.body.style.overflow = '';
+    trapModalClose();
   }
   function closeReportOutside(e) {
     if (e.target === document.getElementById('report-modal')) closeReport();
@@ -1698,12 +1821,14 @@
     if (!m) return;
     m.classList.add('open');
     document.body.style.overflow = 'hidden';
+    trapModalOpen(m);
   }
   function closeEventDetail() {
     const m = document.getElementById('event-detail-modal');
     if (!m) return;
     m.classList.remove('open');
     document.body.style.overflow = '';
+    trapModalClose();
   }
   function closeEventDetailOutside(e) {
     if (e.target === document.getElementById('event-detail-modal')) closeEventDetail();
@@ -1760,6 +1885,8 @@
     localStorage.removeItem('gccs-home-base');
     const input = document.getElementById('home-base-input');
     if (input) input.value = '';
+    const radiusSel = document.getElementById('radius-filter');
+    if (radiusSel) radiusSel.value = '';
     setStatus('');
     document.querySelectorAll('.distance-pill').forEach(p => p.remove());
     applyFilters();

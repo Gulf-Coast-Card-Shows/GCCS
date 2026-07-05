@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gulf Coast Card Shows — Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
   :root {
     --bg: #F5F0E8; --card-bg: #FFFFFF; --nav-bg: #FDFAF4;
@@ -95,6 +97,9 @@
   .geo-result.ok { color: var(--green); }
   .geo-result.pending { color: var(--muted); }
   .geo-result.err { color: var(--red); }
+  .geo-result.stale { color: #B8860B; }
+  #geo-preview-map { width: 100%; height: 160px; border-radius: 9px; margin-top: 10px; border: 2px solid var(--border); display: none; }
+  #geo-preview-map.visible { display: block; }
   .form-actions { display: flex; gap: 10px; padding-top: 6px; }
   .field-error { border-color: var(--red) !important; }
   .field-error-msg { font-size: 12px; color: var(--red); margin-top: 3px; }
@@ -179,6 +184,18 @@
 
   // ===== Toast =====
   let toastTimer = null;
+  let previewMap = null;
+  let previewMarker = null;
+  function showPreviewMap(lat, lng) {
+    const container = document.getElementById('geo-preview-map');
+    if (!container || typeof L === 'undefined') return;
+    container.classList.add('visible');
+    if (previewMap) { previewMap.remove(); previewMap = null; previewMarker = null; }
+    previewMap = L.map(container, { zoomControl: false, attributionControl: false, scrollWheelZoom: false }).setView([lat, lng], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(previewMap);
+    previewMarker = L.marker([lat, lng]).addTo(previewMap);
+    setTimeout(() => previewMap && previewMap.invalidateSize(), 60);
+  }
   function toast(msg, isErr) {
     const el = document.getElementById('toast');
     el.textContent = msg;
@@ -597,7 +614,8 @@ ${serializeDetails(ev.details)}
         <button type="button" id="f-geocode" class="btn-sm">📍 Find coordinates</button>
         <span class="geo-result ${ev.lat != null ? 'ok' : 'pending'}" id="geo-result">${ev.lat != null ? `Set: ${ev.lat.toFixed(4)}, ${ev.lng.toFixed(4)}` : 'Not set yet — click "Find coordinates" after entering the address'}</span>
       </div>
-      <div class="hint">Needed to place this show on the map and to power distance sorting. Uses OpenStreetMap — free, no API key.</div>
+      <div id="geo-preview-map"></div>
+      <div class="hint">Needed to place this show on the map and to power distance sorting. Uses OpenStreetMap — free, no API key. Check the pin lands on the right venue before saving.</div>
 
       <div class="section-divider"><div class="section-label">Fees</div></div>
       <div class="form-group">
@@ -723,8 +741,10 @@ ${serializeDetails(ev.details)}
         if (!data || !data.length) { resultEl.textContent = "Couldn't find that address — try adding a city/state/ZIP."; resultEl.className = 'geo-result err'; return; }
         ev._foundLat = parseFloat(data[0].lat);
         ev._foundLng = parseFloat(data[0].lon);
+        ev._geocodedFor = addr;
         resultEl.textContent = `Found: ${ev._foundLat.toFixed(4)}, ${ev._foundLng.toFixed(4)} ✓`;
         resultEl.className = 'geo-result ok';
+        showPreviewMap(ev._foundLat, ev._foundLng);
       } catch (err) {
         resultEl.textContent = 'Lookup failed — check your connection.';
         resultEl.className = 'geo-result err';
@@ -733,6 +753,25 @@ ${serializeDetails(ev.details)}
     // seed found coords from existing values so "save without re-searching" keeps them
     ev._foundLat = ev.lat;
     ev._foundLng = ev.lng;
+    ev._geocodedFor = ev.location || '';
+    if (ev._foundLat != null && ev._foundLng != null) showPreviewMap(ev._foundLat, ev._foundLng);
+
+    // If the address text is edited after coordinates were already found (either
+    // from a prior save or a previous "Find coordinates" click), the old lat/lng
+    // no longer necessarily match the new text. Require a fresh geocode before
+    // the mismatched pair can be saved — this is exactly the gap that let a few
+    // shows end up with coordinates from a totally different city.
+    $('f-location').addEventListener('input', () => {
+      const addr = $('f-location').value.trim();
+      if (addr === ev._geocodedFor) return; // back to the address these coords were found for
+      ev._foundLat = null;
+      ev._foundLng = null;
+      const resultEl = $('geo-result');
+      resultEl.textContent = '⚠️ Address changed — click "Find coordinates" again before saving.';
+      resultEl.className = 'geo-result stale';
+      const map = $('geo-preview-map');
+      if (map) map.classList.remove('visible');
+    });
 
     $('f-cancel').addEventListener('click', () => {
       selectedId = null;
