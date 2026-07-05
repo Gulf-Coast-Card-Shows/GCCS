@@ -833,6 +833,36 @@ ${serializeDetails(ev.details)}
         },
       };
 
+      // Duplicate detection: warn if a similarly-named show already exists on
+      // an overlapping date. Compares normalized names (case/punct-insensitive,
+      // fuzzy via prefix-substring match) and any date overlap in the range.
+      (function checkDuplicate() {
+        function normName(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); }
+        function datesOverlap(aStart, aEnd, bStart, bEnd) {
+          if (!aStart || !bStart) return false;
+          const as = aStart, ae = aEnd || aStart, bs = bStart, be = bEnd || bStart;
+          return as <= be && bs <= ae;
+        }
+        const nName = normName(updated.name);
+        if (!nName) return;
+        const dup = events.find(other => {
+          if (other.id === updated.id) return false;
+          const on = normName(other.name);
+          if (!on) return false;
+          const nameMatch = on === nName || on.includes(nName) || nName.includes(on);
+          if (!nameMatch) return false;
+          return datesOverlap(updated.startDate, updated.endDate, other.startDate, other.endDate);
+        });
+        if (dup) {
+          const proceed = confirm(
+            `⚠️ Possible duplicate:\n\n"${dup.name}" is already listed on ${dup.dateDisplay || dup.startDate}.\n\nContinue anyway?`
+          );
+          if (!proceed) { window.__dupCancel = true; return; }
+        }
+        window.__dupCancel = false;
+      })();
+      if (window.__dupCancel) { toast('Cancelled — not saved.', true); return; }
+
       if (isNew) {
         events.push(updated);
         toast('Show added — remember to save to index.html');

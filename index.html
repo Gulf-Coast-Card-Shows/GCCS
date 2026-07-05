@@ -3,7 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gulf Coast Card Shows</title>
+<title>Gulf Coast Card Shows — Sports & Trading Card Shows in FL, AL, MS, LA</title>
+<meta name="description" content="The community calendar of sports card, Pokémon, and trading card shows along the Gulf Coast — Florida, Alabama, Mississippi, and Louisiana. Browse upcoming shows, get directions, and add them to your calendar.">
+<link rel="canonical" href="https://gulfcoastcardshows.com/">
+<meta name="theme-color" content="#E53935">
+
+<!-- Open Graph -->
+<meta property="og:site_name" content="Gulf Coast Card Shows">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Gulf Coast Card Shows">
+<meta property="og:description" content="The community calendar of sports card, Pokémon, and trading card shows along the Gulf Coast — FL, AL, MS, LA. Find upcoming shows near you.">
+<meta property="og:url" content="https://gulfcoastcardshows.com/">
+<meta property="og:image" content="https://gulfcoastcardshows.com/og-image.png">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Gulf Coast Card Shows">
+<meta name="twitter:description" content="Sports card, Pokémon, and trading card shows along the Gulf Coast — FL, AL, MS, LA.">
+<meta name="twitter:image" content="https://gulfcoastcardshows.com/og-image.png">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='white' stroke='%231A1A2E' stroke-width='4'/%3E%3Cpath d='M2 50 Q2 2 50 2 Q98 2 98 50 Z' fill='%23E53935'/%3E%3Crect x='2' y='45' width='96' height='10' fill='%231A1A2E'/%3E%3Ccircle cx='50' cy='50' r='16' fill='white' stroke='%231A1A2E' stroke-width='4'/%3E%3Ccircle cx='50' cy='50' r='7' fill='%23E53935'/%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
@@ -370,6 +387,7 @@
     <p class="count-number" id="count-number">–</p>
     <p class="count-sub">Upcoming shows ready to browse.</p>
     <p class="count-verified" id="count-verified" style="font-size:12px;color:var(--muted);margin-top:8px;font-family:'Nunito',sans-serif;font-weight:700;letter-spacing:.02em;">Last verified: —</p>
+    <button type="button" onclick="downloadAllIcs()" style="margin-top:12px;background:var(--red);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;cursor:pointer;">🗓️ Subscribe to all shows (.ics)</button>
   </div>
 </div>
 
@@ -1325,7 +1343,9 @@
 
     const calUrl = googleCalUrl(ev);
     let actions = '<div class="card-actions">';
-    if (calUrl) actions += `<a class="card-action-btn calendar" href="${calUrl}" target="_blank" rel="noopener">📅 Add to Calendar</a>`;
+    if (calUrl) actions += `<a class="card-action-btn calendar" href="${calUrl}" target="_blank" rel="noopener">📅 Google</a>`;
+    actions += `<a class="card-action-btn calendar" href="#" onclick="downloadIcs('${escapeHtml(ev.id)}'); return false;" title="Apple Calendar / Outlook (.ics)">🗓️ .ics</a>`;
+    actions += `<a class="card-action-btn calendar" href="#" onclick="shareShow('${escapeHtml(ev.id)}'); return false;" title="Copy shareable link">🔗 Share</a>`;
     actions += `<a class="card-action-btn report" href="#" onclick="openReport('${escapeHtml(ev.name)} ${num}'); return false;">🚩 Report</a>`;
     actions += '</div>';
 
@@ -1958,6 +1978,161 @@
     e.preventDefault();
     document.getElementById('shows').scrollIntoView({ behavior: 'smooth' });
   });
+
+  // ===== .ics (Apple / Outlook / universal) export =====
+  function icsEscape(s) {
+    return String(s || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+  }
+  function icsDate(d) {
+    return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`;
+  }
+  function eventToVEvent(ev) {
+    const start = eventStartDate(ev), end = eventEndDate(ev);
+    if (!start || !end) return null;
+    const endEx = new Date(end.getFullYear(), end.getMonth(), end.getDate() + 1);
+    const uid = `${ev.id || 'evt'}@gulfcoastcardshows.com`;
+    const stamp = icsDate(new Date()) + 'T000000Z';
+    const url = `https://gulfcoastcardshows.com/?show=${encodeURIComponent(ev.id || '')}`;
+    const desc = `${ev.dateDisplay || ''}\n${ev.location || ''}\n\nMore info: ${url}`;
+    return [
+      'BEGIN:VEVENT',
+      `UID:${uid}`,
+      `DTSTAMP:${stamp}`,
+      `DTSTART;VALUE=DATE:${icsDate(start)}`,
+      `DTEND;VALUE=DATE:${icsDate(endEx)}`,
+      `SUMMARY:${icsEscape(ev.name || 'Card Show')}`,
+      `LOCATION:${icsEscape(ev.location || '')}`,
+      `DESCRIPTION:${icsEscape(desc)}`,
+      `URL:${url}`,
+      'END:VEVENT',
+    ].join('\r\n');
+  }
+  function buildIcs(events) {
+    const body = events.map(eventToVEvent).filter(Boolean).join('\r\n');
+    return [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Gulf Coast Card Shows//EN',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      'X-WR-CALNAME:Gulf Coast Card Shows',
+      'X-WR-CALDESC:Sports & trading card shows along the Gulf Coast',
+      body,
+      'END:VCALENDAR',
+    ].join('\r\n');
+  }
+  function downloadBlob(filename, content, mime) {
+    const blob = new Blob([content], { type: mime || 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 0);
+  }
+  window.downloadIcs = function(eventId) {
+    const ev = EVENTS.find(x => x.id === eventId);
+    if (!ev) return;
+    const ics = buildIcs([ev]);
+    const slug = (ev.name || 'card-show').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    downloadBlob(`${slug || 'card-show'}.ics`, ics);
+  };
+  window.downloadAllIcs = function() {
+    downloadBlob('gulf-coast-card-shows.ics', buildIcs(EVENTS));
+  };
+  window.shareShow = async function(eventId) {
+    const ev = EVENTS.find(x => x.id === eventId);
+    if (!ev) return;
+    const url = `${location.origin}${location.pathname}?show=${encodeURIComponent(eventId)}`;
+    try {
+      if (navigator.share) { await navigator.share({ title: ev.name, url }); return; }
+    } catch (_) { /* fall through to clipboard */ }
+    try {
+      await navigator.clipboard.writeText(url);
+      alert('Link copied to clipboard:\n' + url);
+    } catch (_) {
+      prompt('Copy this link:', url);
+    }
+  };
+
+  // ===== JSON-LD structured data (schema.org Event) =====
+  (function injectStructuredData() {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const items = EVENTS
+      .filter(ev => {
+        const end = eventEndDate(ev);
+        return end && end.getTime() >= today.getTime() && !ev.tbd;
+      })
+      .map(ev => {
+        const start = eventStartDate(ev), end = eventEndDate(ev);
+        const data = {
+          '@context': 'https://schema.org',
+          '@type': 'Event',
+          name: ev.name,
+          startDate: ev.startDate,
+          endDate: ev.endDate || ev.startDate,
+          eventStatus: 'https://schema.org/EventScheduled',
+          eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+          location: {
+            '@type': 'Place',
+            name: ev.location || '',
+            address: ev.location || '',
+            ...(ev.lat && ev.lng ? { geo: { '@type': 'GeoCoordinates', latitude: ev.lat, longitude: ev.lng } } : {}),
+          },
+          url: `https://gulfcoastcardshows.com/?show=${encodeURIComponent(ev.id || '')}`,
+          organizer: { '@type': 'Organization', name: ev.organizer || 'Gulf Coast Card Shows' },
+          description: (ev.details && ev.details.about) ? ev.details.about : `${ev.name} — ${ev.dateDisplay || ''}`,
+        };
+        if (ev.entryFree) {
+          data.offers = {
+            '@type': 'Offer',
+            price: '0',
+            priceCurrency: 'USD',
+            availability: 'https://schema.org/InStock',
+            url: ev.websiteUrl || data.url,
+            validFrom: (start ? start.toISOString().slice(0,10) : ev.startDate),
+          };
+        } else if (ev.entryFee) {
+          data.offers = {
+            '@type': 'Offer',
+            price: (ev.entryFee.match(/[\d.]+/) || ['0'])[0],
+            priceCurrency: 'USD',
+            availability: 'https://schema.org/InStock',
+            url: ev.websiteUrl || data.url,
+            validFrom: (start ? start.toISOString().slice(0,10) : ev.startDate),
+          };
+        }
+        return data;
+      });
+    if (!items.length) return;
+    const s = document.createElement('script');
+    s.type = 'application/ld+json';
+    s.textContent = JSON.stringify(items);
+    document.head.appendChild(s);
+  })();
+
+  // ===== Deep link: ?show=evt-xxx auto-opens that show's detail modal =====
+  (function handleDeepLink() {
+    try {
+      const params = new URLSearchParams(location.search);
+      const id = params.get('show');
+      if (!id) return;
+      const ev = EVENTS.find(x => x.id === id);
+      if (!ev) return;
+      // Wait a tick so the grid is in the DOM and modal wiring is live.
+      setTimeout(() => {
+        if (typeof populateEventDetail === 'function') {
+          populateEventDetail(ev);
+          const m = document.getElementById('event-detail-modal');
+          if (m) {
+            m.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            if (typeof trapModalOpen === 'function') trapModalOpen(m);
+          }
+        }
+      }, 0);
+    } catch (_) { /* noop */ }
+  })();
+
 </script>
 
 </body>
