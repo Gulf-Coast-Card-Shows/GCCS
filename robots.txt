@@ -3,4 +3,4 @@ Allow: /
 
 Disallow: /admin.html
 
-Sitemap: https://gulfcoastcardshows.com/sitemap.xml
+Sitemap: https://gccardshows.com/sitemap.xml
