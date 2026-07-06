@@ -134,6 +134,7 @@
     <input type="file" id="file-input-fallback" accept=".html,.htm" style="display:none;">
     <button id="btn-save" class="btn-primary" disabled>💾 Save to index.html</button>
     <button id="btn-download" disabled>⬇️ Download copy</button>
+    <button id="btn-gen-states" disabled title="Creates one SEO-friendly landing page per state (e.g. florida-card-shows.html) from the shows currently loaded">🌎 Generate State Pages</button>
   </div>
 </header>
 <p class="browser-note" id="browser-note"></p>
@@ -372,6 +373,7 @@ ${serializeDetails(ev.details)}
     setFileStatus(`Opened ${name} — ${events.length} show${events.length === 1 ? '' : 's'} loaded.`, 'ok');
     document.getElementById('btn-save').disabled = false;
     document.getElementById('btn-download').disabled = false;
+    document.getElementById('btn-gen-states').disabled = false;
     document.getElementById('btn-add').disabled = false;
     renderList();
     renderForm(null);
@@ -382,7 +384,7 @@ ${serializeDetails(ev.details)}
     if (!originalText) { toast('Open index.html first.', true); return; }
     let newText;
     try {
-      newText = writeEventsIntoHtml(originalText, events);
+      newText = buildMainOutputHtml();
     } catch (err) { toast(err.message, true); return; }
 
     if (fileHandle) {
@@ -419,9 +421,10 @@ ${serializeDetails(ev.details)}
   document.getElementById('btn-open').addEventListener('click', openFile);
   document.getElementById('btn-open-2').addEventListener('click', openFile);
   document.getElementById('btn-save').addEventListener('click', saveFile);
+  document.getElementById('btn-gen-states').addEventListener('click', generateStatePages);
   document.getElementById('btn-download').addEventListener('click', () => {
     if (!originalText) { toast('Open index.html first.', true); return; }
-    try { downloadFile(writeEventsIntoHtml(originalText, events)); }
+    try { downloadFile(buildMainOutputHtml()); }
     catch (err) { toast(err.message, true); }
   });
 
@@ -469,6 +472,86 @@ ${serializeDetails(ev.details)}
       if (new RegExp('\\b' + STATE_NAMES[k] + '\\b', 'i').test(loc)) return k;
     }
     return 'UNK';
+  }
+  function stateFileSlug(abbrev) {
+    const name = STATE_NAMES[abbrev];
+    return name ? name.toLowerCase().replace(/\s+/g, '-') + '-card-shows.html' : null;
+  }
+
+  // ===== State-nav block (kept in sync with whichever states currently have
+  // shows) and per-state SEO landing pages (florida-card-shows.html etc.) =====
+  const NAV_START = '<!-- STATE-NAV-START -->';
+  const NAV_END = '<!-- STATE-NAV-END -->';
+  function statesPresentIn(list) {
+    const present = new Set();
+    list.forEach(ev => { const st = detectState(ev.location); if (st !== 'UNK') present.add(st); });
+    return Object.keys(STATE_NAMES).filter(k => present.has(k)).sort();
+  }
+  function buildStateNavHtml(list, currentState) {
+    const states = statesPresentIn(list);
+    const items = [currentState ? '<a href="index.html">All States</a>' : '<strong>All States</strong>'];
+    states.forEach(k => {
+      items.push(k === currentState
+        ? `<strong>${STATE_NAMES[k]}</strong>`
+        : `<a href="${stateFileSlug(k)}">${STATE_NAMES[k]}</a>`);
+    });
+    return `${NAV_START}\n<nav class="state-nav" aria-label="Browse card shows by state">\n  <span class="state-nav-label">Browse by State:</span>\n  ${items.join('\n  ')}\n</nav>\n${NAV_END}`;
+  }
+  function writeStateNavIntoHtml(text, list, currentState) {
+    const s = text.indexOf(NAV_START), e = text.indexOf(NAV_END);
+    if (s === -1 || e === -1) return text; // older file without the nav markers — leave untouched
+    return text.slice(0, s) + buildStateNavHtml(list, currentState || null) + text.slice(e + NAV_END.length);
+  }
+  // Swaps title/meta/OG/hero copy to be state-specific and injects the tiny
+  // PAGE_STATE_FILTER flag that index.html's own (unmodified) filter logic
+  // reads to pre-select that state — the map/filter code itself isn't touched.
+  function buildStatePageHtml(html, stateAbbrev) {
+    const stateName = STATE_NAMES[stateAbbrev];
+    if (!stateName) return html;
+    const title = `${stateName} Card Shows | Gulf Coast Card Shows`;
+    const desc = `Upcoming sports card, Pokémon, and trading card shows in ${stateName}. Dates, entry fees, vendor info, and directions — updated regularly.`;
+    const url = `https://gulfcoastcardshows.com/${stateFileSlug(stateAbbrev)}`;
+    let out = html;
+    out = out.replace(/<title>[^<]*<\/title>/, `<title>${title}</title>`);
+    out = out.replace(/<meta name="description" content="[^"]*">/, `<meta name="description" content="${desc}">`);
+    out = out.replace(/<link rel="canonical" href="[^"]*">/, `<link rel="canonical" href="${url}">`);
+    out = out.replace(/<meta property="og:title" content="[^"]*">/, `<meta property="og:title" content="${title}">`);
+    out = out.replace(/<meta property="og:description" content="[^"]*">/, `<meta property="og:description" content="${desc}">`);
+    out = out.replace(/<meta property="og:url" content="[^"]*">/, `<meta property="og:url" content="${url}">`);
+    out = out.replace(/<meta name="twitter:title" content="[^"]*">/, `<meta name="twitter:title" content="${title}">`);
+    out = out.replace(/<meta name="twitter:description" content="[^"]*">/, `<meta name="twitter:description" content="${desc}">`);
+    out = out.replace(/<p class="hero-eyebrow">[^<]*<\/p>/, `<p class="hero-eyebrow">${stateName} Card Shows</p>`);
+    out = out.replace(/<h1 class="hero-title">[^<]*<\/h1>/, `<h1 class="hero-title">Upcoming Card Shows in ${stateName}</h1>`);
+    out = out.replace(/<p class="hero-desc">[^<]*<\/p>/, `<p class="hero-desc">Every upcoming sports card, Pokémon, and trading card show we know about in ${stateName} — dates, entry fees, vendor details, and directions. Part of the Gulf Coast Card Shows community calendar, free and updated regularly.</p>`);
+    out = out.replace('</head>', `<script>window.PAGE_STATE_FILTER=${JSON.stringify(stateAbbrev)};<\/script>\n</head>`);
+    return out;
+  }
+  function buildMainOutputHtml() {
+    let t = writeEventsIntoHtml(originalText, events);
+    t = writeStateNavIntoHtml(t, events, null);
+    return t;
+  }
+  async function generateStatePages() {
+    if (!originalText) { toast('Open index.html first.', true); return; }
+    let base;
+    try { base = writeEventsIntoHtml(originalText, events); }
+    catch (err) { toast(err.message, true); return; }
+    const states = statesPresentIn(events);
+    if (!states.length) { toast('No shows with a recognizable state yet.', true); return; }
+    states.forEach((st, i) => {
+      setTimeout(() => {
+        const withNav = writeStateNavIntoHtml(base, events, st);
+        const finalHtml = buildStatePageHtml(withNav, st);
+        const blob = new Blob([finalHtml], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = stateFileSlug(st);
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }, i * 350);
+    });
+    toast(`Generating ${states.length} state page${states.length === 1 ? '' : 's'} — check your downloads.`);
   }
 
   // ===== List rendering =====
