@@ -811,6 +811,35 @@ ${serializeDetails(ev.details)}
       }
     });
 
+    // Nominatim's free-text search often comes back empty when a venue/business
+    // name is prepended before the street address ("Hilton Garden Inn, 1144
+    // Airport Blvd, Pensacola, FL 32504") — most business names aren't indexed
+    // as searchable points, so the whole query fails to match even though the
+    // street address alone would geocode fine. queryVariants() builds a list of
+    // fallback queries (full string, then address with any leading venue name
+    // stripped, then that address without the ZIP) and geocodeAddress() tries
+    // them in order until one returns a result.
+    function queryVariants(addr) {
+      const variants = [addr];
+      const parts = addr.split(',').map(s => s.trim()).filter(Boolean);
+      if (parts.length > 2) {
+        const withoutVenue = parts.slice(1).join(', ');
+        if (!variants.includes(withoutVenue)) variants.push(withoutVenue);
+        const withoutZip = withoutVenue.replace(/\s*\d{5}(-\d{4})?\s*$/, '').trim();
+        if (withoutZip && withoutZip !== withoutVenue && !variants.includes(withoutZip)) variants.push(withoutZip);
+      }
+      return variants;
+    }
+    async function geocodeAddress(addr) {
+      for (const q of queryVariants(addr)) {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=us&q=${encodeURIComponent(q)}`;
+        const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+        if (!r.ok) throw new Error(`Nominatim returned HTTP ${r.status}`);
+        const data = await r.json();
+        if (data && data.length) return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon), matchedQuery: q };
+      }
+      return null;
+    }
     $('f-geocode').addEventListener('click', async () => {
       const addr = $('f-location').value.trim();
       const resultEl = $('geo-result');
@@ -818,18 +847,21 @@ ${serializeDetails(ev.details)}
       resultEl.textContent = 'Looking up…';
       resultEl.className = 'geo-result pending';
       try {
-        const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=us&q=${encodeURIComponent(addr)}`;
-        const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
-        const data = await r.json();
-        if (!data || !data.length) { resultEl.textContent = "Couldn't find that address — try adding a city/state/ZIP."; resultEl.className = 'geo-result err'; return; }
-        ev._foundLat = parseFloat(data[0].lat);
-        ev._foundLng = parseFloat(data[0].lon);
+        const found = await geocodeAddress(addr);
+        if (!found) {
+          resultEl.textContent = "Couldn't find that address — double-check the street, city, and state, or try without the venue name.";
+          resultEl.className = 'geo-result err';
+          return;
+        }
+        ev._foundLat = found.lat;
+        ev._foundLng = found.lng;
         ev._geocodedFor = addr;
-        resultEl.textContent = `Found: ${ev._foundLat.toFixed(4)}, ${ev._foundLng.toFixed(4)} ✓`;
+        const note = found.matchedQuery !== addr ? ' (matched on address only, without the venue name)' : '';
+        resultEl.textContent = `Found: ${ev._foundLat.toFixed(4)}, ${ev._foundLng.toFixed(4)} ✓${note}`;
         resultEl.className = 'geo-result ok';
         showPreviewMap(ev._foundLat, ev._foundLng);
       } catch (err) {
-        resultEl.textContent = 'Lookup failed — check your connection.';
+        resultEl.textContent = 'Lookup failed — check your internet connection and try again in a moment.';
         resultEl.className = 'geo-result err';
       }
     });

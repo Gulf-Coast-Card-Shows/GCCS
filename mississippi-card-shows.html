@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mississippi Pokémon & Sports Card Shows | Gulf Coast Calendar</title>
-<meta name="description" content="Find upcoming Pokémon, sports card, and TCG collector shows in Mississippi and along the Gulf Coast. Dates, vendor fees, maps, and directions.">
+<title>Mississippi Card Shows | Gulf Coast Card Shows</title>
+<meta name="description" content="Upcoming sports card, Pokémon, and trading card shows in Mississippi. Dates, entry fees, vendor info, and directions — updated regularly.">
 <link rel="canonical" href="https://gulfcoastcardshows.com/mississippi-card-shows.html">
 <meta name="theme-color" content="#E53935">
 
@@ -13,31 +13,45 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="Mississippi Card Shows | Gulf Coast Card Shows">
 <meta property="og:description" content="Upcoming sports card, Pokémon, and trading card shows in Mississippi. Dates, entry fees, vendor info, and directions — updated regularly.">
-<meta property="og:url" content="https://gccardshows.com/mississippi-card-shows.html">
+<meta property="og:url" content="https://gulfcoastcardshows.com/mississippi-card-shows.html">
 <meta property="og:image" content="https://gccardshows.com/og-image.png">
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Mississippi Pokémon & Sports Card Shows | Gulf Coast Calendar">
+<meta name="twitter:title" content="Mississippi Card Shows | Gulf Coast Card Shows">
 <meta name="twitter:description" content="Upcoming sports card, Pokémon, and trading card shows in Mississippi. Dates, entry fees, vendor info, and directions — updated regularly.">
 <meta name="twitter:image" content="https://gccardshows.com/og-image.png">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='white' stroke='%231A1A2E' stroke-width='4'/%3E%3Cpath d='M2 50 Q2 2 50 2 Q98 2 98 50 Z' fill='%23E53935'/%3E%3Crect x='2' y='45' width='96' height='10' fill='%231A1A2E'/%3E%3Ccircle cx='50' cy='50' r='16' fill='white' stroke='%231A1A2E' stroke-width='4'/%3E%3Ccircle cx='50' cy='50' r='7' fill='%23E53935'/%3E%3C/svg%3E">
+<!-- FAQPage structured data — mirrors the visible FAQ section in the page body -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
+  "@type": "FAQPage",
+  "mainEntity": [
     {
-      "@type": "ListItem",
-      "position": 1,
-      "name": "Home",
-      "item": "https://gccardshows.com/"
+      "@type": "Question",
+      "name": "How often is this card show calendar updated?",
+      "acceptedAnswer": { "@type": "Answer", "text": "New shows and corrections go up weekly, usually as soon as an organizer submits details or a collector flags an error. Check the \"Last updated\" note in the footer for the most recent refresh." }
     },
     {
-      "@type": "ListItem",
-      "position": 2,
-      "name": "Mississippi Card Shows",
-      "item": "https://gccardshows.com/mississippi-card-shows.html"
+      "@type": "Question",
+      "name": "Is it free to attend Gulf Coast card shows?",
+      "acceptedAnswer": { "@type": "Answer", "text": "It depends on the show — many are free to walk in, while others charge a small entry fee (usually $0-$10). Each show card lists its entry fee, and free shows are marked clearly so you can filter for them." }
+    },
+    {
+      "@type": "Question",
+      "name": "What kinds of cards will I find at these shows?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Most shows feature a mix of sports cards (baseball, football, basketball) and Pokemon TCG, with several also carrying Magic: The Gathering, Yu-Gi-Oh!, One Piece, Disney Lorcana, and general collectibles. Use the \"Filter by Card Type\" control to narrow the list to what you collect." }
+    },
+    {
+      "@type": "Question",
+      "name": "Which states and cities do you cover?",
+      "acceptedAnswer": { "@type": "Answer", "text": "The calendar currently tracks shows across Florida, Alabama, and Mississippi along the Gulf Coast — including Pensacola, Mobile, Biloxi, Tallahassee, Saraland, and Huntsville. Use the \"Browse by State\" links to jump straight to a state's listings." }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I get my card show listed?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Click \"Add Your Show\" anywhere on the site and fill in the event details — organizer, date, location, entry fee, and a website or social link. Submissions are reviewed and typically posted within a few days." }
     }
   ]
 }
@@ -169,16 +183,6 @@
   .state-nav a:hover { border-color: var(--blue); color: var(--blue); }
   html.dark .state-nav a { color: var(--dark); }
   html.dark .state-nav strong { background: #2a0a0a; }
-  @media (max-width: 640px) {
-    .state-nav {
-      flex-wrap: nowrap; gap: 6px; padding: 12px 12px 0;
-      overflow-x: auto; -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-    }
-    .state-nav::-webkit-scrollbar { display: none; }
-    .state-nav-label { flex-shrink: 0; font-size: 11px; }
-    .state-nav a, .state-nav strong { flex-shrink: 0; font-size: 12px; padding: 5px 11px; white-space: nowrap; }
-  }
 
   /* MAP */
   .hero-map-wrap {
@@ -231,6 +235,18 @@
 
   /* ADD CTA */
   .add-section { max-width: 1120px; margin: 0 auto 64px; padding: 0 32px; }
+
+  .faq-section { max-width: 860px; margin: 0 auto 64px; padding: 0 32px; }
+  .faq-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 28px; color: var(--dark); margin-bottom: 20px; text-align: center; }
+  .faq-list { display: flex; flex-direction: column; gap: 10px; }
+  .faq-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 4px 20px; box-shadow: var(--shadow); }
+  .faq-item summary { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 15px; color: var(--dark); padding: 16px 0; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::after { content: '+'; font-size: 20px; color: var(--muted); flex-shrink: 0; transition: transform 0.2s; }
+  .faq-item[open] summary::after { transform: rotate(45deg); }
+  .faq-item p { font-size: 14px; color: var(--muted); line-height: 1.6; padding: 0 0 18px; }
+
+  .js-required-notice { max-width: 1120px; margin: 0 auto; padding: 14px 32px; text-align: center; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 14px; background: var(--next-bg); color: #92400E; }
   .add-card { background: var(--dark); border-radius: var(--radius); padding: 40px; text-align: center; position: relative; overflow: hidden; }
   .add-card::before { content: '🎴'; position: absolute; font-size: 120px; opacity: 0.06; top: -20px; left: -20px; }
   .add-card::after { content: '⚡'; position: absolute; font-size: 120px; opacity: 0.06; bottom: -20px; right: -20px; }
@@ -286,6 +302,17 @@
   .popup-date { font-weight: 700; color: #E53935; margin-bottom: 2px; }
   .popup-loc { color: #6B7280; font-size: 12px; }
 
+  /* Tablet tuning — the old setup jumped straight from desktop to the 768px
+     phone layout, which left mid-size tablets with a cramped grid and a
+     hero that was neither the roomy desktop version nor the stacked mobile one. */
+  @media (max-width: 1024px) and (min-width: 769px) {
+    .hero { gap: 28px; padding: 40px 24px 28px; }
+    .hero-title { font-size: 46px; }
+    .shows-grid { grid-template-columns: repeat(2, 1fr); }
+    .controls-card { padding: 16px 18px; }
+    .ctrl-group { flex: 1 1 45%; min-width: 160px; }
+  }
+
   @media (max-width: 768px) {
     nav { padding: 0 14px; gap: 10px; }
     .nav-logo { min-width: 0; gap: 8px; flex: 1 1 auto; overflow: hidden; }
@@ -301,7 +328,25 @@
     .nav-links .nav-btn { display: none; }
     .nav-links { gap: 8px; flex: 0 0 auto; }
     .mobile-menu-wrap { display: block; }
+
+    /* Collapsible filter panel: search + sort stay visible; everything else
+       (home base, distance, state/type filters, past-events toggle) tucks
+       behind a "Filters" toggle so mobile visitors aren't scrolling past a
+       tall stack of form fields before they see any shows. */
+    .filters-toggle { display: flex; }
+    .extra-filters { display: none; flex-direction: column; gap: 14px 18px; width: 100%; }
+    .extra-filters.open { display: flex; }
   }
+
+  .filters-toggle {
+    display: none; align-items: center; justify-content: space-between; gap: 10px;
+    width: 100%; background: transparent; border: none; padding: 0 0 4px; cursor: pointer;
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 13px; color: var(--dark);
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .filters-toggle .chev { transition: transform 0.2s; font-size: 12px; color: var(--muted); }
+  .filters-toggle[aria-expanded="true"] .chev { transform: rotate(180deg); }
+  .extra-filters { display: contents; }
 
   .contact-row {
     display:flex; align-items:center; gap:14px; padding:14px 16px;
@@ -410,11 +455,20 @@
   </div>
 </nav>
 
+<noscript>
+  <div class="js-required-notice">
+    This calendar needs JavaScript enabled to display show listings, the map, and filters. You can also reach us directly at <a href="mailto:zacbrannen@gmail.com" style="color:inherit;">zacbrannen@gmail.com</a> for the current schedule.
+  </div>
+</noscript>
+
 <section class="hero">
   <div>
     <p class="hero-eyebrow">Mississippi Card Shows</p>
     <h1 class="hero-title">Upcoming Card Shows in Mississippi</h1>
-    <p class="hero-desc">Every upcoming sports card, Pokémon, and trading card show we know about in Mississippi — dates, entry fees, vendor details, and directions. Part of the Gulf Coast Card Shows community calendar, free and updated regularly.</p>
+    <p class="hero-desc">Your local community calendar for trading card events along the Gulf Coast region. 
+        Whether you collect <strong>Pokémon TCG, baseball, football, or basketball cards</strong>, 
+        we track every upcoming show from <strong>Pensacola, Fort Walton Beach, and Tallahassee</strong> 
+        over to <strong>Mobile, Biloxi, and Saraland</strong>. Free, collector-driven, and updated weekly.</p>
     <div class="hero-tags">
       <span class="hero-tag red">⚡ Built by trainers</span>
       <span class="hero-tag blue">💙 Collector friendly</span>
@@ -453,64 +507,69 @@
 
 <section class="shows-section" id="shows" style="padding-bottom:0;">
   <div class="controls-card" style="margin-bottom:32px;">
-    <div class="ctrl-group">
-      <label class="ctrl-label" for="home-base-input">Your Home Base</label>
-      <input id="home-base-input" class="ctrl-input" type="text"
-             placeholder="e.g. Pensacola, FL or 32501" autocomplete="off"
-             onkeydown="if (event.key === 'Enter') { event.preventDefault(); setHomeBase(); }">
-    </div>
-    <div class="ctrl-group" style="flex:0 0 auto;">
-      <label class="ctrl-label">&nbsp;</label>
-      <button class="ctrl-btn" type="button" onclick="setHomeBase()">📍 Set Home Base</button>
-    </div>
-    <div class="ctrl-group" style="flex:0 0 auto;">
-      <label class="ctrl-label">&nbsp;</label>
-      <button class="ctrl-btn secondary" type="button" onclick="clearHomeBase()">Clear</button>
-    </div>
-    <div class="ctrl-group" style="flex:0 0 auto;">
-      <label class="ctrl-label" for="radius-filter">Within Distance</label>
-      <select id="radius-filter" class="ctrl-select" onchange="applyFilters()">
-        <option value="">Any distance</option>
-        <option value="25">25 miles</option>
-        <option value="50">50 miles</option>
-        <option value="100">100 miles</option>
-        <option value="200">200 miles</option>
-      </select>
-    </div>
     <div class="ctrl-group" style="flex:1 1 260px;">
       <label class="ctrl-label" for="search-input">Search Shows</label>
       <input id="search-input" class="ctrl-input" type="search"
              placeholder="Title, city, or venue…" oninput="applyFilters()" autocomplete="off">
     </div>
-    <div class="ctrl-group" style="flex:0 0 auto;">
-      <label class="ctrl-label" for="state-filter">Filter by State</label>
-      <select id="state-filter" class="ctrl-select" onchange="applyFilters()">
-        <option value="">All States</option>
-      </select>
+    <button type="button" class="filters-toggle" id="filters-toggle" aria-expanded="false" aria-controls="extra-filters" onclick="toggleExtraFilters()">
+      <span>More Filters</span><span class="chev">▾</span>
+    </button>
+    <div class="extra-filters" id="extra-filters">
+      <div class="ctrl-group">
+        <label class="ctrl-label" for="home-base-input">Your Home Base</label>
+        <input id="home-base-input" class="ctrl-input" type="text"
+               placeholder="e.g. Pensacola, FL or 32501" autocomplete="off"
+               onkeydown="if (event.key === 'Enter') { event.preventDefault(); setHomeBase(); }">
+      </div>
+      <div class="ctrl-group" style="flex:0 0 auto;">
+        <label class="ctrl-label">&nbsp;</label>
+        <button class="ctrl-btn" type="button" onclick="setHomeBase()">📍 Set Home Base</button>
+      </div>
+      <div class="ctrl-group" style="flex:0 0 auto;">
+        <label class="ctrl-label">&nbsp;</label>
+        <button class="ctrl-btn secondary" type="button" onclick="clearHomeBase()">Clear</button>
+      </div>
+      <div class="ctrl-group" style="flex:0 0 auto;">
+        <label class="ctrl-label" for="radius-filter">Within Distance</label>
+        <select id="radius-filter" class="ctrl-select" onchange="applyFilters()">
+          <option value="">Any distance</option>
+          <option value="25">25 miles</option>
+          <option value="50">50 miles</option>
+          <option value="100">100 miles</option>
+          <option value="200">200 miles</option>
+        </select>
+      </div>
+      <div class="ctrl-group" style="flex:0 0 auto;">
+        <label class="ctrl-label" for="state-filter">Filter by State</label>
+        <select id="state-filter" class="ctrl-select" onchange="applyFilters()">
+          <option value="">All States</option>
+        </select>
+      </div>
+      <div class="ctrl-group" style="flex:0 0 auto;">
+        <label class="ctrl-label" for="type-filter">Filter by Card Type</label>
+        <select id="type-filter" class="ctrl-select" onchange="applyFilters()">
+          <option value="">All Card Types</option>
+        </select>
+      </div>
+      <div class="ctrl-group" style="flex:0 0 auto;">
+        <label class="ctrl-label">&nbsp;</label>
+        <label style="display:inline-flex;align-items:center;gap:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:var(--dark);cursor:pointer;height:44px;">
+          <input id="show-past-toggle" type="checkbox" onchange="applyFilters()" style="width:18px;height:18px;cursor:pointer;">
+          Show past events
+        </label>
+      </div>
+      <div class="ctrl-group">
+        <label class="ctrl-label" for="sort-select">Sort Shows By</label>
+        <select id="sort-select" class="ctrl-select" onchange="applySort()">
+          <option value="default">Default order</option>
+          <option value="date">Date (soonest first)</option>
+          <option value="distance">Distance (nearest first)</option>
+          <option value="distance-far">Distance (farthest first)</option>
+        </select>
+      </div>
+      <div id="home-base-status" class="ctrl-status"></div>
     </div>
-    <div class="ctrl-group" style="flex:0 0 auto;">
-      <label class="ctrl-label" for="type-filter">Filter by Card Type</label>
-      <select id="type-filter" class="ctrl-select" onchange="applyFilters()">
-        <option value="">All Card Types</option>
-      </select>
-    </div>
-    <div class="ctrl-group" style="flex:0 0 auto;">
-      <label class="ctrl-label">&nbsp;</label>
-      <label style="display:inline-flex;align-items:center;gap:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:var(--dark);cursor:pointer;height:44px;">
-        <input id="show-past-toggle" type="checkbox" onchange="applyFilters()" style="width:18px;height:18px;cursor:pointer;">
-        Show past events
-      </label>
-    </div>
-    <div class="ctrl-group">
-      <label class="ctrl-label" for="sort-select">Sort Shows By</label>
-      <select id="sort-select" class="ctrl-select" onchange="applySort()">
-        <option value="default">Default order</option>
-        <option value="date">Date (soonest first)</option>
-        <option value="distance">Distance (nearest first)</option>
-        <option value="distance-far">Distance (farthest first)</option>
-      </select>
-    </div>
-    <div id="home-base-status" class="ctrl-status"></div>
   </div>
 </section>
 
@@ -529,6 +588,32 @@
   <a href="https://buymeacoffee.com/zbflips8" target="_blank" rel="noopener noreferrer" style="display:block; margin-top:24px;">
     <img src="images/image3.png" alt="Want to support the project? Scan this QR code!" style="width:100%; height:auto; display:block; border-radius:18px;">
   </a>
+</section>
+
+<section class="faq-section">
+  <h2 class="faq-title">Frequently Asked Questions</h2>
+  <div class="faq-list">
+    <details class="faq-item">
+      <summary>How often is this card show calendar updated?</summary>
+      <p>New shows and corrections go up weekly, usually as soon as an organizer submits details or a collector flags an error. Check the "Last updated" note in the footer for the most recent refresh.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Is it free to attend Gulf Coast card shows?</summary>
+      <p>It depends on the show — many are free to walk in, while others charge a small entry fee (usually $0–$10). Each show card lists its entry fee, and free shows are marked clearly so you can filter for them.</p>
+    </details>
+    <details class="faq-item">
+      <summary>What kinds of cards will I find at these shows?</summary>
+      <p>Most shows feature a mix of sports cards (baseball, football, basketball) and Pokémon TCG, with several also carrying Magic: The Gathering, Yu-Gi-Oh!, One Piece, Disney Lorcana, and general collectibles. Use the "Filter by Card Type" control to narrow the list to what you collect.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Which states and cities do you cover?</summary>
+      <p>The calendar currently tracks shows across Florida, Alabama, and Mississippi along the Gulf Coast — including Pensacola, Mobile, Biloxi, Tallahassee, Saraland, and Huntsville. Use the "Browse by State" links to jump straight to a state's listings.</p>
+    </details>
+    <details class="faq-item">
+      <summary>How do I get my card show listed?</summary>
+      <p>Click "Add Your Show" anywhere on the site and fill in the event details — organizer, date, location, entry fee, and a website or social link. Submissions are reviewed and typically posted within a few days.</p>
+    </details>
+  </div>
 </section>
 
 <footer>
@@ -599,6 +684,15 @@
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') closeMobileMenu();
   });
+
+  // --- MOBILE FILTERS PANEL ---
+  function toggleExtraFilters() {
+    const panel = document.getElementById('extra-filters');
+    const btn = document.getElementById('filters-toggle');
+    if (!panel || !btn) return;
+    const open = panel.classList.toggle('open');
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
 
   // --- DARK MODE ---
   function toggleDark() {
@@ -1220,18 +1314,18 @@
       dateDisplay: "Saturday, November 28th, 2026",
       time: "9:30AM to 4:30PM",
       timeUnknown: false,
-      location: "VFW Post 706, 5000 Lillian Hwy, Pensacola, FL 32506",
-      lat: 30.6177, lng: -88.1789,
-      entryFee: "$0", entryFree: true,
+      location: "800 W 9 Mile Rd Pensacola, FL, 32534",
+      lat: 30.5228502, lng: -87.2779206,
+      entryFee: "$5 - FREE for under 13!", entryFree: false,
       vendorFee: "",
       websiteUrl: "https://www.emeraldcoastcollectorsshowcase.com", websiteLabel: "📅 Facebook",
       organizer: "Emerald Coast Collectors Showcase",
       tbd: false,
       authServices: { present: false, company: "" },
       details: {
-        about: "",
+        about: "Are you a passionate sports card collector, a Pokémon master, or a TCG enthusiast looking for your next big find? Look no further! The Emerald Coast Collectors Showcase is coming to Pensacola, Florida, and it is shaping up to be the ultimate destination for hobbyists, investors, and families alike.\n\nWhether you are looking to buy, sell, trade, or just immerse yourself in the local collector community, here is everything you need to know about what to expect at this year’s most anticipated collectibles event.",
         atAGlance: [{label:"Saturday Hours",value:"9:30AM to 4:30PM"}, {label:"Parking",value:"Free"}, {label:"Vendor Tables",value:"100+"}],
-        whatToExpect: ["Sports", "Pokemon", "TCG"],
+        whatToExpect: ["100+ Vendor Tables", "Buying/Selling/Trading", "Giveaways and Raffles", "Great Food on Site"],
         locationNotes: "",
       },
     },
@@ -2194,6 +2288,24 @@
     s.type = 'application/ld+json';
     s.textContent = JSON.stringify(items);
     document.head.appendChild(s);
+
+    // ItemList wrapping the same events, so search engines understand this
+    // page as a single list of N upcoming shows rather than N disconnected
+    // Event entries.
+    const listData = {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      itemListElement: items.map((it, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: it.name,
+        url: it.url,
+      })),
+    };
+    const ls = document.createElement('script');
+    ls.type = 'application/ld+json';
+    ls.textContent = JSON.stringify(listData);
+    document.head.appendChild(ls);
   })();
 
   // ===== Deep link: ?show=evt-xxx auto-opens that show's detail modal =====
