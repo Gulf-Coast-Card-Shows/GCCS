@@ -74,6 +74,16 @@
   .event-meta { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .event-tag { display: inline-block; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 9px; padding: 2px 7px; border-radius: 50px; background: var(--dark); color: #fff; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
   .event-actions { display: flex; flex-direction: column; gap: 4px; }
+  .event-row.archived { opacity: 0.6; background: transparent; }
+  .event-row.archived .event-name { text-decoration: line-through; text-decoration-color: var(--muted); }
+  .archive-toggle {
+    width: 100%; margin: 14px 0 10px; padding: 10px 12px; border-radius: 10px;
+    border: 1px dashed var(--border); background: transparent; color: var(--muted);
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px; cursor: pointer;
+    text-align: left; display: flex; align-items: center; gap: 8px;
+  }
+  .archive-toggle:hover { background: var(--border); color: var(--dark); }
+  .archive-note { font-size: 11px; color: var(--muted); margin: -4px 0 12px; line-height: 1.5; }
 
   /* Form */
   .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
@@ -510,7 +520,7 @@ ${serializeDetails(ev.details)}
     if (!stateName) return html;
     const title = `${stateName} Card Shows | Gulf Coast Card Shows`;
     const desc = `Upcoming sports card, Pokémon, and trading card shows in ${stateName}. Dates, entry fees, vendor info, and directions — updated regularly.`;
-    const url = `https://gulfcoastcardshows.com/${stateFileSlug(stateAbbrev)}`;
+    const url = `https://gccardshows.com/${stateFileSlug(stateAbbrev)}`;
     let out = html;
     out = out.replace(/<title>[^<]*<\/title>/, `<title>${title}</title>`);
     out = out.replace(/<meta name="description" content="[^"]*">/, `<meta name="description" content="${desc}">`);
@@ -555,33 +565,105 @@ ${serializeDetails(ev.details)}
   }
 
   // ===== List rendering =====
+  // ===== Past-show detection =====
+  // Single source of truth for "has this show already happened?" — used to
+  // split the admin list into an active section and a collapsed archive so
+  // past shows fall out of the working list automatically as their dates pass,
+  // instead of piling up and having to be scrolled past or deleted by hand.
+  function parseIsoDateAdmin(iso) {
+    if (!iso) return null;
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+    if (!m) return null;
+    const d = new Date(parseInt(m[1], 10), parseInt(m[2], 10) - 1, parseInt(m[3], 10));
+    return isNaN(d.getTime()) ? null : d;
+  }
+  function eventEndDateAdmin(ev) {
+    return parseIsoDateAdmin(ev.endDate) || parseIsoDateAdmin(ev.startDate);
+  }
+  function hasEventPassed(ev) {
+    const end = eventEndDateAdmin(ev);
+    if (!end) return false; // no usable date yet (e.g. still TBD) — keep it active, not archived
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    return end.getTime() < today.getTime();
+  }
+  let showArchived = false;
+
   function renderList() {
-    document.getElementById('event-count').textContent = events.length;
+    const pastCountForHeader = events.filter(hasEventPassed).length;
+    const activeCountForHeader = events.length - pastCountForHeader;
+    document.getElementById('event-count').textContent = pastCountForHeader
+      ? `${activeCountForHeader} active · ${pastCountForHeader} archived`
+      : String(activeCountForHeader);
     const body = document.getElementById('event-list-body');
     if (!events.length) {
       body.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🎴</div><p>No shows yet. Click "+ Add Show" to create the first one.</p></div>`;
       return;
     }
-    body.innerHTML = events.map((ev, i) => {
+
+    const upcoming = [];
+    const past = [];
+    events.forEach((ev, i) => { (hasEventPassed(ev) ? past : upcoming).push({ ev, i }); });
+
+    function rowHtml(item, posInGroup, groupLen, isPast) {
+      const { ev, i } = item;
       const st = detectState(ev.location);
       return `
-      <div class="event-row${ev.tbd ? ' tbd' : ''}${ev.id === selectedId ? ' selected' : ''}" data-id="${ev.id}">
+      <div class="event-row${ev.tbd ? ' tbd' : ''}${ev.id === selectedId ? ' selected' : ''}${isPast ? ' archived' : ''}" data-id="${ev.id}">
         <div class="event-order">
-          <button class="btn-icon" data-action="up" data-id="${ev.id}" ${i === 0 ? 'disabled' : ''} title="Move up">↑</button>
-          <button class="btn-icon" data-action="down" data-id="${ev.id}" ${i === events.length - 1 ? 'disabled' : ''} title="Move down">↓</button>
+          <button class="btn-icon" data-action="up" data-id="${ev.id}" ${posInGroup === 0 ? 'disabled' : ''} title="Move up">↑</button>
+          <button class="btn-icon" data-action="down" data-id="${ev.id}" ${posInGroup === groupLen - 1 ? 'disabled' : ''} title="Move down">↓</button>
         </div>
-        <div class="event-num">#${String(i + 1).padStart(2, '0')}</div>
+        <div class="event-num">#${String(posInGroup + 1).padStart(2, '0')}</div>
         <div class="event-main" data-action="edit" data-id="${ev.id}">
           <div class="event-name">${escapeHtml(ev.tbd ? (ev.name || 'Details Coming Soon') : (ev.name || '(unnamed show)'))}</div>
           <div class="event-meta">${escapeHtml(ev.dateDisplay || 'No date set')} · ${st === 'UNK' ? '' : st}</div>
           ${ev.tbd ? '<span class="event-tag">TBD</span>' : ''}
+          ${isPast ? '<span class="event-tag" style="background:var(--muted);">Archived</span>' : ''}
         </div>
         <div class="event-actions">
           <button class="btn-icon" data-action="edit" data-id="${ev.id}" title="Edit">✏️</button>
           <button class="btn-icon btn-danger" data-action="delete" data-id="${ev.id}" title="Delete">🗑️</button>
         </div>
       </div>`;
-    }).join('');
+    }
+
+    let html = upcoming.map((item, pos) => rowHtml(item, pos, upcoming.length, false)).join('');
+    if (!upcoming.length) {
+      html += `<div class="empty-state"><div class="empty-state-icon">📭</div><p>No active shows. ${past.length ? 'Check the archive below, or add' : 'Add'} a new one.</p></div>`;
+    }
+
+    if (past.length) {
+      html += `<button type="button" class="archive-toggle" id="btn-toggle-archived">
+        <span>${showArchived ? '▾' : '▸'}</span>
+        <span>${showArchived ? 'Hide' : 'Show'} archived shows (${past.length} past)</span>
+      </button>`;
+      if (showArchived) {
+        html += `<p class="archive-note">These shows have already ended (based on their end date, or start date if no end date was set) and are automatically kept out of the active list above. They still export to the site normally — nothing here is deleted.</p>`;
+        html += past.map((item, pos) => rowHtml(item, pos, past.length, true)).join('');
+      }
+    }
+
+    body.innerHTML = html;
+
+    const toggleBtn = document.getElementById('btn-toggle-archived');
+    if (toggleBtn) toggleBtn.addEventListener('click', () => { showArchived = !showArchived; renderList(); });
+  }
+
+  // Moves an event up/down within its own group (active or archived) rather
+  // than the raw array, so reordering never mixes an upcoming show into the
+  // archived block or vice versa.
+  function moveWithinGroup(id, dir) {
+    const idx = events.findIndex(ev => ev.id === id);
+    if (idx === -1) return;
+    const isPast = hasEventPassed(events[idx]);
+    const groupIdx = events.map((ev, i) => ({ ev, i })).filter(x => hasEventPassed(x.ev) === isPast).map(x => x.i);
+    const pos = groupIdx.indexOf(idx);
+    const targetPos = pos + dir;
+    if (targetPos < 0 || targetPos >= groupIdx.length) return;
+    const otherIdx = groupIdx[targetPos];
+    [events[idx], events[otherIdx]] = [events[otherIdx], events[idx]];
+    dirty = true;
+    renderList();
   }
 
   document.getElementById('event-list-body').addEventListener('click', (e) => {
@@ -599,12 +681,10 @@ ${serializeDetails(ev.details)}
         if (selectedId === id) { selectedId = null; renderForm(null); }
         renderList();
       }
-    } else if (action === 'up' && idx > 0) {
-      [events[idx - 1], events[idx]] = [events[idx], events[idx - 1]];
-      dirty = true; renderList();
-    } else if (action === 'down' && idx < events.length - 1) {
-      [events[idx + 1], events[idx]] = [events[idx], events[idx + 1]];
-      dirty = true; renderList();
+    } else if (action === 'up') {
+      moveWithinGroup(id, -1);
+    } else if (action === 'down') {
+      moveWithinGroup(id, 1);
     }
   });
 

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Alabama Card Shows | Gulf Coast Card Shows</title>
 <meta name="description" content="Upcoming sports card, Pokémon, and trading card shows in Alabama. Dates, entry fees, vendor info, and directions — updated regularly.">
-<link rel="canonical" href="https://gulfcoastcardshows.com/alabama-card-shows.html">
+<link rel="canonical" href="https://gccardshows.com/alabama-card-shows.html">
 <meta name="theme-color" content="#E53935">
 
 <!-- Open Graph -->
@@ -13,7 +13,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="Alabama Card Shows | Gulf Coast Card Shows">
 <meta property="og:description" content="Upcoming sports card, Pokémon, and trading card shows in Alabama. Dates, entry fees, vendor info, and directions — updated regularly.">
-<meta property="og:url" content="https://gulfcoastcardshows.com/alabama-card-shows.html">
+<meta property="og:url" content="https://gccardshows.com/alabama-card-shows.html">
 <meta property="og:image" content="https://gccardshows.com/og-image.png">
 
 <!-- Twitter -->
@@ -22,6 +22,28 @@
 <meta name="twitter:description" content="Upcoming sports card, Pokémon, and trading card shows in Alabama. Dates, entry fees, vendor info, and directions — updated regularly.">
 <meta name="twitter:image" content="https://gccardshows.com/og-image.png">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='white' stroke='%231A1A2E' stroke-width='4'/%3E%3Cpath d='M2 50 Q2 2 50 2 Q98 2 98 50 Z' fill='%23E53935'/%3E%3Crect x='2' y='45' width='96' height='10' fill='%231A1A2E'/%3E%3Ccircle cx='50' cy='50' r='16' fill='white' stroke='%231A1A2E' stroke-width='4'/%3E%3Ccircle cx='50' cy='50' r='7' fill='%23E53935'/%3E%3C/svg%3E">
+<!-- Organization + WebSite structured data — identifies the site itself as an entity -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Gulf Coast Card Shows",
+  "url": "https://gccardshows.com/",
+  "description": "Community calendar of Pokémon, sports card, and TCG collector shows along the Gulf Coast — Florida, Alabama, and Mississippi.",
+  "sameAs": [
+    "https://buymeacoffee.com/zbflips8"
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Gulf Coast Card Shows",
+  "url": "https://gccardshows.com/",
+  "description": "Find upcoming Pokémon, sports card, and TCG collector shows along the Gulf Coast."
+}
+</script>
 <!-- FAQPage structured data — mirrors the visible FAQ section in the page body -->
 <script type="application/ld+json">
 {
@@ -212,6 +234,63 @@
   /* SHOWS GRID */
   .shows-section { max-width: 1120px; margin: 0 auto; padding: 0 32px 64px; }
   .shows-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  /* ===== View toggle (list / calendar) ===== */
+  .view-toggle { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 18px; }
+  .view-toggle-btn {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 13px; padding: 9px 16px;
+    border-radius: 50px; border: 2px solid var(--border); background: var(--card-bg); color: var(--dark);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .view-toggle-btn:hover { border-color: var(--blue); }
+  .view-toggle-btn.active { background: var(--dark); border-color: var(--dark); color: var(--card-bg); }
+  .view-toggle-ics {
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 12px; padding: 9px 14px;
+    border-radius: 50px; border: 2px dashed var(--border); background: transparent; color: var(--muted);
+    cursor: pointer; margin-left: auto;
+  }
+  .view-toggle-ics:hover { border-color: var(--red); color: var(--red); }
+
+  /* ===== Calendar view ===== */
+  .calendar-wrap { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
+  .calendar-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .calendar-month-label { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 20px; color: var(--dark); flex: 1; text-align: center; }
+  .calendar-nav-btn {
+    width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--border); background: transparent;
+    color: var(--dark); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  .calendar-nav-btn:hover { background: var(--border); }
+  .calendar-today-btn {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px; padding: 7px 14px;
+    border-radius: 50px; border: 2px solid var(--border); background: transparent; color: var(--dark); cursor: pointer;
+  }
+  .calendar-today-btn:hover { background: var(--border); }
+  .calendar-weekday-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 6px; }
+  .calendar-weekday-row div { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; text-align: center; padding-bottom: 4px; }
+  .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .calendar-day {
+    min-height: 92px; border: 1px solid var(--border); border-radius: 10px; padding: 6px;
+    display: flex; flex-direction: column; gap: 3px; background: var(--bg);
+  }
+  .calendar-day.other-month { opacity: 0.35; }
+  .calendar-day.today { border-color: var(--red); border-width: 2px; }
+  .calendar-day.past { opacity: 0.5; }
+  .calendar-day-num { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px; color: var(--dark); }
+  .calendar-event-pill {
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 10px; padding: 3px 6px; border-radius: 6px;
+    background: var(--next-bg); border: 1px solid var(--next-border); color: var(--dark); cursor: pointer;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left;
+  }
+  .calendar-event-pill:hover { filter: brightness(0.95); }
+  .calendar-more { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 10px; color: var(--muted); cursor: pointer; background: none; border: none; text-align: left; padding: 0; }
+  html.dark .calendar-event-pill { background: #1F1A08; border-color: #B8960A; }
+
+  @media (max-width: 768px) {
+    .calendar-day { min-height: 64px; padding: 4px; }
+    .calendar-event-pill, .calendar-more { font-size: 9px; padding: 2px 4px; }
+    .calendar-month-label { font-size: 16px; }
+    .view-toggle-ics { margin-left: 0; width: 100%; text-align: center; }
+  }
   .show-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); transition: transform 0.2s, box-shadow 0.2s; }
   .show-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.12); }
   .show-card.tbd { border-style: dashed; border-color: #ccc; background: #FAFAFA; }
@@ -574,8 +653,27 @@
 </section>
 
 <section class="shows-section" id="shows-real" style="padding-top:0;">
+  <div class="view-toggle" role="group" aria-label="Switch between list and calendar view">
+    <button type="button" class="view-toggle-btn active" id="view-toggle-list" onclick="setViewMode('list')">📋 List</button>
+    <button type="button" class="view-toggle-btn" id="view-toggle-calendar" onclick="setViewMode('calendar')">📅 Calendar</button>
+    <button type="button" class="view-toggle-ics" onclick="downloadFilteredIcs()" title="Download an .ics file of the shows currently matching your filters">🗓️ Add filtered shows to calendar</button>
+  </div>
+
   <div class="shows-grid" id="shows-grid">
     <!-- Rendered automatically from the EVENTS array below -->
+  </div>
+
+  <div class="calendar-wrap" id="calendar-view" hidden>
+    <div class="calendar-header">
+      <button type="button" class="calendar-nav-btn" onclick="calendarShiftMonth(-1)" aria-label="Previous month">‹</button>
+      <div class="calendar-month-label" id="calendar-month-label">—</div>
+      <button type="button" class="calendar-nav-btn" onclick="calendarShiftMonth(1)" aria-label="Next month">›</button>
+      <button type="button" class="calendar-today-btn" onclick="calendarGoToday()">Today</button>
+    </div>
+    <div class="calendar-weekday-row">
+      <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+    </div>
+    <div class="calendar-grid" id="calendar-grid"></div>
   </div>
 </section>
 
@@ -1315,8 +1413,8 @@
       time: "9:30AM to 4:30PM",
       timeUnknown: false,
       location: "800 W 9 Mile Rd Pensacola, FL, 32534",
-      lat: 30.5228502, lng: -87.2779206,
-      entryFee: "$5 - FREE for under 13!", entryFree: false,
+      lat: 30.5228475, lng: -87.277926,
+      entryFee: "$0", entryFree: true,
       vendorFee: "",
       websiteUrl: "https://www.emeraldcoastcollectorsshowcase.com", websiteLabel: "📅 Facebook",
       organizer: "Emerald Coast Collectors Showcase",
@@ -1431,7 +1529,7 @@
     const e = `${endEx.getFullYear()}${pad(endEx.getMonth() + 1)}${pad(endEx.getDate())}`;
     const params = new URLSearchParams({
       action: 'TEMPLATE', text: ev.name, dates: `${s}/${e}`, location: ev.location || '',
-      details: `Card show details: https://gulfcoastcardshows.com\n\n${ev.name}\n${ev.dateDisplay}\n${ev.location || ''}`
+      details: `Card show details: https://gccardshows.com\n\n${ev.name}\n${ev.dateDisplay}\n${ev.location || ''}`
     });
     return `https://calendar.google.com/calendar/render?${params.toString()}`;
   }
@@ -1802,6 +1900,106 @@
     }
 
     syncMapToVisible(visibleIds);
+    lastVisibleIds = visibleIds;
+    if (viewMode === 'calendar') renderCalendar();
+  }
+
+  // ===== Calendar view =====
+  // Reuses whatever applyFilters() most recently decided is "visible" (search,
+  // state, card type, distance, past-events toggle all already baked into
+  // lastVisibleIds) so the calendar always matches the list 1:1 without
+  // duplicating any filter logic.
+  function setViewMode(mode) {
+    if (mode === viewMode) return;
+    viewMode = mode;
+    const listBtn = document.getElementById('view-toggle-list');
+    const calBtn = document.getElementById('view-toggle-calendar');
+    const grid = document.getElementById('shows-grid');
+    const cal = document.getElementById('calendar-view');
+    if (listBtn) listBtn.classList.toggle('active', mode === 'list');
+    if (calBtn) calBtn.classList.toggle('active', mode === 'calendar');
+    if (grid) grid.style.display = mode === 'list' ? '' : 'none';
+    if (cal) cal.style.display = mode === 'calendar' ? '' : 'none';
+    if (mode === 'calendar') renderCalendar();
+  }
+
+  function calendarShiftMonth(delta) {
+    if (!calendarCursor) calendarCursor = new Date();
+    calendarCursor = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() + delta, 1);
+    renderCalendar();
+  }
+
+  function calendarGoToday() {
+    const today = new Date();
+    calendarCursor = new Date(today.getFullYear(), today.getMonth(), 1);
+    renderCalendar();
+  }
+
+  function renderCalendar() {
+    const gridEl = document.getElementById('calendar-grid');
+    const labelEl = document.getElementById('calendar-month-label');
+    if (!gridEl || !labelEl) return;
+
+    const visibleEvents = EVENTS.filter(ev => lastVisibleIds.has(ev.id));
+
+    if (!calendarCursor) {
+      // Default to the month of the soonest filtered upcoming show, falling
+      // back to the current month if nothing matches or everything's TBD.
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const upcomingStarts = visibleEvents
+        .map(eventStartDate)
+        .filter(d => d && d.getTime() >= today.getTime())
+        .sort((a, b) => a - b);
+      const base = upcomingStarts[0] || today;
+      calendarCursor = new Date(base.getFullYear(), base.getMonth(), 1);
+    }
+
+    const year = calendarCursor.getFullYear(), month = calendarCursor.getMonth();
+    labelEl.textContent = calendarCursor.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+    // Map each date (YYYY-MM-DD, local) to the events occurring that day —
+    // multi-day shows get a pill on every day in their range.
+    const byDate = {};
+    const todayKey = (() => { const d = new Date(); d.setHours(0,0,0,0); return d.toDateString(); })();
+    visibleEvents.forEach(ev => {
+      const start = eventStartDate(ev), end = eventEndDate(ev) || start;
+      if (!start) return;
+      const cursor = new Date(start);
+      let guard = 0;
+      while (cursor.getTime() <= end.getTime() && guard < 14) {
+        const key = cursor.toDateString();
+        (byDate[key] = byDate[key] || []).push(ev);
+        cursor.setDate(cursor.getDate() + 1);
+        guard++;
+      }
+    });
+
+    const firstOfMonth = new Date(year, month, 1);
+    const gridStart = new Date(firstOfMonth);
+    gridStart.setDate(gridStart.getDate() - gridStart.getDay()); // back up to the preceding Sunday
+
+    let html = '';
+    const cellDate = new Date(gridStart);
+    for (let i = 0; i < 42; i++) { // 6 full weeks, enough for any month layout
+      const key = cellDate.toDateString();
+      const inMonth = cellDate.getMonth() === month;
+      const isToday = key === todayKey;
+      const isPast = cellDate.getTime() < new Date(new Date().setHours(0,0,0,0)).getTime();
+      const dayEvents = byDate[key] || [];
+      const shown = dayEvents.slice(0, 3);
+      const extra = dayEvents.length - shown.length;
+
+      html += `<div class="calendar-day${inMonth ? '' : ' other-month'}${isToday ? ' today' : ''}${isPast ? ' past' : ''}">`;
+      html += `<div class="calendar-day-num">${cellDate.getDate()}</div>`;
+      shown.forEach(ev => {
+        html += `<button type="button" class="calendar-event-pill" onclick="openEventDetailById('${escapeHtml(ev.id)}')" title="${escapeHtml(ev.name || '')}">${escapeHtml(ev.name || 'Card Show')}</button>`;
+      });
+      if (extra > 0) html += `<div class="calendar-more">+${extra} more</div>`;
+      html += `</div>`;
+
+      cellDate.setDate(cellDate.getDate() + 1);
+    }
+    gridEl.innerHTML = html;
   }
 
   // ===== Add Your Show modal =====
@@ -2009,6 +2207,19 @@
     document.body.style.overflow = 'hidden';
     trapModalOpen(m);
   }
+  // Calendar-view pills are themselves buttons, so openEventDetail's "ignore
+  // clicks on nested links/buttons" guard would swallow every click on them.
+  // This skips that guard and opens the modal directly by id.
+  function openEventDetailById(eventId) {
+    const ev = EVENTS.find(x => x.id === eventId);
+    if (!ev) return;
+    populateEventDetail(ev);
+    const m = document.getElementById('event-detail-modal');
+    if (!m) return;
+    m.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    trapModalOpen(m);
+  }
   function closeEventDetail() {
     const m = document.getElementById('event-detail-modal');
     if (!m) return;
@@ -2027,6 +2238,9 @@
 
   // ===== Home base + distance =====
   let homeBase = null;
+  let viewMode = 'list';
+  let lastVisibleIds = new Set();
+  let calendarCursor = null; // Date set to the 1st of the month currently shown; null until first render
   function loadHomeBase() {
     try {
       const raw = localStorage.getItem('gccs-home-base');
@@ -2168,9 +2382,9 @@
     const start = eventStartDate(ev), end = eventEndDate(ev);
     if (!start || !end) return null;
     const endEx = new Date(end.getFullYear(), end.getMonth(), end.getDate() + 1);
-    const uid = `${ev.id || 'evt'}@gulfcoastcardshows.com`;
+    const uid = `${ev.id || 'evt'}@gccardshows.com`;
     const stamp = icsDate(new Date()) + 'T000000Z';
-    const url = `https://gulfcoastcardshows.com/?show=${encodeURIComponent(ev.id || '')}`;
+    const url = `https://gccardshows.com/?show=${encodeURIComponent(ev.id || '')}`;
     const desc = `${ev.dateDisplay || ''}\n${ev.location || ''}\n\nMore info: ${url}`;
     return [
       'BEGIN:VEVENT',
@@ -2217,6 +2431,14 @@
   window.downloadAllIcs = function() {
     downloadBlob('gulf-coast-card-shows.ics', buildIcs(EVENTS));
   };
+  window.downloadFilteredIcs = function() {
+    const evs = EVENTS.filter(ev => lastVisibleIds.has(ev.id));
+    if (!evs.length) {
+      alert('No shows match your current filters — widen your search and try again.');
+      return;
+    }
+    downloadBlob('gulf-coast-card-shows-filtered.ics', buildIcs(evs));
+  };
   window.shareShow = async function(eventId) {
     const ev = EVENTS.find(x => x.id === eventId);
     if (!ev) return;
@@ -2258,7 +2480,7 @@
             address: ev.location || '',
             ...(ev.lat && ev.lng ? { geo: { '@type': 'GeoCoordinates', latitude: ev.lat, longitude: ev.lng } } : {}),
           },
-          url: `https://gulfcoastcardshows.com/?show=${encodeURIComponent(ev.id || '')}`,
+          url: `https://gccardshows.com/?show=${encodeURIComponent(ev.id || '')}`,
           organizer: { '@type': 'Organization', name: ev.organizer || 'Gulf Coast Card Shows' },
           description: (ev.details && ev.details.about) ? ev.details.about : `${ev.name} — ${ev.dateDisplay || ''}`,
         };
