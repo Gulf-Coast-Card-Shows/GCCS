@@ -505,6 +505,13 @@
   .detail-hero { background: linear-gradient(135deg, #E53935 0%, #1A1A2E 100%); color: #fff; margin: -36px -36px 24px; padding: 32px 36px; border-radius: var(--radius) var(--radius) 0 0; }
   .detail-hero h2 { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 30px; margin: 0 0 6px; line-height: 1.15; }
   .detail-hero .detail-sub { font-size: 15px; opacity: .92; }
+  .detail-hero-actions { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+  .detail-hero-actions .fav-btn { color: rgba(255,255,255,0.85); }
+  .detail-hero-actions .fav-btn.active { color: #FFD54A; }
+  .detail-hero-actions .interest-btn {
+    background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.35); color: #fff;
+  }
+  .detail-hero-actions .interest-btn.active { background: rgba(255,255,255,0.28); border-color: #fff; }
   .detail-section { margin-bottom: 22px; }
   .detail-section h3 { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 15px; text-transform: uppercase; letter-spacing: .6px; color: var(--red); margin: 0 0 8px; }
   .detail-section p, .detail-section li { font-size: 15px; line-height: 1.6; color: var(--text); margin: 0 0 6px; }
@@ -667,6 +674,21 @@
   .card-action-btn.calendar { border-color:#2E7D32; color:#2E7D32; }
   .card-action-btn.report { border-color:var(--red); color:var(--red); margin-left:auto; }
 
+  /* Favorite star toggle */
+  .fav-btn {
+    background: none; border: none; font-size: 22px; line-height: 1; cursor: pointer;
+    padding: 2px; color: var(--muted); transition: transform 0.15s ease;
+  }
+  .fav-btn:hover { transform: scale(1.15); }
+  .fav-btn.active { color: #F0B90B; }
+
+  /* "Interested" counter — hidden entirely if no Worker endpoint is configured
+     (see INTEREST_API in the script below) so the feature degrades gracefully. */
+  .interest-btn { cursor: pointer; }
+  .interest-btn.active { border-color: #2563EB; color: #2563EB; background: #EFF6FF; }
+  html.dark .interest-btn.active { background: #0B1E38; }
+  body.interest-disabled .interest-btn { display: none; }
+
   .last-updated {
     font-family:'Nunito',sans-serif; font-size:12px; color:var(--muted);
     text-align:center; padding:12px 32px 0;
@@ -818,6 +840,13 @@
         <label style="display:inline-flex;align-items:center;gap:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:var(--dark);cursor:pointer;height:44px;">
           <input id="show-past-toggle" type="checkbox" onchange="applyFilters()" style="width:18px;height:18px;cursor:pointer;">
           Show past events
+        </label>
+      </div>
+      <div class="ctrl-group" style="flex:0 0 auto;">
+        <label class="ctrl-label">&nbsp;</label>
+        <label style="display:inline-flex;align-items:center;gap:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:var(--dark);cursor:pointer;height:44px;">
+          <input id="favorites-only-toggle" type="checkbox" onchange="applyFilters()" style="width:18px;height:18px;cursor:pointer;">
+          ⭐ Favorites only <span id="favorites-count" style="color:var(--muted);font-weight:600;"></span>
         </label>
       </div>
       <div class="ctrl-group">
@@ -1096,6 +1125,10 @@
       <div id="detail-eyebrow" style="font-size:12px; text-transform:uppercase; letter-spacing:1px; opacity:.9; font-weight:800;">Show Details</div>
       <h2 id="detail-name"></h2>
       <div class="detail-sub" id="detail-sub"></div>
+      <div class="detail-hero-actions">
+        <button type="button" class="fav-btn" id="detail-fav-btn" aria-label="Save this show to your favorites" aria-pressed="false">☆</button>
+        <button type="button" class="card-action-btn interest-btn" id="detail-interest-btn" aria-pressed="false">🙋 — interested</button>
+      </div>
     </div>
 
     <div class="detail-section" id="detail-about-sec" hidden>
@@ -1893,6 +1926,7 @@
     if (calUrl) actions += `<a class="card-action-btn calendar" href="${calUrl}" target="_blank" rel="noopener">📅 Google</a>`;
     actions += `<a class="card-action-btn calendar" href="#" onclick="downloadIcs('${escapeHtml(ev.id)}'); return false;" title="Apple Calendar / Outlook (.ics)">🗓️ .ics</a>`;
     actions += `<a class="card-action-btn calendar" href="#" onclick="shareShow('${escapeHtml(ev.id)}'); return false;" title="Copy shareable link">🔗 Share</a>`;
+    actions += `<button type="button" class="card-action-btn interest-btn" data-interest-id="${escapeHtml(ev.id)}" onclick="toggleInterest('${escapeHtml(ev.id)}')" aria-pressed="false">🙋 — interested</button>`;
     actions += `<a class="card-action-btn report" href="#" onclick="openReport('${escapeHtml(ev.name)} ${num}'); return false;">🚩 Report</a>`;
     actions += '</div>';
 
@@ -1922,6 +1956,7 @@
           <span class="state-badge state-${st}">${st === 'UNK' ? '?' : st} · ${stName}</span>
         </div>
         <div class="header-right">
+          <button type="button" class="fav-btn${isFavorited(ev.id) ? ' active' : ''}" data-fav-id="${escapeHtml(ev.id)}" onclick="toggleFavorite('${escapeHtml(ev.id)}')" aria-label="Save this show to your favorites" aria-pressed="${isFavorited(ev.id) ? 'true' : 'false'}">${isFavorited(ev.id) ? '⭐' : '☆'}</button>
           <span class="show-num">${num}</span>
           ${hasDetails ? '<span class="details-badge">Click for details →</span>' : ''}
         </div>
@@ -1949,6 +1984,9 @@
     document.getElementById('count-number').textContent = EVENTS.length;
     document.getElementById('map-count-label').textContent =
       `📍 ${EVENTS.length} Show${EVENTS.length === 1 ? '' : 's'} Along the Gulf Coast`;
+
+    saveFavorites(); // no-op on storage, just syncs the "(N)" count label to current state
+    loadInterestCounts();
 
     // Single "last verified" timestamp under the Live count.
     const verifiedEl = document.getElementById('count-verified');
@@ -2166,6 +2204,7 @@
     if (!grid) return;
     const q = (document.getElementById('search-input')?.value || '').trim().toLowerCase();
     const showPast = !!document.getElementById('show-past-toggle')?.checked;
+    const favOnly = !!document.getElementById('favorites-only-toggle')?.checked;
     const stateVal = document.getElementById('state-filter')?.value || '';
     const typeVal = document.getElementById('type-filter')?.value || '';
     const radiusVal = document.getElementById('radius-filter')?.value || '';
@@ -2185,12 +2224,13 @@
       const stateOk = !stateVal || card.dataset.state === stateVal;
       const types = (card.dataset.cardTypes || '').split(' ');
       const typeOk = !typeVal || types.includes(typeVal);
+      const favOk = !favOnly || favorites.has(card.dataset.eventId);
       let radiusOk = true;
       if (radiusVal && homeBase) {
         const dist = parseFloat(card.dataset.distance);
         radiusOk = !isNaN(dist) && dist <= parseFloat(radiusVal);
       }
-      const show = matches && (showPast || !isPast) && stateOk && typeOk && radiusOk;
+      const show = matches && (showPast || !isPast) && stateOk && typeOk && radiusOk && favOk;
       card.style.display = show ? '' : 'none';
       if (show) { visible++; visibleIds.add(card.dataset.eventId); }
     });
@@ -2462,6 +2502,22 @@
     document.getElementById('detail-sub').textContent =
       [ev.dateDisplay, cityState].filter(Boolean).join(' · ');
 
+    const favBtn = document.getElementById('detail-fav-btn');
+    if (favBtn) {
+      favBtn.dataset.favId = ev.id;
+      favBtn.onclick = () => toggleFavorite(ev.id);
+      const fav = isFavorited(ev.id);
+      favBtn.classList.toggle('active', fav);
+      favBtn.setAttribute('aria-pressed', fav ? 'true' : 'false');
+      favBtn.textContent = fav ? '⭐' : '☆';
+    }
+    const interestBtn = document.getElementById('detail-interest-btn');
+    if (interestBtn) {
+      interestBtn.dataset.interestId = ev.id;
+      interestBtn.onclick = () => toggleInterest(ev.id);
+      refreshInterestButton(interestBtn);
+    }
+
     // About
     const aboutSec = document.getElementById('detail-about-sec');
     if (d.about && d.about.trim()) {
@@ -2556,6 +2612,90 @@
   });
 
 
+
+  // ===== Favorites (saved shows, stored locally — no account needed) =====
+  let favorites = new Set();
+  try {
+    favorites = new Set(JSON.parse(localStorage.getItem('gccs-favorites') || '[]'));
+  } catch (e) { favorites = new Set(); }
+
+  function saveFavorites() {
+    try { localStorage.setItem('gccs-favorites', JSON.stringify([...favorites])); } catch (e) { /* storage unavailable — favorites just won't persist */ }
+    const countEl = document.getElementById('favorites-count');
+    if (countEl) countEl.textContent = favorites.size ? `(${favorites.size})` : '';
+  }
+
+  function isFavorited(id) { return favorites.has(id); }
+
+  function toggleFavorite(id) {
+    const nowFav = !favorites.has(id);
+    if (nowFav) favorites.add(id); else favorites.delete(id);
+    saveFavorites();
+    document.querySelectorAll(`.fav-btn[data-fav-id="${CSS.escape(id)}"]`).forEach(btn => {
+      btn.classList.toggle('active', nowFav);
+      btn.setAttribute('aria-pressed', nowFav ? 'true' : 'false');
+      btn.textContent = nowFav ? '⭐' : '☆';
+    });
+    showToast(nowFav ? '⭐ Added to your favorites' : 'Removed from favorites', 'success', 2000);
+    // If the "Favorites only" filter is active, unfavoriting a show should
+    // drop it from the visible list immediately rather than leaving a stale card.
+    if (document.getElementById('favorites-only-toggle')?.checked) applyFilters();
+  }
+
+  // ===== "Interested" counter (shared across visitors via a small Cloudflare
+  // Worker + KV store — see WORKER-README for setup. If INTEREST_API isn't
+  // configured yet, the buttons quietly hide themselves instead of breaking. =====
+  const INTEREST_API = ''; // e.g. 'https://gccs-interest.yoursubdomain.workers.dev' — leave blank to disable
+  let interestCounts = {};
+  let myInterests = new Set();
+  try {
+    myInterests = new Set(JSON.parse(localStorage.getItem('gccs-interested') || '[]'));
+  } catch (e) { myInterests = new Set(); }
+
+  async function loadInterestCounts() {
+    if (!INTEREST_API) { document.body.classList.add('interest-disabled'); return; }
+    try {
+      const r = await fetch(`${INTEREST_API}/counts`);
+      if (!r.ok) throw new Error('bad response');
+      interestCounts = await r.json();
+      document.querySelectorAll('.interest-btn').forEach(refreshInterestButton);
+    } catch (e) {
+      console.warn('Interest counter unavailable:', e.message);
+      document.body.classList.add('interest-disabled');
+    }
+  }
+
+  function refreshInterestButton(btn) {
+    const id = btn.dataset.interestId;
+    const count = interestCounts[id] || 0;
+    const mine = myInterests.has(id);
+    btn.classList.toggle('active', mine);
+    btn.setAttribute('aria-pressed', mine ? 'true' : 'false');
+    btn.textContent = `🙋 ${count} interested`;
+  }
+
+  async function toggleInterest(id) {
+    if (!INTEREST_API) return;
+    const mine = myInterests.has(id);
+    const action = mine ? 'remove' : 'add';
+    // Optimistic update — flip immediately, reconcile with the server's count after.
+    interestCounts[id] = Math.max(0, (interestCounts[id] || 0) + (mine ? -1 : 1));
+    if (mine) myInterests.delete(id); else myInterests.add(id);
+    localStorage.setItem('gccs-interested', JSON.stringify([...myInterests]));
+    document.querySelectorAll(`.interest-btn[data-interest-id="${CSS.escape(id)}"]`).forEach(refreshInterestButton);
+    try {
+      const r = await fetch(`${INTEREST_API}/interest`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, action }),
+      });
+      if (r.ok) {
+        const data = await r.json();
+        interestCounts[id] = data.count;
+        document.querySelectorAll(`.interest-btn[data-interest-id="${CSS.escape(id)}"]`).forEach(refreshInterestButton);
+      }
+    } catch (e) { /* optimistic update already shown — a background sync failure isn't worth interrupting the user for */ }
+  }
 
   // ===== Home base + distance =====
   let homeBase = null;
