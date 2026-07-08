@@ -2644,7 +2644,7 @@
   // ===== "Interested" counter (shared across visitors via a small Cloudflare
   // Worker + KV store — see WORKER-README for setup. If INTEREST_API isn't
   // configured yet, the buttons quietly hide themselves instead of breaking. =====
-  const INTEREST_API = ''; // e.g. 'https://gccs-interest.zbcaptures.workers.dev' — leave blank to disable
+  const INTEREST_API = 'https://gccs-interest.zbcaptures.workers.dev'; // e.g. 'https://gccs-interest.zbcaptures.workers.dev' — leave blank to disable
   let interestCounts = {};
   let myInterests = new Set();
   try {
