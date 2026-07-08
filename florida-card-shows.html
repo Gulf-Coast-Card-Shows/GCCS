@@ -197,6 +197,10 @@
   .state-nav {
     display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
     max-width: 1200px; margin: 0 auto; padding: 14px 24px 16px;
+    position: sticky; top: 68px; z-index: 90;
+    background: var(--nav-bg);
+    box-shadow: 0 0 0 100vmax var(--nav-bg), 0 1px 0 var(--border);
+    clip-path: inset(0 -100vmax);
   }
   .state-nav-label { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
   .state-nav a, .state-nav strong {
