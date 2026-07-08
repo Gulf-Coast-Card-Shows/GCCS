@@ -100,6 +100,8 @@
     --border: #E5E0D5;
     --next-bg: #FFF8E1;
     --next-border: #FFD600;
+    --featured-bg: #EFF6FF;
+    --featured-border: #60A5FA;
     --radius: 18px;
     --shadow: 0 2px 16px rgba(0,0,0,0.07);
   }
@@ -113,6 +115,8 @@
     --border: #2E2E45;
     --next-bg: #1F1A08;
     --next-border: #B8960A;
+    --featured-bg: #0B1E38;
+    --featured-border: #2563EB;
     --shadow: 0 2px 16px rgba(0,0,0,0.35);
   }
 
@@ -157,6 +161,14 @@
   }
   .dark-toggle:hover { background: var(--border); }
   * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .skip-link {
+    position: absolute; top: -100px; left: 12px; z-index: 1200;
+    background: var(--dark); color: #fff; padding: 12px 20px; border-radius: 10px;
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px; text-decoration: none;
+    transition: top 0.15s ease;
+  }
+  .skip-link:focus { top: 12px; }
   body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--dark); min-height: 100vh; }
   body { background-image: url('images/image1.png'); background-repeat: repeat; background-size: 100px auto; background-blend-mode: normal; }
   body::before { content: ''; position: fixed; inset: 0; background-color: var(--bg); opacity: 0.95; z-index: -1; pointer-events: none; }
@@ -264,8 +276,11 @@
   }
 
   /* STAT STRIP */
-  .stat-strip { max-width: 1120px; margin: 0 auto 32px; padding: 0 32px; display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+  .stat-strip { max-width: 1120px; margin: 0 auto 32px; padding: 0 32px; display: grid; grid-template-columns: 1.15fr 1.15fr 1fr; gap: 16px; }
+  .stat-strip.no-featured { grid-template-columns: 2fr 1fr; }
   .next-show-card { background: var(--next-bg); border: 2px solid var(--next-border); border-radius: var(--radius); padding: 24px 28px; }
+  .featured-show-card { background: var(--featured-bg); border: 2px solid var(--featured-border); border-radius: var(--radius); padding: 24px 28px; }
+  .featured-show-card.hidden { display: none; }
   .next-label { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 12px; color: #B8860B; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
   .next-name { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 700; font-size: 24px; color: var(--dark); margin-bottom: 6px; }
   .next-date { font-size: 14px; color: #92400E; margin-bottom: 6px; line-height: 1.5; }
@@ -329,7 +344,7 @@
     display: block; width: 100%; min-width: 0; box-sizing: border-box;
   }
   .calendar-event-pill:hover { filter: brightness(0.95); }
-  .calendar-more { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 10px; color: var(--muted); cursor: pointer; background: none; border: none; text-align: left; padding: 0; width: 100%; }
+  .calendar-more { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 10px; color: var(--muted); background: none; border: none; text-align: left; padding: 0; width: 100%; }
   html.dark .calendar-event-pill { background: #1F1A08; border-color: #B8960A; }
 
   @media (max-width: 768px) {
@@ -536,6 +551,7 @@
     .hero { grid-template-columns: 1fr; }
     .hero-map-wrap { height: 240px; }
     .stat-strip { grid-template-columns: 1fr; }
+    .stat-strip.no-featured { grid-template-columns: 1fr; }
     .shows-grid { grid-template-columns: 1fr; }
     .show-fields { grid-template-columns: 1fr; }
     .hero-title { font-size: 40px; }
@@ -656,9 +672,14 @@
     text-align:center; padding:12px 32px 0;
   }
 </style>
+<!-- Analytics: Plausible (privacy-friendly, no cookies, no consent banner needed).
+     Requires a Plausible account for gccardshows.com — see plausible.io. -->
+<script defer data-domain="gccardshows.com" src="https://plausible.io/js/script.js"></script>
 <script>window.PAGE_STATE_FILTER="MS";</script>
 </head>
 <body>
+
+<a href="#main-content" class="skip-link">Skip to main content</a>
 
 
 <nav>
@@ -678,7 +699,7 @@
         <a href="https://buymeacoffee.com/zbflips8" class="mobile-menu-item" target="_blank" rel="noopener noreferrer" onclick="closeMobileMenu()">Support</a>
       </div>
     </div>
-    <button class="dark-toggle" id="dark-toggle" onclick="toggleDark()" title="Toggle dark mode">🌙</button>
+    <button class="dark-toggle" id="dark-toggle" onclick="toggleDark()" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
   </div>
 </nav>
 
@@ -688,7 +709,7 @@
   </div>
 </noscript>
 
-<section class="hero">
+<section class="hero" id="main-content">
   <div>
     <p class="hero-eyebrow">Mississippi Card Shows</p>
     <h1 class="hero-title">Upcoming Card Shows in Mississippi</h1>
@@ -717,13 +738,18 @@
   <a href="index.html">All States</a>
   <a href="alabama-card-shows.html">Alabama</a>
   <a href="florida-card-shows.html">Florida</a>
+  <a href="georgia-card-shows.html">Georgia</a>
   <strong>Mississippi</strong>
 </nav>
 <!-- STATE-NAV-END -->
 
-<div class="stat-strip">
+<div class="stat-strip no-featured" id="stat-strip">
   <div class="next-show-card" id="next-show-card">
     <p class="next-label">Next show</p>
+    <p class="next-name">Loading…</p>
+  </div>
+  <div class="featured-show-card hidden" id="featured-show-card">
+    <p class="next-label">⭐ Featured show</p>
     <p class="next-name">Loading…</p>
   </div>
   <div class="count-card">
@@ -756,6 +782,10 @@
       <div class="ctrl-group" style="flex:0 0 auto;">
         <label class="ctrl-label">&nbsp;</label>
         <button class="ctrl-btn" type="button" onclick="setHomeBase()">📍 Set Home Base</button>
+      </div>
+      <div class="ctrl-group" style="flex:0 0 auto;">
+        <label class="ctrl-label">&nbsp;</label>
+        <button class="ctrl-btn" type="button" onclick="useMyLocation()" id="use-my-location-btn" title="Use your device's location instead of typing an address">🎯 Near Me</button>
       </div>
       <div class="ctrl-group" style="flex:0 0 auto;">
         <label class="ctrl-label">&nbsp;</label>
@@ -806,8 +836,8 @@
 
 <section class="shows-section" id="shows-real" style="padding-top:0;">
   <div class="view-toggle" role="group" aria-label="Switch between list and calendar view">
-    <button type="button" class="view-toggle-btn active" id="view-toggle-list" onclick="setViewMode('list')">📋 List</button>
-    <button type="button" class="view-toggle-btn" id="view-toggle-calendar" onclick="setViewMode('calendar')">📅 Calendar</button>
+    <button type="button" class="view-toggle-btn active" id="view-toggle-list" onclick="setViewMode('list')" aria-pressed="true">📋 List</button>
+    <button type="button" class="view-toggle-btn" id="view-toggle-calendar" onclick="setViewMode('calendar')" aria-pressed="false">📅 Calendar</button>
     <button type="button" class="view-toggle-ics" onclick="downloadFilteredIcs()" title="Download an .ics file of the shows currently matching your filters">🗓️ Add filtered shows to calendar</button>
   </div>
 
@@ -880,10 +910,10 @@
 </footer>
 
 <!-- MODAL -->
-<div class="modal-overlay" id="modal" onclick="closeModalOutside(event)">
+<div class="modal-overlay" id="modal" onclick="closeModalOutside(event)" role="dialog" aria-modal="true" aria-labelledby="add-show-title">
   <div class="modal">
     <button class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
-    <h2 class="modal-title">Add Your Show 🎴</h2>
+    <h2 class="modal-title" id="add-show-title">Add Your Show 🎴</h2>
     <form id="show-form" action="https://formspree.io/f/xzdlvozp" method="POST" onsubmit="handleSubmit(event)">
     <div class="form-row">
       <div class="form-group"><label>Event Name *</label><input type="text" name="event_name" placeholder="e.g. Gulf Coast Card Swap" required></div>
@@ -988,12 +1018,12 @@
 </script>
 
 <!-- CONTACT MODAL -->
-<div class="modal-overlay" id="contact-modal" onclick="closeContactOutside(event)">
+<div class="modal-overlay" id="contact-modal" onclick="closeContactOutside(event)" role="dialog" aria-modal="true" aria-labelledby="contact-title">
   <div class="modal" style="max-width:420px;">
     <button class="modal-close" onclick="closeContact()" aria-label="Close">✕</button>
     <div style="text-align:center; margin-bottom:24px;">
       <div style="font-size:52px; margin-bottom:8px;">🎴</div>
-      <h2 class="modal-title" style="margin-bottom:4px;">Get in Touch</h2>
+      <h2 class="modal-title" id="contact-title" style="margin-bottom:4px;">Get in Touch</h2>
       <p style="font-size:14px; color:var(--muted);">Questions, submissions, or just want to talk cards?</p>
     </div>
     <div style="display:flex; flex-direction:column; gap:14px;">
@@ -1027,10 +1057,10 @@
 </div>
 
 <!-- REPORT ERROR MODAL -->
-<div class="modal-overlay" id="report-modal" onclick="closeReportOutside(event)">
+<div class="modal-overlay" id="report-modal" onclick="closeReportOutside(event)" role="dialog" aria-modal="true" aria-labelledby="report-title">
   <div class="modal">
     <button class="modal-close" onclick="closeReport()" aria-label="Close">✕</button>
-    <h2 class="modal-title">Report an Error 🚩</h2>
+    <h2 class="modal-title" id="report-title">Report an Error 🚩</h2>
     <p style="font-size:14px; color:var(--muted); margin-bottom:18px;">
       Spot something wrong — bad date, wrong address, broken link? Let Zac know and he'll fix it.
     </p>
@@ -1059,7 +1089,7 @@
 </div>
 
 <!-- EVENT DETAIL MODAL (populated dynamically from EVENTS data) -->
-<div class="modal-overlay blur-bg" id="event-detail-modal" onclick="closeEventDetailOutside(event)">
+<div class="modal-overlay blur-bg" id="event-detail-modal" onclick="closeEventDetailOutside(event)" role="dialog" aria-modal="true" aria-labelledby="detail-name">
   <div class="modal detail-modal">
     <button class="modal-close" onclick="closeEventDetail()" aria-label="Close">✕</button>
     <div class="detail-hero">
@@ -1122,6 +1152,7 @@
       name: "The 850 Card Show",
       startDate: "2026-07-10", endDate: "2026-07-11",
       dateAdded: "2026-07-08",
+      featured: false,
       dateDisplay: "Friday, July 10th & Saturday, July 11th, 2026",
       time: "3:00PM–8:00PM Fri · 9:00AM–3:00PM Sat",
       timeUnknown: false,
@@ -1145,6 +1176,7 @@
       name: "Anchor Up Card Show",
       startDate: "2026-07-11", endDate: "2026-07-11",
       dateAdded: "2026-07-08",
+      featured: false,
       dateDisplay: "Saturday, July 11th, 2026",
       time: "9:00AM to 3:00PM",
       timeUnknown: false,
@@ -1164,10 +1196,35 @@
       },
     },
     {
+      id: "evt-1783533368332",
+      name: "The Flip - Columbus, GA",
+      startDate: "2026-07-11", endDate: "2026-07-11",
+      dateAdded: "",
+      featured: false,
+      dateDisplay: "Saturday, July 11th, 2026",
+      time: "10:00AM to 5:00PM EST",
+      timeUnknown: false,
+      location: "801 Front Ave, Columbus, GA",
+      lat: 32.461105, lng: -84.994674,
+      entryFee: "$7 - FREE for 13 and under!", entryFree: false,
+      vendorFee: "$75-$125",
+      websiteUrl: "TheFlipTradeShow.com", websiteLabel: "🌐 Website",
+      organizer: "The Flip Trade Show and Southern Card Collectors",
+      tbd: false,
+      authServices: { present: null, company: "" },
+      details: {
+        about: "The FLIP is a trade show and marketplace featuring 100+ collectibles vendors, now with 300+ table capacity and more room than ever before. Come buy, sell, and trade with vendors and collectors from across the region in a fun, family-friendly atmosphere.\nYou’ll find a huge variety of collectibles, including:\nSports Cards, Non-Sports Cards, Trading Card Games (TCGs), Pokémon, MTG, Comics, Video Games, Funko Pops, Currency & Coins, Sports Memorabilia, Wrestling Memorabilia, Autographs, Jerseys, NASCAR, F1, UFC, Wrestling collectibles, and much more.\nItem selection will vary by vendor and category.\nA FAMILY-FRIENDLY, FUN ATMOSPHERE\n35,000 square feet, almost twice the space!",
+        atAGlance: [{label:"Saturday Hours",value:"10:00 AM – 5:00 PM"}, {label:"General Admission",value:"$7"}, {label:"Kids 14 & under",value:"Free"}, {label:"Military, police and 1st responders $3 off",value:""}, {label:"Admission payment",value:"Cash and payment apps only. No cards."}, {label:"All tickets are purchased at the door.",value:""}],
+        whatToExpect: ["300+ table capacity", "Police & security on-site", "Free kid packs", "Free entry for kids 13 & under", "Free giveaways & contests", "Free estimations", "Grading submissions", "Seating areas to trade", "Autograph signers", "Trade night"],
+        locationNotes: "",
+      },
+    },
+    {
       id: "evt-003",
       name: "Bay County Card Fest",
       startDate: "2026-07-18", endDate: "2026-07-18",
       dateAdded: "2026-07-08",
+      featured: false,
       dateDisplay: "Saturday, July 18th, 2026",
       time: "10:00AM to 7:00PM",
       timeUnknown: false,
@@ -1191,6 +1248,7 @@
       name: "Iconic Sports Cards & Collectibles Show",
       startDate: "2026-07-24", endDate: "2026-07-25",
       dateAdded: "2026-07-08",
+      featured: false,
       dateDisplay: "Friday, July 24th & Saturday, July 25th, 2026",
       time: "11:00AM to 8:00PM Friday, 10:00AM to 6:00PM Saturday",
       timeUnknown: false,
@@ -1214,6 +1272,7 @@
       name: "Coastal Collectors Expo",
       startDate: "2026-07-25", endDate: "2026-07-25",
       dateAdded: "2026-07-08",
+      featured: false,
       dateDisplay: "Saturday, July 25th, 2026",
       time: "10:00AM to 5:00PM",
       timeUnknown: false,
@@ -1237,6 +1296,7 @@
       name: "Gulf Breeze Card Clash",
       startDate: "2026-08-01", endDate: "2026-08-01",
       dateAdded: "2026-07-08",
+      featured: false,
       dateDisplay: "Saturday, August 1st, 2026",
       time: "9:00AM to 5:00PM",
       timeUnknown: false,
@@ -1259,7 +1319,8 @@
       id: "evt-006",
       name: "Cards on the Coast",
       startDate: "2026-08-08", endDate: "2026-08-08",
-      dateAdded: "2026-07-08",
+      dateAdded: "",
+      featured: false,
       dateDisplay: "Saturday, August 8th, 2026",
       time: "9:00AM to 4:00PM",
       timeUnknown: false,
@@ -1283,6 +1344,7 @@
       name: "TheC2Show",
       startDate: "2026-08-15", endDate: "2026-08-15",
       dateAdded: "2026-07-08",
+      featured: false,
       dateDisplay: "Saturday, August 15th, 2026",
       time: "9:00AM to 5:00PM",
       timeUnknown: false,
@@ -1306,6 +1368,7 @@
       name: "Anchor Up Spectacular",
       startDate: "2026-08-22", endDate: "2026-08-22",
       dateAdded: "2026-07-08",
+      featured: false,
       dateDisplay: "Saturday, August 22nd, 2026",
       time: "8:00AM to 4:00PM",
       timeUnknown: false,
@@ -1329,6 +1392,7 @@
       name: "TCG Con Huntsville",
       startDate: "2026-08-22", endDate: "2026-08-23",
       dateAdded: "2026-07-08",
+      featured: false,
       dateDisplay: "Saturday, August 22nd & Sunday, August 23rd, 2026",
       time: "10:00AM to 5:00PM Saturday, 11:00AM to 4:00PM Sunday",
       timeUnknown: false,
@@ -1347,6 +1411,7 @@
       name: "Gulf Coast Card Show",
       startDate: "2026-08-29", endDate: "2026-08-29",
       dateAdded: "2026-07-08",
+      featured: false,
       dateDisplay: "Saturday, August 29th, 2026",
       time: "9:00AM to 5:00PM",
       timeUnknown: false,
@@ -1370,6 +1435,7 @@
       name: "Iconic Sports Cards & Collectibles Show",
       startDate: "2026-09-04", endDate: "2026-09-05",
       dateAdded: "2026-07-08",
+      featured: false,
       dateDisplay: "Friday, September 4th & Saturday, September 5th, 2026",
       time: "10:00AM to 6:00PM",
       timeUnknown: false,
@@ -1393,6 +1459,7 @@
       name: "Card Town Pensacola Labor Day Showcase",
       startDate: "2026-09-07", endDate: "2026-09-07",
       dateAdded: "2026-07-08",
+      featured: false,
       dateDisplay: "Monday, September 7th, 2026",
       time: "10:00AM to 3:00PM",
       timeUnknown: false,
@@ -1416,6 +1483,7 @@
       name: "850 Sports Card Show",
       startDate: "2026-09-11", endDate: "2026-09-12",
       dateAdded: "2026-07-08",
+      featured: false,
       dateDisplay: "Friday, September 11th & Saturday, September 12th, 2026",
       time: "3:00PM–8:00PM Fri · 9:00AM–3:00PM Sat",
       timeUnknown: false,
@@ -1439,6 +1507,7 @@
       name: "MobTown Card Show",
       startDate: "2026-09-26", endDate: "2026-09-26",
       dateAdded: "2026-07-08",
+      featured: false,
       dateDisplay: "Saturday, September 26th, 2026",
       time: "8:00AM to 4:00PM",
       timeUnknown: false,
@@ -1462,6 +1531,7 @@
       name: "Anchor Up Card Show",
       startDate: "2026-09-12", endDate: "2026-09-12",
       dateAdded: "2026-07-08",
+      featured: false,
       dateDisplay: "Saturday, September 12th, 2026",
       time: "9:00AM to 3:00PM",
       timeUnknown: false,
@@ -1485,6 +1555,7 @@
       name: "DJ's Trade Show",
       startDate: "2026-10-03", endDate: "2026-10-03",
       dateAdded: "2026-07-08",
+      featured: false,
       dateDisplay: "Saturday, October 3rd, 2026",
       time: "9:00AM to 5:00PM",
       timeUnknown: false,
@@ -1508,6 +1579,7 @@
       name: "Anchor Up Card Show",
       startDate: "2026-10-10", endDate: "2026-10-10",
       dateAdded: "2026-07-08",
+      featured: false,
       dateDisplay: "Saturday, October 10th, 2026",
       time: "9:00AM to 3:00PM",
       timeUnknown: false,
@@ -1526,6 +1598,7 @@
       name: "Riptide CardCon",
       startDate: "2026-10-18", endDate: "2026-10-18",
       dateAdded: "2026-07-08",
+      featured: false,
       dateDisplay: "Sunday, October 18th, 2026",
       time: "9:00AM to 6:00PM",
       timeUnknown: false,
@@ -1549,6 +1622,7 @@
       name: "Gulf Coast Card Show",
       startDate: "2026-10-31", endDate: "2026-10-31",
       dateAdded: "2026-07-08",
+      featured: false,
       dateDisplay: "Saturday, October 31st, 2026",
       time: "9:00AM to 5:00PM",
       timeUnknown: false,
@@ -1572,6 +1646,7 @@
       name: "Mid-South Card Con",
       startDate: "2026-11-14", endDate: "2026-11-14",
       dateAdded: "2026-07-08",
+      featured: false,
       dateDisplay: "Saturday, November 14th, 2026",
       time: "",
       timeUnknown: true,
@@ -1590,6 +1665,7 @@
       name: "Anchor Up Card Show",
       startDate: "2026-11-14", endDate: "2026-11-14",
       dateAdded: "2026-07-08",
+      featured: false,
       dateDisplay: "Saturday, November 14th, 2026",
       time: "9:00AM to 3:00PM",
       timeUnknown: false,
@@ -1613,6 +1689,7 @@
       name: "Emerald Coast Collectors Showcase",
       startDate: "2026-11-28", endDate: "2026-11-28",
       dateAdded: "2026-07-08",
+      featured: false,
       dateDisplay: "Saturday, November 28th, 2026",
       time: "9:30AM to 4:30PM",
       timeUnknown: false,
@@ -1636,6 +1713,7 @@
       name: "The 850 Card Show",
       startDate: "2026-12-19", endDate: "2026-12-19",
       dateAdded: "2026-07-08",
+      featured: false,
       dateDisplay: "Saturday, December 19th, 2026",
       time: "",
       timeUnknown: true,
@@ -1902,6 +1980,7 @@
     }
 
     computeNextShow();
+    computeFeaturedShow();
     populateFilterOptions();
     applyFilters();
   }
@@ -1953,6 +2032,29 @@
       <p class="next-date">${escapeHtml(ev.dateDisplay)}${timeStr}</p>
       <p class="next-loc">${escapeHtml(ev.location)}</p>
     `;
+  }
+
+  function computeFeaturedShow() {
+    const card = document.getElementById('featured-show-card');
+    const strip = document.getElementById('stat-strip');
+    if (!card || !strip) return;
+    const ev = EVENTS.find(x => x.featured);
+    if (!ev) {
+      card.classList.add('hidden');
+      strip.classList.add('no-featured');
+      return;
+    }
+    const st = detectState(ev.location);
+    const stName = st === 'UNK' ? 'Unknown' : STATE_NAMES[st];
+    const timeStr = (!ev.timeUnknown && ev.time) ? ` · ${escapeHtml(ev.time)}` : '';
+    card.innerHTML = `
+      <p class="next-label">⭐ Featured show <span class="state-badge state-${st}" style="margin-left:8px;vertical-align:middle;">${st === 'UNK' ? '?' : st} · ${stName}</span></p>
+      <p class="next-name">${escapeHtml(ev.tbd ? (ev.name || 'Details Coming Soon') : ev.name)}</p>
+      <p class="next-date">${escapeHtml(ev.dateDisplay)}${timeStr}</p>
+      <p class="next-loc">${escapeHtml(ev.location)}</p>
+    `;
+    card.classList.remove('hidden');
+    strip.classList.remove('no-featured');
   }
 
   // ===== Map =====
@@ -2131,8 +2233,8 @@
     const calBtn = document.getElementById('view-toggle-calendar');
     const grid = document.getElementById('shows-grid');
     const cal = document.getElementById('calendar-view');
-    if (listBtn) listBtn.classList.toggle('active', mode === 'list');
-    if (calBtn) calBtn.classList.toggle('active', mode === 'calendar');
+    if (listBtn) { listBtn.classList.toggle('active', mode === 'list'); listBtn.setAttribute('aria-pressed', mode === 'list' ? 'true' : 'false'); }
+    if (calBtn) { calBtn.classList.toggle('active', mode === 'calendar'); calBtn.setAttribute('aria-pressed', mode === 'calendar' ? 'true' : 'false'); }
     if (grid) grid.style.display = mode === 'list' ? 'grid' : 'none';
     if (cal) cal.hidden = mode !== 'calendar';
     if (mode === 'calendar') renderCalendar();
@@ -2170,7 +2272,9 @@
     }
 
     const year = calendarCursor.getFullYear(), month = calendarCursor.getMonth();
-    labelEl.textContent = calendarCursor.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    const monthYearLabel = calendarCursor.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    labelEl.textContent = monthYearLabel;
+    gridEl.setAttribute('aria-label', `Card shows in ${monthYearLabel}`);
 
     // Map each date (YYYY-MM-DD, local) to the events occurring that day —
     // multi-day shows get a pill on every day in their range.
@@ -2203,11 +2307,13 @@
       const dayEvents = byDate[key] || [];
       const shown = dayEvents.slice(0, 3);
       const extra = dayEvents.length - shown.length;
+      const fullDateLabel = cellDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+      const cellLabel = `${fullDateLabel}${isToday ? ' (today)' : ''}${dayEvents.length ? `, ${dayEvents.length} show${dayEvents.length === 1 ? '' : 's'}` : ', no shows'}`;
 
-      html += `<div class="calendar-day${inMonth ? '' : ' other-month'}${isToday ? ' today' : ''}${isPast ? ' past' : ''}">`;
-      html += `<div class="calendar-day-num">${cellDate.getDate()}</div>`;
+      html += `<div class="calendar-day${inMonth ? '' : ' other-month'}${isToday ? ' today' : ''}${isPast ? ' past' : ''}" aria-label="${escapeHtml(cellLabel)}">`;
+      html += `<div class="calendar-day-num" aria-hidden="true">${cellDate.getDate()}</div>`;
       shown.forEach(ev => {
-        html += `<button type="button" class="calendar-event-pill" onclick="openEventDetailById('${escapeHtml(ev.id)}')" title="${escapeHtml(ev.name || '')}">${escapeHtml(ev.name || 'Card Show')}</button>`;
+        html += `<button type="button" class="calendar-event-pill" onclick="openEventDetailById('${escapeHtml(ev.id)}')" aria-label="${escapeHtml(ev.name || 'Card Show')} — ${escapeHtml(fullDateLabel)}, view details">${escapeHtml(ev.name || 'Card Show')}</button>`;
       });
       if (extra > 0) html += `<div class="calendar-more">+${extra} more</div>`;
       html += `</div>`;
@@ -2494,6 +2600,46 @@
     } catch (e) {
       setStatus('Geocoding failed. Check your connection and try again.', true);
     }
+  }
+  function useMyLocation() {
+    if (!navigator.geolocation) {
+      setStatus("Your browser doesn't support geolocation — type an address above instead.", true);
+      return;
+    }
+    const btn = document.getElementById('use-my-location-btn');
+    if (btn) { btn.disabled = true; btn.textContent = '🎯 Locating…'; }
+    setStatus('Getting your location…');
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      const lat = pos.coords.latitude, lng = pos.coords.longitude;
+      let label = 'Your current location';
+      try {
+        const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10`;
+        const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+        const data = await r.json();
+        const a = data && data.address;
+        if (a) {
+          const city = a.city || a.town || a.village || a.county;
+          if (city && a.state) label = `${city}, ${a.state}`;
+          else if (a.state) label = a.state;
+        }
+      } catch (e) { /* keep the generic label — coordinates still work fine either way */ }
+      homeBase = { lat, lng, label };
+      localStorage.setItem('gccs-home-base', JSON.stringify(homeBase));
+      const input = document.getElementById('home-base-input');
+      if (input) input.value = label;
+      setStatus(`📍 Home base: ${label}`);
+      renderDistances();
+      applyFilters();
+      const sel = document.getElementById('sort-select');
+      if (sel && sel.value === 'default') { sel.value = 'distance'; applySort(); }
+      showToast(`📍 Using ${label} as your home base.`, 'success');
+      if (btn) { btn.disabled = false; btn.textContent = '🎯 Near Me'; }
+    }, (err) => {
+      let msg = 'Could not get your location — type an address above instead.';
+      if (err.code === err.PERMISSION_DENIED) msg = 'Location permission denied — you can still type an address above.';
+      setStatus(msg, true);
+      if (btn) { btn.disabled = false; btn.textContent = '🎯 Near Me'; }
+    }, { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 });
   }
   function clearHomeBase() {
     homeBase = null;

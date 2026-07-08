@@ -84,6 +84,17 @@
   }
   .archive-toggle:hover { background: var(--border); color: var(--dark); }
   .archive-note { font-size: 11px; color: var(--muted); margin: -4px 0 12px; line-height: 1.5; }
+  .featured-picker {
+    max-width: 1200px; margin: 0 auto 16px; padding: 14px 18px; background: #EFF6FF; border: 2px solid #60A5FA;
+    border-radius: var(--radius); display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  }
+  .featured-picker label { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 13px; color: var(--dark); }
+  .featured-picker select {
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 13px; padding: 8px 12px;
+    border-radius: 8px; border: 1px solid var(--border); background: var(--card-bg); color: var(--dark); min-width: 220px;
+  }
+  .featured-picker .hint { font-size: 12px; color: var(--muted); flex-basis: 100%; }
+  .event-tag.featured-tag { background: #2563EB; }
 
   /* Form */
   .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
@@ -149,6 +160,14 @@
   </div>
 </header>
 <p class="browser-note" id="browser-note"></p>
+
+<div class="featured-picker" id="featured-picker">
+  <label for="featured-select">⭐ Featured Show</label>
+  <select id="featured-select" disabled>
+    <option value="">— None —</option>
+  </select>
+  <span class="hint">Shown in the spotlight box next to "Next Show" on the site. Pick one show, or "None" to hide that box entirely.</span>
+</div>
 
 <div class="layout">
   <div class="panel">
@@ -252,6 +271,7 @@
       startDate: ev.startDate || '',
       endDate: ev.endDate || '',
       dateAdded: ev.dateAdded || todayIsoAdmin(),
+      featured: !!ev.featured,
       time: ev.time || '',
       timeUnknown: !!ev.timeUnknown,
       location: ev.location || '',
@@ -316,6 +336,7 @@
       name: "${jsStringEscape(ev.name)}",
       startDate: "${jsStringEscape(ev.startDate)}", endDate: "${jsStringEscape(ev.endDate)}",
       dateAdded: "${jsStringEscape(ev.dateAdded)}",
+      featured: ${!!ev.featured},
       dateDisplay: "${jsStringEscape(ev.dateDisplay)}",
       time: "${jsStringEscape(ev.time)}",
       timeUnknown: ${!!ev.timeUnknown},
@@ -712,6 +733,7 @@ ${itemsXml}
           <div class="event-name">${escapeHtml(ev.tbd ? (ev.name || 'Details Coming Soon') : (ev.name || '(unnamed show)'))}</div>
           <div class="event-meta">${escapeHtml(ev.dateDisplay || 'No date set')} · ${st === 'UNK' ? '' : st}</div>
           ${ev.tbd ? '<span class="event-tag">TBD</span>' : ''}
+          ${ev.featured ? '<span class="event-tag featured-tag">⭐ Featured</span>' : ''}
           ${isPast ? '<span class="event-tag" style="background:var(--muted);">Archived</span>' : ''}
         </div>
         <div class="event-actions">
@@ -741,7 +763,26 @@ ${itemsXml}
 
     const toggleBtn = document.getElementById('btn-toggle-archived');
     if (toggleBtn) toggleBtn.addEventListener('click', () => { showArchived = !showArchived; renderList(); });
+
+    renderFeaturedPicker();
   }
+
+  function renderFeaturedPicker() {
+    const sel = document.getElementById('featured-select');
+    if (!sel) return;
+    sel.disabled = !events.length;
+    const current = events.find(ev => ev.featured);
+    sel.innerHTML = '<option value="">— None —</option>' + events.map(ev =>
+      `<option value="${ev.id}">${escapeHtml(ev.name || '(unnamed show)')} — ${escapeHtml(ev.dateDisplay || 'no date')}</option>`
+    ).join('');
+    sel.value = current ? current.id : '';
+  }
+  document.getElementById('featured-select').addEventListener('change', (e) => {
+    const chosenId = e.target.value;
+    events.forEach(ev => { ev.featured = (ev.id === chosenId); });
+    dirty = true;
+    renderList();
+  });
 
   // Moves an event up/down within its own group (active or archived) rather
   // than the raw array, so reordering never mixes an upcoming show into the
@@ -797,6 +838,7 @@ ${itemsXml}
     return {
       id: 'evt-' + Date.now(), name: '', dateDisplay: '', startDate: '', endDate: '',
       dateAdded: todayIsoAdmin(),
+      featured: false,
       time: '', timeUnknown: false, location: '', lat: null, lng: null,
       entryFee: '', entryFree: true, vendorFee: '', websiteUrl: '', websiteLabel: '',
       organizer: '', tbd: false,
