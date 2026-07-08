@@ -1414,7 +1414,7 @@
       timeUnknown: false,
       location: "800 W 9 Mile Rd Pensacola, FL, 32534",
       lat: 30.5228475, lng: -87.277926,
-      entryFee: "$0", entryFree: true,
+      entryFee: "$5 - Free under 13!", entryFree: false,
       vendorFee: "",
       websiteUrl: "https://www.emeraldcoastcollectorsshowcase.com", websiteLabel: "📅 Facebook",
       organizer: "Emerald Coast Collectors Showcase",
@@ -1918,8 +1918,8 @@
     const cal = document.getElementById('calendar-view');
     if (listBtn) listBtn.classList.toggle('active', mode === 'list');
     if (calBtn) calBtn.classList.toggle('active', mode === 'calendar');
-    if (grid) grid.style.display = mode === 'list' ? '' : 'none';
-    if (cal) cal.style.display = mode === 'calendar' ? '' : 'none';
+    if (grid) grid.style.display = mode === 'list' ? 'grid' : 'none';
+    if (cal) cal.hidden = mode !== 'calendar';
     if (mode === 'calendar') renderCalendar();
   }
 
