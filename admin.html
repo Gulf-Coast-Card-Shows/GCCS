@@ -145,6 +145,7 @@
     <button id="btn-save" class="btn-primary" disabled>💾 Save to index.html</button>
     <button id="btn-download" disabled>⬇️ Download copy</button>
     <button id="btn-gen-states" disabled title="Creates one SEO-friendly landing page per state (e.g. florida-card-shows.html) from the shows currently loaded">🌎 Generate State Pages</button>
+    <button id="btn-gen-feeds" disabled title="Creates feed.xml (RSS) and feed.json listing recently-added shows, newest first">📰 Download Feeds</button>
   </div>
 </header>
 <p class="browser-note" id="browser-note"></p>
@@ -250,6 +251,7 @@
       dateDisplay: ev.dateDisplay || '',
       startDate: ev.startDate || '',
       endDate: ev.endDate || '',
+      dateAdded: ev.dateAdded || todayIsoAdmin(),
       time: ev.time || '',
       timeUnknown: !!ev.timeUnknown,
       location: ev.location || '',
@@ -313,6 +315,7 @@
       id: "${jsStringEscape(ev.id)}",
       name: "${jsStringEscape(ev.name)}",
       startDate: "${jsStringEscape(ev.startDate)}", endDate: "${jsStringEscape(ev.endDate)}",
+      dateAdded: "${jsStringEscape(ev.dateAdded)}",
       dateDisplay: "${jsStringEscape(ev.dateDisplay)}",
       time: "${jsStringEscape(ev.time)}",
       timeUnknown: ${!!ev.timeUnknown},
@@ -384,6 +387,7 @@ ${serializeDetails(ev.details)}
     document.getElementById('btn-save').disabled = false;
     document.getElementById('btn-download').disabled = false;
     document.getElementById('btn-gen-states').disabled = false;
+    document.getElementById('btn-gen-feeds').disabled = false;
     document.getElementById('btn-add').disabled = false;
     renderList();
     renderForm(null);
@@ -445,6 +449,13 @@ ${serializeDetails(ev.details)}
   // ===== Date helpers =====
   const DOW = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  function todayIsoAdmin() {
+    // Local calendar date as YYYY-MM-DD — avoids the UTC-shift bug you get
+    // from new Date().toISOString() near midnight in US time zones.
+    const d = new Date();
+    const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0'), day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
   function ordinal(n) {
     const s = ['th','st','nd','rd'], v = n % 100;
     return n + (s[(v - 20) % 10] || s[v] || s[0]);
@@ -563,6 +574,89 @@ ${serializeDetails(ev.details)}
     });
     toast(`Generating ${states.length} state page${states.length === 1 ? '' : 's'} — check your downloads.`);
   }
+
+  // ===== Feed generation (RSS + JSON Feed of newly-added shows) =====
+  function xmlEscapeAdmin(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  function feedItemsFrom(list, limit) {
+    // Newest-added first. Shows without a usable dateAdded (shouldn't happen
+    // once normalizeEvent() has run, but just in case) sort last rather than
+    // crashing the sort or floating to the top.
+    return list.slice()
+      .sort((a, b) => (b.dateAdded || '').localeCompare(a.dateAdded || ''))
+      .slice(0, limit || 50);
+  }
+  function feedDescriptionFor(ev) {
+    const about = ((ev.details && ev.details.about) || '').replace(/\s+/g, ' ').trim();
+    const base = about || `${ev.dateDisplay || ''} — ${ev.location || ''}`.trim();
+    return base.length > 300 ? base.slice(0, 297) + '…' : base;
+  }
+  function buildRssXml(list) {
+    const items = feedItemsFrom(list);
+    const nowRfc822 = new Date().toUTCString();
+    const itemsXml = items.map(ev => {
+      const link = `https://gccardshows.com/?show=${encodeURIComponent(ev.id)}`;
+      const pub = new Date(`${ev.dateAdded || todayIsoAdmin()}T12:00:00Z`).toUTCString();
+      return `    <item>
+      <title><![CDATA[${ev.name || 'Card Show'}]]></title>
+      <link>${xmlEscapeAdmin(link)}</link>
+      <guid isPermaLink="false">${xmlEscapeAdmin(ev.id)}</guid>
+      <pubDate>${pub}</pubDate>
+      <description><![CDATA[${feedDescriptionFor(ev)}]]></description>
+    </item>`;
+    }).join('\n');
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Gulf Coast Card Shows — New Listings</title>
+    <link>https://gccardshows.com/</link>
+    <description>Newly added Pokémon, sports card, and TCG shows along the Gulf Coast.</description>
+    <language>en-us</language>
+    <lastBuildDate>${nowRfc822}</lastBuildDate>
+${itemsXml}
+  </channel>
+</rss>
+`;
+  }
+  function buildJsonFeedContent(list) {
+    const items = feedItemsFrom(list);
+    const feed = {
+      version: 'https://jsonfeed.org/version/1.1',
+      title: 'Gulf Coast Card Shows — New Listings',
+      home_page_url: 'https://gccardshows.com/',
+      feed_url: 'https://gccardshows.com/feed.json',
+      description: 'Newly added Pokémon, sports card, and TCG shows along the Gulf Coast.',
+      items: items.map(ev => ({
+        id: ev.id,
+        url: `https://gccardshows.com/?show=${encodeURIComponent(ev.id)}`,
+        title: ev.name || 'Card Show',
+        content_text: feedDescriptionFor(ev),
+        date_published: `${ev.dateAdded || todayIsoAdmin()}T12:00:00Z`,
+      })),
+    };
+    return JSON.stringify(feed, null, 2);
+  }
+  function generateFeeds() {
+    if (!originalText) { toast('Open index.html first.', true); return; }
+    const files = [
+      { name: 'feed.xml', content: buildRssXml(events), type: 'application/rss+xml' },
+      { name: 'feed.json', content: buildJsonFeedContent(events), type: 'application/feed+json' },
+    ];
+    files.forEach((f, i) => {
+      setTimeout(() => {
+        const blob = new Blob([f.content], { type: f.type });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = f.name;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }, i * 350);
+    });
+    toast('Generating feed.xml and feed.json — check your downloads, then upload both alongside index.html.');
+  }
+  document.getElementById('btn-gen-feeds').addEventListener('click', generateFeeds);
 
   // ===== List rendering =====
   // ===== Past-show detection =====
@@ -702,6 +796,7 @@ ${serializeDetails(ev.details)}
   function blankEvent() {
     return {
       id: 'evt-' + Date.now(), name: '', dateDisplay: '', startDate: '', endDate: '',
+      dateAdded: todayIsoAdmin(),
       time: '', timeUnknown: false, location: '', lat: null, lng: null,
       entryFee: '', entryFree: true, vendorFee: '', websiteUrl: '', websiteLabel: '',
       organizer: '', tbd: false,
@@ -762,6 +857,7 @@ ${serializeDetails(ev.details)}
         <div class="form-group"><label>End Date (if multi-day)</label><input type="date" id="f-end-date" value="${escapeHtml(ev.endDate)}"></div>
       </div>
       <div class="hint" id="date-preview">Date display will be generated automatically.</div>
+      <div class="hint" style="margin-top:2px;">📰 Added to site: ${escapeHtml(ev.dateAdded || todayIsoAdmin())} — this is what determines its order in the RSS/JSON feed of new listings, not the show date above.</div>
       <div class="form-group" style="margin-top:12px;">
         <label>Time</label>
         <input type="text" id="f-time" value="${escapeHtml(ev.time)}" placeholder="e.g. 9:00AM to 3:00PM" ${ev.timeUnknown ? 'disabled' : ''}>

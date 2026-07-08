@@ -1,0 +1,177 @@
+{
+  "version": "https://jsonfeed.org/version/1.1",
+  "title": "Gulf Coast Card Shows — New Listings",
+  "home_page_url": "https://gccardshows.com/",
+  "feed_url": "https://gccardshows.com/feed.json",
+  "description": "Newly added Pokémon, sports card, and TCG shows along the Gulf Coast.",
+  "items": [
+    {
+      "id": "evt-001",
+      "url": "https://gccardshows.com/?show=evt-001",
+      "title": "The 850 Card Show",
+      "content_text": "The 850 Card Show returns to Tallahassee on July 10–11 at the North Florida Fairgrounds, offering collectors a chance to buy, sell, and trade sports cards, Pokémon, One Piece, Disney, and other trading cards. Admission and parking are both free, making it an accessible event for collectors of all…",
+      "date_published": "2026-07-08T12:00:00Z"
+    },
+    {
+      "id": "evt-002",
+      "url": "https://gccardshows.com/?show=evt-002",
+      "title": "Anchor Up Card Show",
+      "content_text": "Anchor up Sports Card Show — 2026 Schedule Announcement! ⚓: Now we’re turning it up a notch for 2026! 📅 The Anchor Up Sports Card Show will now be held the 2nd Saturday of EVERY month! That’s 12 awesome shows in 2026 — more cards, more collectibles, more community, and more fun! 💥",
+      "date_published": "2026-07-08T12:00:00Z"
+    },
+    {
+      "id": "evt-003",
+      "url": "https://gccardshows.com/?show=evt-003",
+      "title": "Bay County Card Fest",
+      "content_text": "The Bay County Card Fest returns for its second show on July 18, 2026, hosted at the Central Panhandle Fairgrounds in Panama City, Florida. This premier regional event features 80 vendor tables dedicated to a diverse array of collectibles, including Pokémon, One Piece, Magic: The Gathering, and p…",
+      "date_published": "2026-07-08T12:00:00Z"
+    },
+    {
+      "id": "evt-004",
+      "url": "https://gccardshows.com/?show=evt-004",
+      "title": "Iconic Sports Cards & Collectibles Show",
+      "content_text": "Come out and browse iconic sports cards and collectibles from vendors across the gulf coast. Bring the whole family there is something for everyone! From Professionally Graded Sports Cards & Pokémon cards, Vintage and Newly Released Packs, boxes and factory sets, down to heavy discounted $1 items…",
+      "date_published": "2026-07-08T12:00:00Z"
+    },
+    {
+      "id": "evt-007",
+      "url": "https://gccardshows.com/?show=evt-007",
+      "title": "Coastal Collectors Expo",
+      "content_text": "Coastal Collectors Expo brings together collectors, dealers, and hobbyists in Pensacola, Florida for an unforgettable experience. Whether you're hunting for vintage cards, modern hits, or unique memorabilia, our shows have something for everyone. Presented by The Mewseum and Magikart, we're passi…",
+      "date_published": "2026-07-08T12:00:00Z"
+    },
+    {
+      "id": "evt-008",
+      "url": "https://gccardshows.com/?show=evt-008",
+      "title": "Gulf Breeze Card Clash",
+      "content_text": "Bring your collection, find rare cards, and connect with fellow collectors from across the area. This is more than a show — it’s a clash you don’t want to miss! 💥 🎉 Sponsored by the Optimist Club of Gulf Breeze 👉 Tag your friends and JOIN THE CLASH!",
+      "date_published": "2026-07-08T12:00:00Z"
+    },
+    {
+      "id": "evt-006",
+      "url": "https://gccardshows.com/?show=evt-006",
+      "title": "Cards on the Coast",
+      "content_text": "The Emerald Coast's Premier Card Show is back! Cards on the Coast 2026 will be on August 8th from 9am-4pm at the University of West Florida with over 200 tables!",
+      "date_published": "2026-07-08T12:00:00Z"
+    },
+    {
+      "id": "evt-010",
+      "url": "https://gccardshows.com/?show=evt-010",
+      "title": "TheC2Show",
+      "content_text": "Arrive early for best selection Bring cash and cards to Trade Protect your cards — sleeves/top loaders Be respectful when handling vendor inventory Stay hydrated and take breaks throughout the day",
+      "date_published": "2026-07-08T12:00:00Z"
+    },
+    {
+      "id": "evt-011",
+      "url": "https://gccardshows.com/?show=evt-011",
+      "title": "Anchor Up Spectacular",
+      "content_text": "Saturday, August 22nd, 2026 — Hilton Garden Inn, 1144 Airport Blvd, Pensacola, FL 32504",
+      "date_published": "2026-07-08T12:00:00Z"
+    },
+    {
+      "id": "evt-012",
+      "url": "https://gccardshows.com/?show=evt-012",
+      "title": "TCG Con Huntsville",
+      "content_text": "Saturday, August 22nd & Sunday, August 23rd, 2026 — Von Braun Center East Halls, 700 Monroe St Southwest, Huntsville, AL 35801",
+      "date_published": "2026-07-08T12:00:00Z"
+    },
+    {
+      "id": "evt-013",
+      "url": "https://gccardshows.com/?show=evt-013",
+      "title": "Gulf Coast Card Show",
+      "content_text": "Saturday, August 29th, 2026 — Saraland Event Center, 72 Saraland Blvd South, Saraland, AL 36571",
+      "date_published": "2026-07-08T12:00:00Z"
+    },
+    {
+      "id": "evt-014",
+      "url": "https://gccardshows.com/?show=evt-014",
+      "title": "Iconic Sports Cards & Collectibles Show",
+      "content_text": "Friday, September 4th & Saturday, September 5th, 2026 — Rest & Relax Inn, 7200 Plantation Rd, Pensacola, FL 32504",
+      "date_published": "2026-07-08T12:00:00Z"
+    },
+    {
+      "id": "evt-015",
+      "url": "https://gccardshows.com/?show=evt-015",
+      "title": "Card Town Pensacola Labor Day Showcase",
+      "content_text": "Card Town is proud to announce that we are running back Card Town Pensacola for this Labor Day! Round two! Come day goodbye to summer and hello to Pensacola's newest sports cards, TCG/Pokémon and collectibles event! Over 91% of Americans have Labor Day off of work and we want to give you a fantas…",
+      "date_published": "2026-07-08T12:00:00Z"
+    },
+    {
+      "id": "evt-016",
+      "url": "https://gccardshows.com/?show=evt-016",
+      "title": "850 Sports Card Show",
+      "content_text": "Friday, September 11th & Saturday, September 12th, 2026 — North Florida Fairgrounds, 441 Paul Russell Rd, Tallahassee, FL 32301",
+      "date_published": "2026-07-08T12:00:00Z"
+    },
+    {
+      "id": "evt-017",
+      "url": "https://gccardshows.com/?show=evt-017",
+      "title": "MobTown Card Show",
+      "content_text": "Saturday, September 26th, 2026 — The Grand Hall, 3556 Halls Mill Rd, Mobile, AL 36693",
+      "date_published": "2026-07-08T12:00:00Z"
+    },
+    {
+      "id": "evt-018",
+      "url": "https://gccardshows.com/?show=evt-018",
+      "title": "Anchor Up Card Show",
+      "content_text": "Saturday, September 12th, 2026 — VFW Post 706, 5000 Lillian Hwy, Pensacola, FL 32506",
+      "date_published": "2026-07-08T12:00:00Z"
+    },
+    {
+      "id": "evt-019",
+      "url": "https://gccardshows.com/?show=evt-019",
+      "title": "DJ's Trade Show",
+      "content_text": "Saturday, October 3rd, 2026 — ABBA Shrine, 7701 Hitt Road, Mobile, AL 36695",
+      "date_published": "2026-07-08T12:00:00Z"
+    },
+    {
+      "id": "evt-020",
+      "url": "https://gccardshows.com/?show=evt-020",
+      "title": "Anchor Up Card Show",
+      "content_text": "Saturday, October 10th, 2026 — VFW Post 706, 5000 Lillian Hwy, Pensacola, FL 32506",
+      "date_published": "2026-07-08T12:00:00Z"
+    },
+    {
+      "id": "evt-1783093618186",
+      "url": "https://gccardshows.com/?show=evt-1783093618186",
+      "title": "Riptide CardCon",
+      "content_text": "Sunday, October 18th, 2026 — Fort Walton Beach Fairgrounds, 1319 Lewis Turner Blvd, Fort Walton Beach, FL 32547",
+      "date_published": "2026-07-08T12:00:00Z"
+    },
+    {
+      "id": "evt-1783275820110",
+      "url": "https://gccardshows.com/?show=evt-1783275820110",
+      "title": "Gulf Coast Card Show",
+      "content_text": "Trade in your tricks for some serious treats! Join us for a massive day of collecting, competing, and spooky fun at the ultimate TCG event of the season. Whether you’re hunting for that elusive chase card or looking to trade with the community, this is where the magic happens!",
+      "date_published": "2026-07-08T12:00:00Z"
+    },
+    {
+      "id": "evt-023",
+      "url": "https://gccardshows.com/?show=evt-023",
+      "title": "Mid-South Card Con",
+      "content_text": "Saturday, November 14th, 2026 — Biloxi Civic Center, 578 Howard Ave, Biloxi, MS",
+      "date_published": "2026-07-08T12:00:00Z"
+    },
+    {
+      "id": "evt-024",
+      "url": "https://gccardshows.com/?show=evt-024",
+      "title": "Anchor Up Card Show",
+      "content_text": "Saturday, November 14th, 2026 — VFW Post 706, 5000 Lillian Hwy, Pensacola, FL 32506",
+      "date_published": "2026-07-08T12:00:00Z"
+    },
+    {
+      "id": "evt-025",
+      "url": "https://gccardshows.com/?show=evt-025",
+      "title": "Emerald Coast Collectors Showcase",
+      "content_text": "Are you a passionate sports card collector, a Pokémon master, or a TCG enthusiast looking for your next big find? Look no further! The Emerald Coast Collectors Showcase is coming to Pensacola, Florida, and it is shaping up to be the ultimate destination for hobbyists, investors, and families alik…",
+      "date_published": "2026-07-08T12:00:00Z"
+    },
+    {
+      "id": "evt-026",
+      "url": "https://gccardshows.com/?show=evt-026",
+      "title": "The 850 Card Show",
+      "content_text": "Saturday, December 19th, 2026 — North Florida Fairgrounds, 441 Paul Russell Rd, Tallahassee, FL 32301",
+      "date_published": "2026-07-08T12:00:00Z"
+    }
+  ]
+}
