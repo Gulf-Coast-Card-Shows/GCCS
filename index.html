@@ -435,24 +435,23 @@
     .state-nav-label { display: none; }
     .state-nav a, .state-nav strong { flex: 0 0 auto; padding: 6px 12px; font-size: 12px; }
 
-    /* Collapsible filter panel: search + sort stay visible; everything else
-       (home base, distance, state/type filters, past-events toggle) tucks
-       behind a "Filters" toggle so mobile visitors aren't scrolling past a
-       tall stack of form fields before they see any shows. */
-    .filters-toggle { display: flex; }
-    .extra-filters { display: none; flex-direction: column; gap: 14px 18px; width: 100%; }
-    .extra-filters.open { display: flex; }
+    /* Mobile-only tweaks for the advanced filters panel — collapsed-by-default
+       behavior itself now applies at every screen size (see the unconditional
+       rules below); this just switches it to a stacked column on narrow
+       screens instead of the wrapped-row layout used on desktop. */
+    .extra-filters.open { flex-direction: column; }
   }
 
   .filters-toggle {
-    display: none; align-items: center; justify-content: space-between; gap: 10px;
-    width: 100%; background: transparent; border: none; padding: 0 0 4px; cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    width: 100%; background: transparent; border: none; padding: 10px 0 6px; cursor: pointer;
     font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 13px; color: var(--dark);
     text-transform: uppercase; letter-spacing: 0.04em;
   }
   .filters-toggle .chev { transition: transform 0.2s; font-size: 12px; color: var(--muted); }
   .filters-toggle[aria-expanded="true"] .chev { transform: rotate(180deg); }
-  .extra-filters { display: contents; }
+  .extra-filters { display: none; flex-wrap: wrap; gap: 14px 18px; width: 100%; }
+  .extra-filters.open { display: flex; }
 
   .contact-row {
     display:flex; align-items:center; gap:14px; padding:14px 16px;
@@ -619,7 +618,7 @@
              placeholder="Title, city, or venue…" oninput="applyFilters()" autocomplete="off">
     </div>
     <button type="button" class="filters-toggle" id="filters-toggle" aria-expanded="false" aria-controls="extra-filters" onclick="toggleExtraFilters()">
-      <span>More Filters</span><span class="chev">▾</span>
+      <span>⚙️ Advanced Search Options</span><span class="chev">▾</span>
     </button>
     <div class="extra-filters" id="extra-filters">
       <div class="ctrl-group">
