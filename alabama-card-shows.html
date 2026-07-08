@@ -166,7 +166,7 @@
   nav {
     background: var(--nav-bg); border-bottom: 1px solid var(--border);
     padding: 0 32px; display: flex; align-items: center; justify-content: space-between;
-    height: 68px; position: sticky; top: 0; z-index: 100;
+    height: 68px; position: sticky; top: 0; z-index: 1000;
   }
   .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
   .pokeball-icon { width: 44px; height: 44px; border-radius: 10px; background: #fff; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: var(--shadow); }
@@ -197,7 +197,7 @@
   .state-nav {
     display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
     max-width: 1200px; margin: 0 auto; padding: 14px 24px 16px;
-    position: sticky; top: 68px; z-index: 90;
+    position: sticky; top: 68px; z-index: 900;
     background: var(--nav-bg);
     box-shadow: 0 0 0 100vmax var(--nav-bg), 0 1px 0 var(--border);
     clip-path: inset(0 -100vmax);
@@ -216,13 +216,14 @@
   .hero-map-wrap {
     background: var(--card-bg); border-radius: var(--radius); border: 1px solid var(--border);
     box-shadow: var(--shadow); height: 320px; overflow: hidden; position: relative;
+    z-index: 0; /* isolates Leaflet's internal panes (z-index up to ~700) so they can never escape above the sticky header below */
   }
   #hero-map { width: 100%; height: 100%; border-radius: var(--radius); }
   .map-label {
     position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
     background: rgba(26,26,46,0.85); color: #fff; font-family: 'Nunito', sans-serif;
     font-weight: 700; font-size: 11px; padding: 5px 12px; border-radius: 50px;
-    pointer-events: none; z-index: 500; white-space: nowrap; letter-spacing: 0.05em;
+    pointer-events: none; z-index: 10; white-space: nowrap; letter-spacing: 0.05em;
   }
 
   /* STAT STRIP */
@@ -351,7 +352,7 @@
   footer { border-top: 1px solid var(--border); padding: 24px 32px; text-align: center; font-size: 13px; color: var(--muted); }
 
   /* MODAL */
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; padding: 24px; }
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1100; align-items: center; justify-content: center; padding: 24px; }
   .modal-overlay.open { display: flex; }
   .modal { background: var(--card-bg); border-radius: var(--radius); padding: 36px; max-width: 540px; width: 100%; position: relative; max-height: 90vh; overflow-y: auto; }
   .modal-close { position: absolute; top: 16px; right: 16px; background: var(--border); border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
@@ -420,6 +421,19 @@
     .nav-links .nav-btn { display: none; }
     .nav-links { gap: 8px; flex: 0 0 auto; }
     .mobile-menu-wrap { display: block; }
+
+    /* Keep the state pills on a single row instead of wrapping to a second
+       line. The "Browse by State:" label eats a lot of width on a phone, so
+       it's hidden here (the pills are self-explanatory without it); nowrap +
+       scroll-x is a fallback so it's still guaranteed to never wrap even on
+       the narrowest phones or with larger accessibility text sizes. */
+    .state-nav {
+      flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch;
+      scrollbar-width: none; padding: 12px 16px 14px; gap: 8px;
+    }
+    .state-nav::-webkit-scrollbar { display: none; }
+    .state-nav-label { display: none; }
+    .state-nav a, .state-nav strong { flex: 0 0 auto; padding: 6px 12px; font-size: 12px; }
 
     /* Collapsible filter panel: search + sort stay visible; everything else
        (home base, distance, state/type filters, past-events toggle) tucks
