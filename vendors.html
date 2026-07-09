@@ -672,8 +672,13 @@
   .vendors-toolbar .ctrl-group { flex: 1 1 200px; min-width: 160px; }
   .vendors-grid { max-width: 1100px; margin: 0 auto; padding: 0 24px 40px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
   .vendor-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  .vendor-card.clickable { cursor: pointer; transition: transform .2s cubic-bezier(0.2, 0.8, 0.3, 1.1), box-shadow .2s ease, border-color .2s ease; position: relative; }
+  .vendor-card.clickable:hover { transform: translateY(-5px); box-shadow: 0 14px 34px rgba(0,0,0,0.18); border-color: var(--blue); }
+  .vendor-card.clickable:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+  .vendor-card.clickable .card-action-btn { position: relative; z-index: 2; }
+  .vendor-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
   .vendor-card-name { font-family: 'Baloo 2', sans-serif; font-size: 19px; font-weight: 700; margin: 0; }
-  .vendor-card-desc { font-size: 14px; color: var(--muted); line-height: 1.5; margin: 0; }
+  .vendor-card-desc { font-size: 14px; color: var(--muted); line-height: 1.5; margin: 0; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .vendor-tag-row { display: flex; flex-wrap: wrap; gap: 6px; }
   .vendor-tag { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: var(--featured-bg); border: 1px solid var(--featured-border); color: var(--blue); }
   .vendor-state-tag { background: #FFF3E0; border-color: #FFB74D; color: #E65100; }
@@ -797,6 +802,34 @@
       <input type="hidden" name="_subject" value="New Vendor Directory Submission — Gulf Coast Card Shows">
       <button class="submit-btn" type="submit">Submit for Review ⚡</button>
     </form>
+  </div>
+</div>
+
+<!-- VENDOR DETAIL MODAL (populated dynamically from VENDORS data) -->
+<div class="modal-overlay blur-bg" id="vendor-detail-modal" onclick="closeVendorDetailOutside(event)" role="dialog" aria-modal="true" aria-labelledby="vd-name">
+  <div class="modal detail-modal">
+    <button class="modal-close" onclick="closeVendorDetail()" aria-label="Close">✕</button>
+    <div class="detail-hero">
+      <div style="font-size:12px; text-transform:uppercase; letter-spacing:1px; opacity:.9; font-weight:800;">Vendor</div>
+      <h2 id="vd-name"></h2>
+      <div class="detail-sub" id="vd-sub"></div>
+    </div>
+
+    <div class="vendor-tag-row" id="vd-tags" style="margin-bottom:18px;"></div>
+
+    <div class="detail-section" id="vd-about-sec" hidden>
+      <h3>About</h3>
+      <p id="vd-about" style="white-space:pre-line;"></p>
+    </div>
+
+    <div class="detail-section" id="vd-shows-sec" hidden>
+      <h3>Shows They Attend</h3>
+      <p id="vd-shows"></p>
+    </div>
+
+    <div class="detail-section" style="margin-bottom:0;" id="vd-cta-sec">
+      <a class="detail-cta" id="vd-cta-website" target="_blank" rel="noopener" hidden></a>
+    </div>
   </div>
 </div>
 
@@ -928,8 +961,17 @@
   /* ==VENDORS-DATA-START== */
   const VENDORS = [
     {
+      id: "ven-1783610324412",
+      name: "Pokeshop 850",
+      description: "Welcome to PokeShop 850! Step into our vibrant shop and immerse yourself in a world where Pokémon dreams\ncome true.\n1. Rare Treasures\n2. Friendly Guidance\n3. Guaranteed Authenticity\n4. Memorabilia and Merchandise\n5. Buy / Sell / Trade",
+      states: ["FL", "AL"],
+      cardTypes: ["pokemon"],
+      showsAttended: "Cards on the Coast, Trade Show Mobile",
+      website: "pokeshop850.com", websiteLabel: "🌐 pokeshop850.com",
+    },
+    {
       id: "ven-1783609654812",
-      name: "AnchorUp Sports",
+      name: "Anchor Up Sports",
       description: "Anchor Up Sports was born in Pensacola, FL from a simple idea: the card show experience should feel like coming home. Whether you're chasing a childhood hero's rookie card or hunting the latest hits, we believe the best moments happen face-to-face, surrounded by people who share your passion.\n\nWhat started as a small gathering of local collectors has grown into one of the Gulf Coast's most anticipated trading card events. Every show we host is built on the same foundation — community first, always.\n\nWe handle the logistics so vendors can focus on selling and collectors can focus on finding their next great pickup.\n\nBeyond the shows, we also buy sports card collections in Pensacola — from single graded cards to full estates — so collectors and families have a trusted local option when it's time to sell.",
       states: ["FL", "AL"],
       cardTypes: ["pokemon", "sports", "onepiece"],
@@ -952,7 +994,7 @@
       states: ["FL"],
       cardTypes: ["pokemon", "sports", "mtg", "yugioh", "comics"],
       showsAttended: "Anchor Up",
-      website: "", websiteLabel: "",
+      website: "https://benscardworld.com/", websiteLabel: "🌐 benscardworld.com",
     },
     {
       id: "ven-1783609338787",
@@ -1043,8 +1085,11 @@
     const websiteBtn = v.website
       ? `<a class="card-action-btn calendar" href="${escapeHtml(v.website)}" target="_blank" rel="noopener">${escapeHtml(v.websiteLabel || '🌐 Website')}</a>`
       : '';
-    return `<div class="vendor-card">
-      <h2 class="vendor-card-name">${escapeHtml(v.name)}</h2>
+    return `<div class="vendor-card clickable" data-vendor-id="${escapeHtml(v.id)}" role="button" tabindex="0">
+      <div class="vendor-card-header">
+        <h2 class="vendor-card-name">${escapeHtml(v.name)}</h2>
+        ${v.description ? '<span class="details-badge">Click for details →</span>' : ''}
+      </div>
       ${v.description ? `<p class="vendor-card-desc">${escapeHtml(v.description)}</p>` : ''}
       <div class="vendor-tag-row">${stateTags}${typeTags}</div>
       ${v.showsAttended ? `<p class="vendor-shows"><strong>Shows:</strong> ${escapeHtml(v.showsAttended)}</p>` : ''}
@@ -1079,7 +1124,78 @@
     grid.innerHTML = filtered.length
       ? filtered.map(vendorCardHtml).join('')
       : '<p style="grid-column:1/-1;text-align:center;color:var(--muted);padding:40px 0;">No vendors match those filters — try clearing one.</p>';
+
+    // Event delegation: one click/keydown listener for the whole grid,
+    // rebound to the fresh grid.innerHTML each render (mirrors index.html's
+    // #shows-grid pattern) so every card — including the first — opens
+    // reliably regardless of attribute escaping.
+    if (!grid.dataset.delegated) {
+      grid.addEventListener('click', (e) => {
+        const card = e.target.closest('.vendor-card.clickable');
+        if (!card) return;
+        if (e.target.closest('a, button')) return;
+        openVendorDetail(card.dataset.vendorId);
+      });
+      grid.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        const card = e.target.closest('.vendor-card.clickable');
+        if (!card) return;
+        if (e.target.closest('a, button')) return;
+        e.preventDefault();
+        openVendorDetail(card.dataset.vendorId);
+      });
+      grid.dataset.delegated = '1';
+    }
   }
+
+  // ===== Vendor detail modal =====
+  function populateVendorDetail(v) {
+    document.getElementById('vd-name').textContent = v.name || '';
+    const stateNames = (v.states || []).map((s) => STATE_LABELS[s] || s);
+    document.getElementById('vd-sub').textContent = stateNames.join(' · ');
+
+    const tagRow = document.getElementById('vd-tags');
+    const typeTags = (v.cardTypes || []).map((t) =>
+      `<span class="vendor-tag">${escapeHtml(CARD_TYPE_LABELS[t] || t)}</span>`).join('');
+    const stateTags = (v.states || []).map((s) =>
+      `<span class="vendor-tag vendor-state-tag">${escapeHtml(STATE_LABELS[s] || s)}</span>`).join('');
+    tagRow.innerHTML = stateTags + typeTags;
+
+    const aboutSec = document.getElementById('vd-about-sec');
+    if (v.description && v.description.trim()) {
+      document.getElementById('vd-about').textContent = v.description.trim();
+      aboutSec.hidden = false;
+    } else { aboutSec.hidden = true; }
+
+    const showsSec = document.getElementById('vd-shows-sec');
+    if (v.showsAttended && v.showsAttended.trim()) {
+      document.getElementById('vd-shows').textContent = v.showsAttended.trim();
+      showsSec.hidden = false;
+    } else { showsSec.hidden = true; }
+
+    const websiteBtn = document.getElementById('vd-cta-website');
+    if (v.website) {
+      websiteBtn.href = v.website;
+      websiteBtn.textContent = v.websiteLabel || '🌐 Website';
+      websiteBtn.hidden = false;
+    } else { websiteBtn.hidden = true; }
+  }
+
+  function openVendorDetail(id) {
+    const v = VENDORS.find((x) => x.id === id);
+    if (!v) return;
+    populateVendorDetail(v);
+    const m = document.getElementById('vendor-detail-modal');
+    m.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    trapModalOpen(m);
+  }
+  function closeVendorDetail() {
+    document.getElementById('vendor-detail-modal').classList.remove('open');
+    document.body.style.overflow = '';
+    trapModalClose();
+  }
+  function closeVendorDetailOutside(e) { if (e.target === document.getElementById('vendor-detail-modal')) closeVendorDetail(); }
 
   function openVendorModal() {
     const m = document.getElementById('vendor-modal');

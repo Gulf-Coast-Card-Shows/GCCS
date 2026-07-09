@@ -1516,20 +1516,41 @@ ${itemsXml}
       body.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🏪</div><p>No vendors yet — click "+ Add Vendor" to create the first one.</p></div>`;
       return;
     }
-    body.innerHTML = vendors.map(v => `
+    body.innerHTML = vendors.map((v, pos) => `
       <div class="event-row${v.id === vSelectedId ? ' selected' : ''}" data-id="${v.id}">
+        <div class="event-order">
+          <button class="btn-icon" data-action="v-up" data-id="${v.id}" ${pos === 0 ? 'disabled' : ''} title="Move up">↑</button>
+          <button class="btn-icon" data-action="v-down" data-id="${v.id}" ${pos === vendors.length - 1 ? 'disabled' : ''} title="Move down">↓</button>
+        </div>
+        <div class="event-num">#${String(pos + 1).padStart(2, '0')}</div>
         <div class="event-main" data-action="v-edit" data-id="${v.id}">
           <div class="event-name">${escapeHtml(v.name || '(unnamed vendor)')}</div>
           <div class="event-sub" style="font-size:12px;color:var(--muted);">${escapeHtml((v.states || []).join(', ') || 'No states set')}</div>
         </div>
-        <button class="btn-icon btn-danger" data-action="v-delete" data-id="${v.id}" title="Delete">🗑️</button>
+        <div class="event-actions">
+          <button class="btn-icon btn-danger" data-action="v-delete" data-id="${v.id}" title="Delete">🗑️</button>
+        </div>
       </div>
     `).join('');
+  }
+
+  // This order also controls display order on vendors.html — vendors render
+  // in array order, same as shows do on index.html.
+  function moveVendor(id, dir) {
+    const idx = vendors.findIndex(v => v.id === id);
+    if (idx === -1) return;
+    const targetIdx = idx + dir;
+    if (targetIdx < 0 || targetIdx >= vendors.length) return;
+    [vendors[idx], vendors[targetIdx]] = [vendors[targetIdx], vendors[idx]];
+    vDirty = true;
+    renderVendorList();
   }
 
   document.getElementById('vendor-list-body').addEventListener('click', (e) => {
     const editEl = e.target.closest('[data-action="v-edit"]');
     const delEl = e.target.closest('[data-action="v-delete"]');
+    const upEl = e.target.closest('[data-action="v-up"]');
+    const downEl = e.target.closest('[data-action="v-down"]');
     if (editEl) {
       vSelectedId = editEl.dataset.id;
       renderVendorList();
@@ -1543,6 +1564,10 @@ ${itemsXml}
       vDirty = true;
       renderVendorList();
       renderVendorForm(vSelectedId);
+    } else if (upEl) {
+      moveVendor(upEl.dataset.id, -1);
+    } else if (downEl) {
+      moveVendor(downEl.dataset.id, 1);
     }
   });
 
