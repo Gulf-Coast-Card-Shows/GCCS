@@ -277,15 +277,24 @@
     position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
     background: rgba(26,26,46,0.85); color: #fff; font-family: 'Nunito', sans-serif;
     font-weight: 700; font-size: 11px; padding: 5px 12px; border-radius: 50px;
-    pointer-events: none; z-index: 10; white-space: nowrap; letter-spacing: 0.05em;
+    pointer-events: none; z-index: 750; white-space: nowrap; letter-spacing: 0.05em;
   }
 
   /* STAT STRIP */
-  .stat-strip { max-width: 1120px; margin: 0 auto 32px; padding: 0 32px; display: grid; grid-template-columns: 1.15fr 1.15fr 1fr; gap: 16px; }
+  .stat-strip { max-width: 1120px; margin: 20px auto 32px; padding: 0 32px; display: grid; grid-template-columns: 1.15fr 1.15fr 1fr; gap: 16px; }
   .stat-strip.no-featured { grid-template-columns: 2fr 1fr; }
   .next-show-card { background: var(--next-bg); border: 2px solid var(--next-border); border-radius: var(--radius); padding: 24px 28px; }
   .featured-show-card { background: var(--featured-bg); border: 2px solid var(--featured-border); border-radius: var(--radius); padding: 24px 28px; }
   .featured-show-card.hidden { display: none; }
+  .next-show-card.clickable, .featured-show-card.clickable {
+    cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .next-show-card.clickable:hover, .featured-show-card.clickable:hover {
+    transform: translateY(-3px); box-shadow: var(--shadow);
+  }
+  .next-show-card.clickable:focus-visible, .featured-show-card.clickable:focus-visible {
+    outline: 3px solid var(--red); outline-offset: 3px;
+  }
   .next-label { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 12px; color: #B8860B; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
   .next-name { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 700; font-size: 24px; color: var(--dark); margin-bottom: 6px; }
   .next-date { font-size: 14px; color: #92400E; margin-bottom: 6px; line-height: 1.5; }
@@ -303,7 +312,14 @@
     grid-column: 1 / -1; text-align: center; padding: 56px 32px;
     background: var(--card-bg); border: 1px dashed var(--border); border-radius: var(--radius);
   }
-  .empty-state-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-state-icon {
+    font-size: 30px; margin: 0 auto 16px; width: 68px; height: 68px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg); border: 2px solid var(--border); border-radius: 50%;
+    animation: empty-state-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes empty-state-pop { from { transform: scale(0.55); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .empty-state-icon { animation: none; } }
   .empty-state-heading { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 700; font-size: 19px; color: var(--dark); margin-bottom: 8px; }
   .empty-state-body { font-family: 'Inter', sans-serif; font-size: 14px; color: var(--muted); max-width: 380px; margin: 0 auto 20px; line-height: 1.6; }
   .empty-state-action {
@@ -375,7 +391,17 @@
     .calendar-grid, .calendar-weekday-row { gap: 3px; }
     .view-toggle-ics { margin-left: 0; width: 100%; text-align: center; }
   }
-  .show-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); transition: transform 0.2s, box-shadow 0.2s; }
+  .show-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden; }
+  .show-card::before {
+    content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160"><g fill="none" stroke="%231A1A2E" stroke-width="2" stroke-opacity="0.05"><circle cx="24" cy="34" r="15"/><line x1="10" y1="34" x2="38" y2="34"/><circle cx="24" cy="34" r="4"/><circle cx="122" cy="72" r="22"/><line x1="100" y1="72" x2="144" y2="72"/><circle cx="122" cy="72" r="6"/><circle cx="58" cy="122" r="12"/><line x1="46" y1="122" x2="70" y2="122"/><circle cx="58" cy="122" r="3.5"/></g></svg>');
+    background-repeat: repeat; background-size: 160px 160px;
+  }
+  html.dark .show-card::before {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160"><g fill="none" stroke="%23F0EDE6" stroke-width="2" stroke-opacity="0.06"><circle cx="24" cy="34" r="15"/><line x1="10" y1="34" x2="38" y2="34"/><circle cx="24" cy="34" r="4"/><circle cx="122" cy="72" r="22"/><line x1="100" y1="72" x2="144" y2="72"/><circle cx="122" cy="72" r="6"/><circle cx="58" cy="122" r="12"/><line x1="46" y1="122" x2="70" y2="122"/><circle cx="58" cy="122" r="3.5"/></g></svg>');
+  }
+  .show-card > * { position: relative; z-index: 1; }
+  .show-card.skeleton-card::before { display: none; }
   .show-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.12); }
   .show-card.tbd { border-style: dashed; border-color: #ccc; background: #FAFAFA; }
   .show-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 8px; }
@@ -517,7 +543,7 @@
   .show-card.clickable:hover { transform: translateY(-5px); box-shadow: 0 14px 34px rgba(0,0,0,0.18); border-color: var(--blue); }
   .show-card.clickable:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
   .show-card.clickable .card-action-btn { position: relative; z-index: 2; }
-  .details-badge { background: #1565C0; color:#fff; font-size: 11px; font-weight: 800; padding: 4px 8px; border-radius: 999px; letter-spacing: .3px; text-transform: uppercase; }
+  .details-badge { background: var(--blue); color:#fff; font-size: 11px; font-weight: 800; padding: 4px 8px; border-radius: 999px; letter-spacing: .3px; text-transform: uppercase; }
   .detail-modal { max-width: 720px; }
   .detail-hero { background: linear-gradient(135deg, #E53935 0%, #1A1A2E 100%); color: #fff; margin: -36px -36px 24px; padding: 32px 36px; border-radius: var(--radius) var(--radius) 0 0; }
   .detail-hero h2 { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 30px; margin: 0 0 6px; line-height: 1.15; }
@@ -531,7 +557,7 @@
   .detail-hero-actions .interest-btn.active { background: rgba(255,255,255,0.28); border-color: #fff; }
   .detail-section { margin-bottom: 22px; }
   .detail-section h3 { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 15px; text-transform: uppercase; letter-spacing: .6px; color: var(--red); margin: 0 0 8px; }
-  .detail-section p, .detail-section li { font-size: 15px; line-height: 1.6; color: var(--text); margin: 0 0 6px; }
+  .detail-section p, .detail-section li { font-size: 15px; line-height: 1.6; color: var(--dark); margin: 0 0 6px; }
   #detail-about, #detail-loc-notes { white-space: pre-line; }
   .detail-section ul { padding-left: 20px; margin: 0; }
   .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; }
@@ -710,8 +736,8 @@
   /* Notify-me (TBD shows) */
   .notify-block { margin-top: 10px; }
   .card-notify-block { margin-top: 10px; }
-  .notify-toggle-btn { background: #FFF8E1; border-color: #F5C542; color: #8A6D00; }
-  html.dark .notify-toggle-btn { background: #3A3110; border-color: #8A6D00; color: #F5D76E; }
+  .notify-toggle-btn { font-family: 'Nunito', sans-serif; font-weight: 700; background: var(--next-bg); border-color: var(--next-border); color: #8A6D00; }
+  html.dark .notify-toggle-btn { color: #F5D76E; }
   .notify-submit-btn { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--red); background: var(--red); color: #fff; font-weight: 700; font-size: 13px; cursor: pointer; white-space: nowrap; }
   .notify-submit-btn:disabled { opacity: 0.6; cursor: default; }
   .notify-confirmed-msg { display: inline-block; font-size: 13px; font-weight: 700; color: #2E7D32; background: #E8F5E9; border: 1px solid #A5D6A7; border-radius: 8px; padding: 7px 12px; }
@@ -1802,25 +1828,6 @@
         whatToExpect: [],
         locationNotes: "",
       },
-    },
-    {
-      id: "evt-1783623171784",
-      name: "TBD",
-      startDate: "2026-07-17", endDate: "2026-07-17",
-      dateAdded: "2026-07-09",
-      featured: false,
-      dateDisplay: "Friday, July 17th, 2026",
-      time: "",
-      timeUnknown: false,
-      location: "Pensacola Bay Center",
-      lat: 30.4163944, lng: -87.2089495,
-      entryFee: "$0", entryFree: true,
-      vendorFee: "",
-      websiteUrl: "", websiteLabel: "",
-      organizer: "Unknown",
-      tbd: true,
-      authServices: { present: null, company: "" },
-      details: { about: "", atAGlance: [], whatToExpect: [], locationNotes: "" },
     }
   ];
   /* ==EVENTS-DATA-END== */
@@ -2110,6 +2117,9 @@
     const card = document.getElementById('next-show-card');
     if (!EVENTS.length) {
       card.innerHTML = `<p class="next-label">Next show</p><p class="next-name">No shows listed yet</p>`;
+      card.classList.remove('clickable');
+      card.removeAttribute('role'); card.removeAttribute('tabindex');
+      card.onclick = null; card.onkeydown = null;
       return;
     }
     const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -2128,6 +2138,12 @@
       <p class="next-date">${escapeHtml(ev.dateDisplay)}${timeStr}</p>
       <p class="next-loc">${escapeHtml(ev.location)}</p>
     `;
+    card.classList.add('clickable');
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('aria-label', `View details for ${ev.name || 'this show'}`);
+    card.onclick = () => openEventDetailById(ev.id);
+    card.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openEventDetailById(ev.id); } };
   }
 
   function computeFeaturedShow() {
@@ -2137,6 +2153,9 @@
     const ev = EVENTS.find(x => x.featured);
     if (!ev) {
       card.classList.add('hidden');
+      card.classList.remove('clickable');
+      card.removeAttribute('role'); card.removeAttribute('tabindex');
+      card.onclick = null; card.onkeydown = null;
       strip.classList.add('no-featured');
       return;
     }
@@ -2150,6 +2169,12 @@
       <p class="next-loc">${escapeHtml(ev.location)}</p>
     `;
     card.classList.remove('hidden');
+    card.classList.add('clickable');
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('aria-label', `View details for ${ev.name || 'this show'}`);
+    card.onclick = () => openEventDetailById(ev.id);
+    card.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openEventDetailById(ev.id); } };
     strip.classList.remove('no-featured');
   }
 

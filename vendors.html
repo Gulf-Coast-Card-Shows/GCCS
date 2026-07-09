@@ -178,7 +178,16 @@
   .mobile-menu-item:hover { background: var(--border); }
 
   /* HERO */
-  .hero { max-width: 1120px; margin: 0 auto; padding: 48px 32px 32px; display: flex; justify-content: flex-start; }
+  .hero { max-width: 1120px; margin: 0 auto; padding: 48px 32px 32px; display: flex; justify-content: flex-start; position: relative; overflow: hidden; border-radius: var(--radius); }
+  .hero::before {
+    content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220" viewBox="0 0 220 220"><g fill="none" stroke="%231A1A2E" stroke-width="2.2" stroke-opacity="0.045"><circle cx="34" cy="46" r="20"/><line x1="14" y1="46" x2="54" y2="46"/><circle cx="34" cy="46" r="5.5"/><circle cx="168" cy="100" r="30"/><line x1="138" y1="100" x2="198" y2="100"/><circle cx="168" cy="100" r="8"/><circle cx="80" cy="168" r="16"/><line x1="64" y1="168" x2="96" y2="168"/><circle cx="80" cy="168" r="4.5"/><circle cx="196" cy="24" r="11"/><line x1="185" y1="24" x2="207" y2="24"/></g></svg>');
+    background-repeat: repeat; background-size: 220px 220px;
+  }
+  html.dark .hero::before {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220" viewBox="0 0 220 220"><g fill="none" stroke="%23F0EDE6" stroke-width="2.2" stroke-opacity="0.06"><circle cx="34" cy="46" r="20"/><line x1="14" y1="46" x2="54" y2="46"/><circle cx="34" cy="46" r="5.5"/><circle cx="168" cy="100" r="30"/><line x1="138" y1="100" x2="198" y2="100"/><circle cx="168" cy="100" r="8"/><circle cx="80" cy="168" r="16"/><line x1="64" y1="168" x2="96" y2="168"/><circle cx="80" cy="168" r="4.5"/><circle cx="196" cy="24" r="11"/><line x1="185" y1="24" x2="207" y2="24"/></g></svg>');
+  }
+  .hero > * { position: relative; z-index: 1; }
   .hero-text-block { text-align: left; max-width: 480px; }
   .hero-eyebrow { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
   .hero-title { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 800; font-size: 56px; line-height: 1.05; color: var(--dark); margin-bottom: 16px; }
@@ -244,7 +253,14 @@
     grid-column: 1 / -1; text-align: center; padding: 56px 32px;
     background: var(--card-bg); border: 1px dashed var(--border); border-radius: var(--radius);
   }
-  .empty-state-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-state-icon {
+    font-size: 30px; margin: 0 auto 16px; width: 68px; height: 68px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg); border: 2px solid var(--border); border-radius: 50%;
+    animation: empty-state-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes empty-state-pop { from { transform: scale(0.55); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .empty-state-icon { animation: none; } }
   .empty-state-heading { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 700; font-size: 19px; color: var(--dark); margin-bottom: 8px; }
   .empty-state-body { font-family: 'Inter', sans-serif; font-size: 14px; color: var(--muted); max-width: 380px; margin: 0 auto 20px; line-height: 1.6; }
   .empty-state-action {
@@ -458,7 +474,7 @@
   .show-card.clickable:hover { transform: translateY(-5px); box-shadow: 0 14px 34px rgba(0,0,0,0.18); border-color: var(--blue); }
   .show-card.clickable:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
   .show-card.clickable .card-action-btn { position: relative; z-index: 2; }
-  .details-badge { background: #1565C0; color:#fff; font-size: 11px; font-weight: 800; padding: 4px 8px; border-radius: 999px; letter-spacing: .3px; text-transform: uppercase; }
+  .details-badge { background: var(--blue); color:#fff; font-size: 11px; font-weight: 800; padding: 4px 8px; border-radius: 999px; letter-spacing: .3px; text-transform: uppercase; }
   .detail-modal { max-width: 720px; }
   .detail-hero { background: linear-gradient(135deg, #E53935 0%, #1A1A2E 100%); color: #fff; margin: -36px -36px 24px; padding: 32px 36px; border-radius: var(--radius) var(--radius) 0 0; }
   .detail-hero h2 { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 30px; margin: 0 0 6px; line-height: 1.15; }
@@ -472,7 +488,7 @@
   .detail-hero-actions .interest-btn.active { background: rgba(255,255,255,0.28); border-color: #fff; }
   .detail-section { margin-bottom: 22px; }
   .detail-section h3 { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 15px; text-transform: uppercase; letter-spacing: .6px; color: var(--red); margin: 0 0 8px; }
-  .detail-section p, .detail-section li { font-size: 15px; line-height: 1.6; color: var(--text); margin: 0 0 6px; }
+  .detail-section p, .detail-section li { font-size: 15px; line-height: 1.6; color: var(--dark); margin: 0 0 6px; }
   #detail-about, #detail-loc-notes { white-space: pre-line; }
   .detail-section ul { padding-left: 20px; margin: 0; }
   .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; }
@@ -651,19 +667,7 @@
   body.interest-disabled .interest-btn { display: none; }
 
   /* Notify-me (TBD shows) */
-  .notify-block { margin-top: 10px; }
-  .card-notify-block { margin-top: 10px; }
-  .notify-toggle-btn { background: #FFF8E1; border-color: #F5C542; color: #8A6D00; }
-  html.dark .notify-toggle-btn { background: #3A3110; border-color: #8A6D00; color: #F5D76E; }
-  .notify-inline-form { display: none; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
-  .notify-inline-form.open { display: flex; }
-  #detail-notify-body .notify-inline-form { display: flex; }
-  .notify-email-input { flex: 1 1 180px; min-width: 0; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--card-bg); color: var(--text); font-size: 14px; }
-  .notify-submit-btn { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--red); background: var(--red); color: #fff; font-weight: 700; font-size: 13px; cursor: pointer; white-space: nowrap; }
-  .notify-submit-btn:disabled { opacity: 0.6; cursor: default; }
-  .notify-confirmed-msg { display: inline-block; font-size: 13px; font-weight: 700; color: #2E7D32; background: #E8F5E9; border: 1px solid #A5D6A7; border-radius: 8px; padding: 7px 12px; }
-  html.dark .notify-confirmed-msg { color: #A5D6A7; background: #14301A; border-color: #2E7D32; }
-  .notify-desc { color: var(--muted); font-size: 14px; margin: 0 0 10px; }
+
 
   .last-updated {
     font-family:'Nunito',sans-serif; font-size:12px; color:var(--muted);
@@ -674,24 +678,51 @@
   .vendors-toolbar { max-width: 1100px; margin: 0 auto 28px; padding: 0 24px; display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end; }
   .vendors-toolbar .ctrl-group { flex: 1 1 200px; min-width: 160px; }
   .vendors-grid { max-width: 1100px; margin: 0 auto; padding: 0 24px 40px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
-  .vendor-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  .vendor-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; gap: 10px; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+  .vendor-card::before {
+    content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160"><g fill="none" stroke="%231A1A2E" stroke-width="2" stroke-opacity="0.05"><circle cx="24" cy="34" r="15"/><line x1="10" y1="34" x2="38" y2="34"/><circle cx="24" cy="34" r="4"/><circle cx="122" cy="72" r="22"/><line x1="100" y1="72" x2="144" y2="72"/><circle cx="122" cy="72" r="6"/><circle cx="58" cy="122" r="12"/><line x1="46" y1="122" x2="70" y2="122"/><circle cx="58" cy="122" r="3.5"/></g></svg>');
+    background-repeat: repeat; background-size: 160px 160px;
+  }
+  html.dark .vendor-card::before {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160"><g fill="none" stroke="%23F0EDE6" stroke-width="2" stroke-opacity="0.06"><circle cx="24" cy="34" r="15"/><line x1="10" y1="34" x2="38" y2="34"/><circle cx="24" cy="34" r="4"/><circle cx="122" cy="72" r="22"/><line x1="100" y1="72" x2="144" y2="72"/><circle cx="122" cy="72" r="6"/><circle cx="58" cy="122" r="12"/><line x1="46" y1="122" x2="70" y2="122"/><circle cx="58" cy="122" r="3.5"/></g></svg>');
+  }
+  .vendor-card > * { position: relative; z-index: 1; }
   .vendor-card.clickable { cursor: pointer; transition: transform .2s cubic-bezier(0.2, 0.8, 0.3, 1.1), box-shadow .2s ease, border-color .2s ease; position: relative; }
   .vendor-card.clickable:hover { transform: translateY(-5px); box-shadow: 0 14px 34px rgba(0,0,0,0.18); border-color: var(--blue); }
   .vendor-card.clickable:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
   .vendor-card.clickable .card-action-btn { position: relative; z-index: 2; }
   .vendor-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-  .vendor-card-name { font-family: 'Baloo 2', sans-serif; font-size: 19px; font-weight: 700; margin: 0; }
+  .vendor-card-name { font-family: 'Baloo 2', sans-serif; font-size: 19px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px; }
+  .vendor-card-name .vendor-icon { font-size: 17px; flex-shrink: 0; }
   .vendor-card-desc { font-size: 14px; color: var(--muted); line-height: 1.5; margin: 0; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .vendor-tag-row { display: flex; flex-wrap: wrap; gap: 6px; }
   .vendor-tag { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: var(--featured-bg); border: 1px solid var(--featured-border); color: var(--blue); }
+
+  /* Card-type tags reuse the exact same taxonomy/colors as show cards on the
+     main site, so a vendor selling Pokémon cards reads visually consistent
+     with a Pokémon show — same yellow pill either place. */
+  .type-tag { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px; border: 1px solid; }
+  .type-tag.type-pokemon  { background: #FFF6D9; border-color: #E6B800; color: #8A6D00; }
+  .type-tag.type-sports   { background: #E3F0FF; border-color: #3B82F6; color: #1D4ED8; }
+  .type-tag.type-mtg      { background: #F2E9FF; border-color: #8B5CF6; color: #6D28D9; }
+  .type-tag.type-onepiece { background: #FFE9E5; border-color: #F97362; color: #C0301C; }
+  .type-tag.type-yugioh   { background: #FFEFDB; border-color: #F59E0B; color: #92400E; }
+  .type-tag.type-lorcana  { background: #E5F9F3; border-color: #14B8A6; color: #0F766E; }
+  .type-tag.type-comics   { background: #ECEDFF; border-color: #6366F1; color: #4338CA; }
+  html.dark .type-tag.type-pokemon  { background: #2A2200; }
+  html.dark .type-tag.type-sports   { background: #0B1E38; }
+  html.dark .type-tag.type-mtg      { background: #200F38; }
+  html.dark .type-tag.type-onepiece { background: #331109; }
+  html.dark .type-tag.type-yugioh   { background: #2E1B02; }
+  html.dark .type-tag.type-lorcana  { background: #072A22; }
+  html.dark .type-tag.type-comics   { background: #161233; }
   .vendor-state-tag { background: #FFF3E0; border-color: #FFB74D; color: #E65100; }
   html.dark .vendor-tag { background: #0B1E38; border-color: #2563EB; }
   html.dark .vendor-state-tag { background: #3A2410; border-color: #E65100; color: #FFB74D; }
   .vendor-shows { font-size: 13px; color: var(--muted); margin: 0; }
-  .vendor-shows strong { color: var(--text); }
+  .vendor-shows strong { color: var(--dark); }
   .vendor-card-actions { margin-top: auto; display: flex; gap: 8px; flex-wrap: wrap; padding-top: 6px; }
-  .vendor-empty-state { max-width: 560px; margin: 0 auto; padding: 48px 24px; text-align: center; color: var(--muted); }
-  .vendor-empty-state h3 { color: var(--text); font-family: 'Baloo 2', sans-serif; font-size: 22px; margin-bottom: 8px; }
   .vendor-list-cta { max-width: 700px; margin: 0 auto 48px; padding: 0 24px; }
 </style>
 </head>
@@ -1085,13 +1116,13 @@
     const stateTags = (v.states || []).map((s) =>
       `<span class="vendor-tag vendor-state-tag">${escapeHtml(STATE_LABELS[s] || s)}</span>`).join('');
     const typeTags = (v.cardTypes || []).map((t) =>
-      `<span class="vendor-tag">${escapeHtml(CARD_TYPE_LABELS[t] || t)}</span>`).join('');
+      `<span class="type-tag type-${escapeHtml(t)}">${escapeHtml(CARD_TYPE_LABELS[t] || t)}</span>`).join('');
     const websiteBtn = v.website
       ? `<a class="card-action-btn calendar" href="${escapeHtml(v.website)}" target="_blank" rel="noopener">${escapeHtml(v.websiteLabel || '🌐 Website')}</a>`
       : '';
     return `<div class="vendor-card clickable" data-vendor-id="${escapeHtml(v.id)}" role="button" tabindex="0">
       <div class="vendor-card-header">
-        <h2 class="vendor-card-name">${escapeHtml(v.name)}</h2>
+        <h2 class="vendor-card-name"><span class="vendor-icon" aria-hidden="true">🏪</span>${escapeHtml(v.name)}</h2>
         ${v.description ? '<span class="details-badge">Click →</span>' : ''}
       </div>
       ${v.description ? `<p class="vendor-card-desc">${escapeHtml(v.description)}</p>` : ''}
@@ -1115,19 +1146,25 @@
     });
 
     if (!VENDORS.length) {
-      grid.innerHTML = '';
-      grid.parentElement.insertAdjacentHTML('beforeend', `<div class="vendor-empty-state" id="vendor-empty-msg">
-        <h3>No vendors listed yet</h3>
-        <p>We're just getting this directory started. If you're a dealer who sets up at Gulf Coast shows, be the first — list your business below.</p>
-      </div>`);
+      grid.innerHTML = `<div class="empty-state" id="vendor-empty-msg">
+        <div class="empty-state-icon">🏪</div>
+        <p class="empty-state-heading">No vendors listed yet</p>
+        <p class="empty-state-body">We're just getting this directory started. If you're a dealer who sets up at Gulf Coast shows, be the first — list your business below.</p>
+        <button type="button" class="empty-state-action" onclick="openVendorModal()">+ List Your Business</button>
+      </div>`;
       return;
     }
     const existingEmpty = document.getElementById('vendor-empty-msg');
-    if (existingEmpty) existingEmpty.remove();
+    if (existingEmpty && VENDORS.length) existingEmpty.remove();
 
     grid.innerHTML = filtered.length
       ? filtered.map(vendorCardHtml).join('')
-      : '<p style="grid-column:1/-1;text-align:center;color:var(--muted);padding:40px 0;">No vendors match those filters — try clearing one.</p>';
+      : `<div class="empty-state">
+          <div class="empty-state-icon">🔍</div>
+          <p class="empty-state-heading">No vendors match those filters</p>
+          <p class="empty-state-body">Try clearing the search, state, or card-type filter.</p>
+          <button type="button" class="empty-state-action" onclick="document.getElementById('vendor-search-input').value=''; document.getElementById('vendor-state-filter').value=''; document.getElementById('vendor-type-filter').value=''; renderVendors();">Clear all filters</button>
+        </div>`;
 
     // Event delegation: one click/keydown listener for the whole grid,
     // rebound to the fresh grid.innerHTML each render (mirrors index.html's
@@ -1160,7 +1197,7 @@
 
     const tagRow = document.getElementById('vd-tags');
     const typeTags = (v.cardTypes || []).map((t) =>
-      `<span class="vendor-tag">${escapeHtml(CARD_TYPE_LABELS[t] || t)}</span>`).join('');
+      `<span class="type-tag type-${escapeHtml(t)}">${escapeHtml(CARD_TYPE_LABELS[t] || t)}</span>`).join('');
     const stateTags = (v.states || []).map((s) =>
       `<span class="vendor-tag vendor-state-tag">${escapeHtml(STATE_LABELS[s] || s)}</span>`).join('');
     tagRow.innerHTML = stateTags + typeTags;
