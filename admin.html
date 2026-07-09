@@ -1314,6 +1314,7 @@ ${itemsXml}
 
       if (isNew) {
         events.push(Object.assign({}, ev, updated));
+        lastAddedShowId = updated.id;
         toast('Show added — remember to save to index.html');
       } else {
         const idx = events.findIndex(e2 => e2.id === ev.id);
@@ -1327,6 +1328,7 @@ ${itemsXml}
       selectedId = updated.id;
       renderList();
       renderForm(updated.id);
+      if (pushPanelLoaded) renderPushResults(); // refresh the New Show Announcement pre-fill, if that panel's loaded
     });
   }
 
@@ -1665,6 +1667,8 @@ ${itemsXml}
   // =====================================================================
   const PUSH_API = 'https://gccs-interest.zbcaptures.workers.dev';
   let pushSubscriberData = {};
+  let pushPanelLoaded = false; // becomes true after the first successful load — guards renderPushResults() calls from elsewhere (e.g. saving a show) so we don't stomp on the "enter your token" prompt before it's ever been loaded
+  let lastAddedShowId = null; // set when you add a new show via the form above — used to pre-fill the New Show Announcement compose box
 
   (function initPushPanel() {
     const tokenInput = document.getElementById('push-admin-token');
@@ -1690,7 +1694,8 @@ ${itemsXml}
       const r = await fetch(`${PUSH_API}/push-list?token=${encodeURIComponent(token)}`);
       if (r.status === 401 || r.status === 403) throw new Error('Token rejected — check the ADMIN_TOKEN set on your Worker.');
       if (!r.ok) throw new Error('Worker returned an error (' + r.status + ').');
-      pushSubscriberData = await r.json(); // { showId: count, ... }
+      pushSubscriberData = await r.json(); // { showId: count, ... } — may include "new-shows"
+      pushPanelLoaded = true;
       renderPushResults();
       toast('Loaded subscriber counts');
     } catch (err) {
@@ -1700,42 +1705,70 @@ ${itemsXml}
     }
   }
 
-  function renderPushResults() {
-    const body = document.getElementById('push-panel-body');
-    const showIds = Object.keys(pushSubscriberData || {}).filter((id) => pushSubscriberData[id] > 0);
-    if (!showIds.length) {
-      body.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📣</div><p>No one's subscribed yet — once a visitor taps "Notify Me" on a TBD show, it'll show up here.</p></div>`;
-      return;
-    }
-    const totalSubs = showIds.reduce((sum, id) => sum + pushSubscriberData[id], 0);
-    let html = `<div style="margin-bottom:12px;"><span class="hint">${showIds.length} show${showIds.length === 1 ? '' : 's'} · ${totalSubs} total subscriber${totalSubs === 1 ? '' : 's'}</span></div>`;
-    html += showIds.map((id) => {
-      const ev = (typeof events !== 'undefined') ? events.find((e2) => e2.id === id) : null;
-      const label = ev ? (ev.name || id) : id;
-      return `
-      <div class="event-row" style="cursor:default; align-items:flex-start;">
+  function newShowAnnouncementSectionHtml() {
+    const count = pushSubscriberData['new-shows'] || 0;
+    const ev = lastAddedShowId && typeof events !== 'undefined' ? events.find((e2) => e2.id === lastAddedShowId) : null;
+    const defaultTitle = ev ? `New show added: ${ev.name || 'Show'}!` : '';
+    const defaultBody = ev ? `${ev.dateDisplay ? ev.dateDisplay + ' — ' : ''}${ev.location || ''}`.trim() : '';
+    const targetUrl = ev ? `https://gccardshows.com/#${ev.id}` : 'https://gccardshows.com/#shows';
+    return `
+      <div class="event-row" style="cursor:default; align-items:flex-start; border-color:var(--blue,#2563EB);">
         <div class="event-main" style="cursor:default;">
-          <div class="event-name">${escapeHtml(label)}</div>
-          <div class="event-sub" style="font-size:12px;color:var(--muted);">${escapeHtml(id)} · ${pushSubscriberData[id]} subscriber${pushSubscriberData[id] === 1 ? '' : 's'}</div>
-          <div class="push-compose" id="push-compose-${escapeHtml(id)}" style="margin-top:10px; display:flex; flex-direction:column; gap:8px;">
-            <input type="text" class="push-title-input" placeholder="Notification title" value="${escapeHtml(ev ? `${ev.name || 'Show'} just got a date!` : '')}" style="padding:8px 10px; border:1px solid var(--border,#E5E0D5); border-radius:8px;">
-            <input type="text" class="push-body-input" placeholder="Short message (shown under the title)" value="${escapeHtml(ev && ev.dateDisplay ? `It's happening ${ev.dateDisplay}.` : '')}" style="padding:8px 10px; border:1px solid var(--border,#E5E0D5); border-radius:8px;">
+          <div class="event-name">🆕 New Show Announcement</div>
+          <div class="event-sub" style="font-size:12px;color:var(--muted);">Standing list — subscribers stay on it after each send · ${count} subscriber${count === 1 ? '' : 's'}</div>
+          ${ev ? `<div class="event-sub" style="font-size:12px;color:var(--muted);margin-top:2px;">Pre-filled from the show you just added: <strong>${escapeHtml(ev.name || '(unnamed)')}</strong></div>` : ''}
+          <div class="push-compose" id="push-compose-new-shows" style="margin-top:10px; display:flex; flex-direction:column; gap:8px;">
+            <input type="text" class="push-title-input" placeholder="Notification title" value="${escapeHtml(defaultTitle)}" style="padding:8px 10px; border:1px solid var(--border,#E5E0D5); border-radius:8px;">
+            <input type="text" class="push-body-input" placeholder="Short message (shown under the title)" value="${escapeHtml(defaultBody)}" style="padding:8px 10px; border:1px solid var(--border,#E5E0D5); border-radius:8px;">
             <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-              <button type="button" class="btn-sm btn-primary push-send-btn" data-id="${escapeHtml(id)}">📣 Send to ${pushSubscriberData[id]} subscriber${pushSubscriberData[id] === 1 ? '' : 's'}</button>
-              <span class="hint">Opens gccardshows.com/#${escapeHtml(id)} when tapped</span>
+              <button type="button" class="btn-sm btn-primary push-send-btn" data-id="new-shows" data-url="${escapeHtml(targetUrl)}" data-keep="true" ${count ? '' : 'disabled'}>📣 Send to ${count} subscriber${count === 1 ? '' : 's'}</button>
+              <span class="hint">Opens ${escapeHtml(targetUrl.replace('https://', ''))} when tapped</span>
             </div>
           </div>
         </div>
       </div>`;
-    }).join('');
+  }
+
+  function renderPushResults() {
+    const body = document.getElementById('push-panel-body');
+    const showIds = Object.keys(pushSubscriberData || {}).filter((id) => id !== 'new-shows' && pushSubscriberData[id] > 0);
+
+    let html = newShowAnnouncementSectionHtml();
+
+    if (!showIds.length) {
+      html += `<div class="empty-state"><div class="empty-state-icon">📣</div><p>No TBD-show subscribers yet — once a visitor taps "Notify Me" on a specific TBD show, it'll show up here too.</p></div>`;
+    } else {
+      const totalSubs = showIds.reduce((sum, id) => sum + pushSubscriberData[id], 0);
+      html += `<div style="margin:16px 0 12px;"><span class="hint">${showIds.length} TBD show${showIds.length === 1 ? '' : 's'} · ${totalSubs} total subscriber${totalSubs === 1 ? '' : 's'}</span></div>`;
+      html += showIds.map((id) => {
+        const ev = (typeof events !== 'undefined') ? events.find((e2) => e2.id === id) : null;
+        const label = ev ? (ev.name || id) : id;
+        return `
+        <div class="event-row" style="cursor:default; align-items:flex-start;">
+          <div class="event-main" style="cursor:default;">
+            <div class="event-name">${escapeHtml(label)}</div>
+            <div class="event-sub" style="font-size:12px;color:var(--muted);">${escapeHtml(id)} · ${pushSubscriberData[id]} subscriber${pushSubscriberData[id] === 1 ? '' : 's'}</div>
+            <div class="push-compose" id="push-compose-${escapeHtml(id)}" style="margin-top:10px; display:flex; flex-direction:column; gap:8px;">
+              <input type="text" class="push-title-input" placeholder="Notification title" value="${escapeHtml(ev ? `${ev.name || 'Show'} just got a date!` : '')}" style="padding:8px 10px; border:1px solid var(--border,#E5E0D5); border-radius:8px;">
+              <input type="text" class="push-body-input" placeholder="Short message (shown under the title)" value="${escapeHtml(ev && ev.dateDisplay ? `It's happening ${ev.dateDisplay}.` : '')}" style="padding:8px 10px; border:1px solid var(--border,#E5E0D5); border-radius:8px;">
+              <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                <button type="button" class="btn-sm btn-primary push-send-btn" data-id="${escapeHtml(id)}" data-url="https://gccardshows.com/#${escapeHtml(id)}" data-keep="false">📣 Send to ${pushSubscriberData[id]} subscriber${pushSubscriberData[id] === 1 ? '' : 's'}</button>
+                <span class="hint">Opens gccardshows.com/#${escapeHtml(id)} when tapped</span>
+              </div>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
     body.innerHTML = html;
 
     body.querySelectorAll('.push-send-btn').forEach((btn) => {
-      btn.addEventListener('click', () => sendPushAnnouncement(btn.dataset.id, btn));
+      btn.addEventListener('click', () => sendPushAnnouncement(btn.dataset.id, btn.dataset.url, btn.dataset.keep === 'true', btn));
     });
   }
 
-  async function sendPushAnnouncement(id, btnEl) {
+  async function sendPushAnnouncement(id, targetUrl, keepSubscribers, btnEl) {
     const tokenInput = document.getElementById('push-admin-token');
     const token = tokenInput.value.trim();
     if (!token) { toast('Enter the Worker admin token first.', true); return; }
@@ -1745,7 +1778,8 @@ ${itemsXml}
     const messageBody = compose.querySelector('.push-body-input').value.trim();
     if (!messageBody) { toast('Add a short message before sending.', true); return; }
 
-    if (!confirm(`Send this push notification to ${pushSubscriberData[id]} subscriber(s) now? This can't be undone.`)) return;
+    const count = pushSubscriberData[id] || 0;
+    if (!confirm(`Send this push notification to ${count} subscriber(s) now? This can't be undone.`)) return;
 
     const origLabel = btnEl.textContent;
     btnEl.disabled = true; btnEl.textContent = 'Sending…';
@@ -1753,13 +1787,14 @@ ${itemsXml}
       const r = await fetch(`${PUSH_API}/push-send?token=${encodeURIComponent(token)}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, title, body: messageBody, url: `https://gccardshows.com/#${id}` }),
+        body: JSON.stringify({ id, title, body: messageBody, url: targetUrl, keepSubscribers }),
       });
       if (r.status === 401 || r.status === 403) throw new Error('Token rejected — check the ADMIN_TOKEN set on your Worker.');
       if (!r.ok) throw new Error('Worker returned an error (' + r.status + ').');
       const result = await r.json();
       toast(`📣 Sent to ${result.sent} subscriber${result.sent === 1 ? '' : 's'}${result.failed ? ` (${result.failed} failed)` : ''}`);
-      delete pushSubscriberData[id];
+      if (!keepSubscribers) delete pushSubscriberData[id];
+      if (id === 'new-shows') lastAddedShowId = null; // clear the pre-fill now that it's been sent
       renderPushResults();
     } catch (err) {
       toast(err.message, true);
