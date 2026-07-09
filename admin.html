@@ -157,6 +157,7 @@
     <button id="btn-download" disabled>⬇️ Download copy</button>
     <button id="btn-gen-states" disabled title="Creates one SEO-friendly landing page per state (e.g. florida-card-shows.html) from the shows currently loaded">🌎 Generate State Pages</button>
     <button id="btn-gen-feeds" disabled title="Creates feed.xml (RSS) and feed.json listing recently-added shows, newest first">📰 Download Feeds</button>
+    <button id="btn-gen-sitemap" disabled title="Creates sitemap.xml with an entry for the homepage and every state that currently has shows">🗺️ Download Sitemap</button>
   </div>
 </header>
 <p class="browser-note" id="browser-note"></p>
@@ -409,6 +410,7 @@ ${serializeDetails(ev.details)}
     document.getElementById('btn-download').disabled = false;
     document.getElementById('btn-gen-states').disabled = false;
     document.getElementById('btn-gen-feeds').disabled = false;
+    document.getElementById('btn-gen-sitemap').disabled = false;
     document.getElementById('btn-add').disabled = false;
     renderList();
     renderForm(null);
@@ -678,6 +680,41 @@ ${itemsXml}
     toast('Generating feed.xml and feed.json — check your downloads, then upload both alongside index.html.');
   }
   document.getElementById('btn-gen-feeds').addEventListener('click', generateFeeds);
+
+  // ===== Sitemap generation =====
+  // Reuses statesPresentIn()/stateFileSlug() — the exact same logic that
+  // decides which state pages "Generate State Pages" creates — so the
+  // sitemap can never drift out of sync with which pages actually exist.
+  function buildSitemapXml(list) {
+    const today = todayIsoAdmin();
+    const urls = [
+      { loc: 'https://gccardshows.com/', priority: '1.0' },
+      ...statesPresentIn(list).map(k => ({
+        loc: `https://gccardshows.com/${stateFileSlug(k)}`,
+        priority: '0.8',
+      })),
+    ];
+    const entries = urls.map(u => `  <url>
+    <loc>${u.loc}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>${u.priority}</priority>
+  </url>`).join('\n');
+    return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries}\n</urlset>\n`;
+  }
+  function generateSitemap() {
+    if (!originalText) { toast('Open index.html first.', true); return; }
+    const blob = new Blob([buildSitemapXml(events)], { type: 'application/xml' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'sitemap.xml';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    const stateCount = statesPresentIn(events).length;
+    toast(`Generated sitemap.xml — homepage + ${stateCount} state page${stateCount === 1 ? '' : 's'}. Upload it to your site root.`);
+  }
+  document.getElementById('btn-gen-sitemap').addEventListener('click', generateSitemap);
 
   // ===== List rendering =====
   // ===== Past-show detection =====

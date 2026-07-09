@@ -294,6 +294,19 @@
   .shows-section { max-width: 1120px; margin: 0 auto; padding: 0 32px 64px; }
   .shows-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
+  .empty-state {
+    grid-column: 1 / -1; text-align: center; padding: 56px 32px;
+    background: var(--card-bg); border: 1px dashed var(--border); border-radius: var(--radius);
+  }
+  .empty-state-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-state-heading { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 700; font-size: 19px; color: var(--dark); margin-bottom: 8px; }
+  .empty-state-body { font-family: 'Inter', sans-serif; font-size: 14px; color: var(--muted); max-width: 380px; margin: 0 auto 20px; line-height: 1.6; }
+  .empty-state-action {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 13px; padding: 10px 20px;
+    border-radius: 50px; border: none; background: var(--red); color: #fff; cursor: pointer;
+  }
+  .empty-state-action:hover { filter: brightness(1.08); }
+
   /* ===== View toggle (list / calendar) ===== */
   .view-toggle { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 18px; }
   .view-toggle-btn {
@@ -2239,18 +2252,45 @@
     const mapLabel = document.getElementById('map-count-label');
     if (mapLabel) mapLabel.textContent = `📍 ${visible} Show${visible === 1 ? '' : 's'} Along the Gulf Coast`;
 
-    // Empty-state message
+    // Empty-state message — tailored to whichever filter is most likely the
+    // actual cause, plus a one-click way out rather than a dead end.
     let empty = grid.querySelector('.empty-state');
     if (visible === 0) {
       if (!empty) {
-        empty = document.createElement('p');
+        empty = document.createElement('div');
         empty.className = 'empty-state';
-        empty.style.cssText = 'grid-column:1/-1;text-align:center;color:var(--muted);padding:40px 0;';
         grid.appendChild(empty);
       }
-      empty.textContent = q
-        ? `No shows match "${q}"${showPast ? '' : ' — try enabling "Show past events"'}.`
-        : (showPast ? 'No shows listed yet.' : 'No upcoming shows match your filters — try widening them or enabling "Show past events".');
+      let icon = '🔍', heading = 'No shows match your filters', body = '', actionLabel = 'Clear all filters', actionFn = 'clearAllFilters()';
+
+      if (favOnly && favorites.size === 0) {
+        icon = '⭐'; heading = "You haven't favorited any shows yet";
+        body = 'Tap the star on any show card to save it here for quick access.';
+        actionLabel = 'Show all shows instead'; actionFn = "document.getElementById('favorites-only-toggle').checked = false; applyFilters();";
+      } else if (favOnly) {
+        icon = '⭐'; heading = 'None of your favorites match your other filters';
+        body = 'Try clearing your search, state, or distance filters to see your saved shows.';
+        actionLabel = 'Clear other filters, keep favorites'; actionFn = "clearAllFilters(true);";
+      } else if (radiusVal && homeBase) {
+        icon = '📍'; heading = `Nothing within ${radiusVal} miles`;
+        body = 'Try a wider radius, or clear the distance filter entirely.';
+        actionLabel = `Expand to ${nextRadiusUp(radiusVal)}`; actionFn = `expandRadius();`;
+      } else if (q) {
+        icon = '🔍'; heading = `No shows match "${escapeHtml(q)}"`;
+        body = 'Check the spelling, or try a broader term like just the city name.';
+        actionLabel = 'Clear search'; actionFn = "document.getElementById('search-input').value = ''; applyFilters();";
+      } else if (!showPast) {
+        icon = '🗓️'; heading = 'No upcoming shows match your filters';
+        body = 'There may be past shows that match — or try widening your other filters.';
+        actionLabel = 'Clear all filters'; actionFn = 'clearAllFilters()';
+      }
+
+      empty.innerHTML = `
+        <div class="empty-state-icon">${icon}</div>
+        <p class="empty-state-heading">${heading}</p>
+        ${body ? `<p class="empty-state-body">${body}</p>` : ''}
+        <button type="button" class="empty-state-action" onclick="${actionFn}">${actionLabel}</button>
+      `;
     } else if (empty) {
       empty.remove();
     }
@@ -2258,6 +2298,31 @@
     syncMapToVisible(visibleIds);
     lastVisibleIds = visibleIds;
     if (viewMode === 'calendar') renderCalendar();
+  }
+
+  const RADIUS_TIERS = ['25', '50', '100', '200', ''];
+  function nextRadiusUp(current) {
+    const idx = RADIUS_TIERS.indexOf(String(current));
+    const next = RADIUS_TIERS[idx + 1] ?? '';
+    return next ? `${next} miles` : 'any distance';
+  }
+  function expandRadius() {
+    const sel = document.getElementById('radius-filter');
+    if (!sel) return;
+    const idx = RADIUS_TIERS.indexOf(sel.value);
+    sel.value = RADIUS_TIERS[idx + 1] ?? '';
+    applyFilters();
+  }
+  function clearAllFilters(keepFavorites) {
+    const ids = ['search-input', 'state-filter', 'type-filter', 'radius-filter'];
+    ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    const pastToggle = document.getElementById('show-past-toggle');
+    if (pastToggle) pastToggle.checked = false;
+    if (!keepFavorites) {
+      const favToggle = document.getElementById('favorites-only-toggle');
+      if (favToggle) favToggle.checked = false;
+    }
+    applyFilters();
   }
 
   // ===== Calendar view =====
@@ -2644,7 +2709,7 @@
   // ===== "Interested" counter (shared across visitors via a small Cloudflare
   // Worker + KV store — see WORKER-README for setup. If INTEREST_API isn't
   // configured yet, the buttons quietly hide themselves instead of breaking. =====
-  const INTEREST_API = 'https://gccs-interest.zbcaptures.workers.dev'; // e.g. 'https://gccs-interest.zbcaptures.workers.dev' — leave blank to disable
+  const INTEREST_API = ''; // e.g. 'https://gccs-interest.yoursubdomain.workers.dev' — leave blank to disable
   let interestCounts = {};
   let myInterests = new Set();
   try {
