@@ -378,7 +378,6 @@
   .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
   .upcoming-badge { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 11px; background: var(--dark); color: #fff; padding: 4px 10px; border-radius: 50px; letter-spacing: 0.06em; text-transform: uppercase; }
   .show-card.tbd .upcoming-badge { background: #999; }
-  .show-num { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 13px; color: var(--muted); }
   .show-name { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 700; font-size: 22px; color: var(--dark); margin-bottom: 16px; line-height: 1.2; }
 
   /* Type-color coding, borrowing the *logic* Pokémon's own UI uses (each
@@ -881,6 +880,7 @@
     <button type="button" class="view-toggle-btn active" id="view-toggle-list" onclick="setViewMode('list')" aria-pressed="true">📋 List</button>
     <button type="button" class="view-toggle-btn" id="view-toggle-calendar" onclick="setViewMode('calendar')" aria-pressed="false">📅 Calendar</button>
     <button type="button" class="view-toggle-ics" onclick="downloadFilteredIcs()" title="Download an .ics file of the shows currently matching your filters">🗓️ Add filtered shows to calendar</button>
+    <button type="button" class="view-toggle-ics" onclick="shareFilteredView()" title="Copy a link that reproduces your current search, filters, and distance">🔗 Share this view</button>
   </div>
 
   <div class="shows-grid" id="shows-grid">
@@ -1969,9 +1969,8 @@
           <span class="state-badge state-${st}">${st === 'UNK' ? '?' : st} · ${stName}</span>
         </div>
         <div class="header-right">
-          <button type="button" class="fav-btn${isFavorited(ev.id) ? ' active' : ''}" data-fav-id="${escapeHtml(ev.id)}" onclick="toggleFavorite('${escapeHtml(ev.id)}')" aria-label="Save this show to your favorites" aria-pressed="${isFavorited(ev.id) ? 'true' : 'false'}">${isFavorited(ev.id) ? '⭐' : '☆'}</button>
-          <span class="show-num">${num}</span>
           ${hasDetails ? '<span class="details-badge">Click for details →</span>' : ''}
+          <button type="button" class="fav-btn${isFavorited(ev.id) ? ' active' : ''}" data-fav-id="${escapeHtml(ev.id)}" onclick="toggleFavorite('${escapeHtml(ev.id)}')" aria-label="Save this show to your favorites" aria-pressed="${isFavorited(ev.id) ? 'true' : 'false'}">${isFavorited(ev.id) ? '⭐' : '☆'}</button>
         </div>
       </div>
       <h2 class="show-name">${escapeHtml(ev.tbd ? (ev.name || 'Details Coming Soon') : ev.name)}</h2>
@@ -2710,7 +2709,7 @@
   // ===== "Interested" counter (shared across visitors via a small Cloudflare
   // Worker + KV store — see WORKER-README for setup. If INTEREST_API isn't
   // configured yet, the buttons quietly hide themselves instead of breaking. =====
-  const INTEREST_API = ''; // e.g. 'https://gccs-interest.yoursubdomain.workers.dev' — leave blank to disable
+  const INTEREST_API = 'https://gccs-interest.zbcaptures.workers.dev'; // e.g. 'https://gccs-interest.yoursubdomain.workers.dev' — leave blank to disable
   let interestCounts = {};
   let myInterests = new Set();
   try {
@@ -2919,6 +2918,7 @@
   renderMapMarkers();
   renderShows();
   loadHomeBase();
+  applySharedFiltersFromUrl();
 
   // On a per-state SEO page (PAGE_STATE_FILTER set), pre-select that state in
   // the existing "Filter by State" dropdown and re-run the existing filter
@@ -3020,6 +3020,104 @@
       prompt('Copy this link:', url);
     }
   };
+
+  // Favorites are personal (per-browser localStorage), so intentionally left
+  // out of the shared link — a recipient's own favorites wouldn't match
+  // whatever the sharer had favorited, which would just be confusing.
+  function buildShareableFilterUrl() {
+    const params = new URLSearchParams();
+    const q = document.getElementById('search-input')?.value.trim();
+    const stateVal = document.getElementById('state-filter')?.value;
+    const typeVal = document.getElementById('type-filter')?.value;
+    const radiusVal = document.getElementById('radius-filter')?.value;
+    const showPast = document.getElementById('show-past-toggle')?.checked;
+
+    if (q) params.set('q', q);
+    if (stateVal) params.set('state', stateVal);
+    if (typeVal) params.set('type', typeVal);
+    if (showPast) params.set('past', '1');
+    if (radiusVal && homeBase) {
+      params.set('radius', radiusVal);
+      params.set('hlat', homeBase.lat);
+      params.set('hlng', homeBase.lng);
+      if (homeBase.label) params.set('hlabel', homeBase.label);
+    }
+    if (viewMode === 'calendar') params.set('view', 'calendar');
+
+    const qs = params.toString();
+    return `${location.origin}${location.pathname}${qs ? '?' + qs : ''}`;
+  }
+
+  window.shareFilteredView = async function() {
+    const url = buildShareableFilterUrl();
+    if (url === `${location.origin}${location.pathname}`) {
+      showToast('Set a search, filter, or distance first, then share the view.', 'error');
+      return;
+    }
+    try {
+      if (navigator.share) { await navigator.share({ title: 'Gulf Coast Card Shows', url }); return; }
+    } catch (_) { /* fall through to clipboard */ }
+    try {
+      await navigator.clipboard.writeText(url);
+      showToast('🔗 Shareable link copied — it reproduces this exact view.', 'success');
+    } catch (_) {
+      prompt('Copy this link:', url);
+    }
+  };
+
+  // Restores a filtered view from URL params (?q=&state=&type=&radius=&hlat=&hlng=&hlabel=&past=&view=)
+  // so a link built by shareFilteredView() reproduces the same view for whoever opens it.
+  function applySharedFiltersFromUrl() {
+    const params = new URLSearchParams(location.search);
+    const keys = ['q', 'state', 'type', 'radius', 'past', 'hlat', 'hlng', 'view'];
+    if (!keys.some(k => params.has(k))) return;
+
+    const qVal = params.get('q');
+    if (qVal) { const el = document.getElementById('search-input'); if (el) el.value = qVal; }
+
+    const stateVal = params.get('state');
+    if (stateVal) {
+      const el = document.getElementById('state-filter');
+      if (el && [...el.options].some(o => o.value === stateVal)) el.value = stateVal;
+    }
+
+    const typeVal = params.get('type');
+    if (typeVal) {
+      const el = document.getElementById('type-filter');
+      if (el && [...el.options].some(o => o.value === typeVal)) el.value = typeVal;
+    }
+
+    if (params.get('past') === '1') {
+      const el = document.getElementById('show-past-toggle');
+      if (el) el.checked = true;
+    }
+
+    const radiusVal = params.get('radius');
+    const hlat = parseFloat(params.get('hlat'));
+    const hlng = parseFloat(params.get('hlng'));
+    if (radiusVal && !isNaN(hlat) && !isNaN(hlng)) {
+      homeBase = { lat: hlat, lng: hlng, label: params.get('hlabel') || 'Shared location' };
+      const input = document.getElementById('home-base-input');
+      if (input) input.value = homeBase.label;
+      setStatus(`📍 Home base (from shared link): ${homeBase.label}`);
+      renderDistances();
+      const radiusEl = document.getElementById('radius-filter');
+      if (radiusEl && [...radiusEl.options].some(o => o.value === radiusVal)) radiusEl.value = radiusVal;
+    }
+
+    // A shared link implies at least one advanced filter is active — reveal
+    // the panel instead of leaving it collapsed behind the toggle.
+    const extra = document.getElementById('extra-filters');
+    const toggle = document.getElementById('filters-toggle');
+    if (extra && !extra.classList.contains('open')) {
+      extra.classList.add('open');
+      if (toggle) toggle.setAttribute('aria-expanded', 'true');
+    }
+
+    applyFilters();
+    if (params.get('view') === 'calendar') setViewMode('calendar');
+    showToast('📋 Showing a shared filtered view', 'success');
+  }
 
   // ===== JSON-LD structured data (schema.org Event) =====
   (function injectStructuredData() {
