@@ -684,6 +684,7 @@
   }
   .card-action-btn:hover { transform:translateY(-1px); box-shadow:var(--shadow); }
   .card-action-btn.calendar { border-color:#2E7D32; color:#2E7D32; }
+  .card-action-btn.directions { border-color: var(--blue); color: var(--blue); }
   .card-action-btn.report { border-color:var(--red); color:var(--red); margin-left:auto; }
 
   /* Favorite star toggle */
@@ -1937,6 +1938,7 @@
     let actions = '<div class="card-actions">';
     if (calUrl) actions += `<a class="card-action-btn calendar" href="${calUrl}" target="_blank" rel="noopener">📅 Google</a>`;
     actions += `<a class="card-action-btn calendar" href="#" onclick="downloadIcs('${escapeHtml(ev.id)}'); return false;" title="Apple Calendar / Outlook (.ics)">🗓️ .ics</a>`;
+    actions += `<a class="card-action-btn directions" href="https://maps.google.com/?q=${encodeURIComponent(ev.location || ev.name || '')}" target="_blank" rel="noopener" title="Get directions in Google Maps">🗺️ Directions</a>`;
     actions += `<a class="card-action-btn calendar" href="#" onclick="shareShow('${escapeHtml(ev.id)}'); return false;" title="Copy shareable link">🔗 Share</a>`;
     actions += `<button type="button" class="card-action-btn interest-btn" data-interest-id="${escapeHtml(ev.id)}" onclick="toggleInterest('${escapeHtml(ev.id)}')" aria-pressed="false">🙋 — interested</button>`;
     actions += `<a class="card-action-btn report" href="#" onclick="openReport('${escapeHtml(ev.name)} ${num}'); return false;">🚩 Report</a>`;
@@ -2332,6 +2334,7 @@
   function setViewMode(mode) {
     if (mode === viewMode) return;
     viewMode = mode;
+    try { localStorage.setItem('gccs-view-mode', mode); } catch (e) { /* storage unavailable — just won't persist across visits */ }
     const listBtn = document.getElementById('view-toggle-list');
     const calBtn = document.getElementById('view-toggle-calendar');
     const grid = document.getElementById('shows-grid');
@@ -2908,6 +2911,12 @@
     } catch (e) { /* noop */ }
   })();
 
+  function loadViewMode() {
+    let saved;
+    try { saved = localStorage.getItem('gccs-view-mode'); } catch (e) { saved = null; }
+    if (saved === 'calendar' || saved === 'list') setViewMode(saved);
+  }
+
   // ===== Init =====
   // renderMapMarkers() must run before renderShows(), since renderShows()
   // calls applyFilters() -> syncMapToVisible() which adds markers to the map
@@ -2916,6 +2925,7 @@
   // else happens to trigger applyFilters() again (e.g. setting a home base).
   renderMapMarkers();
   renderShows();
+  loadViewMode();
   loadHomeBase();
   applySharedFiltersFromUrl();
 
