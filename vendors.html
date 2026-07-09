@@ -961,15 +961,6 @@
   /* ==VENDORS-DATA-START== */
   const VENDORS = [
     {
-      id: "ven-1783610324412",
-      name: "Pokeshop 850",
-      description: "Welcome to PokeShop 850! Step into our vibrant shop and immerse yourself in a world where Pokémon dreams\ncome true.\n1. Rare Treasures\n2. Friendly Guidance\n3. Guaranteed Authenticity\n4. Memorabilia and Merchandise\n5. Buy / Sell / Trade",
-      states: ["FL", "AL"],
-      cardTypes: ["pokemon"],
-      showsAttended: "Cards on the Coast, Trade Show Mobile",
-      website: "pokeshop850.com", websiteLabel: "🌐 pokeshop850.com",
-    },
-    {
       id: "ven-1783609654812",
       name: "Anchor Up Sports",
       description: "Anchor Up Sports was born in Pensacola, FL from a simple idea: the card show experience should feel like coming home. Whether you're chasing a childhood hero's rookie card or hunting the latest hits, we believe the best moments happen face-to-face, surrounded by people who share your passion.\n\nWhat started as a small gathering of local collectors has grown into one of the Gulf Coast's most anticipated trading card events. Every show we host is built on the same foundation — community first, always.\n\nWe handle the logistics so vendors can focus on selling and collectors can focus on finding their next great pickup.\n\nBeyond the shows, we also buy sports card collections in Pensacola — from single graded cards to full estates — so collectors and families have a trusted local option when it's time to sell.",
@@ -994,7 +985,7 @@
       states: ["FL"],
       cardTypes: ["pokemon", "sports", "mtg", "yugioh", "comics"],
       showsAttended: "Anchor Up",
-      website: "https://benscardworld.com/", websiteLabel: "🌐 benscardworld.com",
+      website: "", websiteLabel: "",
     },
     {
       id: "ven-1783609338787",
@@ -1088,7 +1079,7 @@
     return `<div class="vendor-card clickable" data-vendor-id="${escapeHtml(v.id)}" role="button" tabindex="0">
       <div class="vendor-card-header">
         <h2 class="vendor-card-name">${escapeHtml(v.name)}</h2>
-        ${v.description ? '<span class="details-badge">Click for details →</span>' : ''}
+        ${v.description ? '<span class="details-badge">Click →</span>' : ''}
       </div>
       ${v.description ? `<p class="vendor-card-desc">${escapeHtml(v.description)}</p>` : ''}
       <div class="vendor-tag-row">${stateTags}${typeTags}</div>
