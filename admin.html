@@ -249,27 +249,28 @@
 
 <header>
   <div class="brand">
-    <div class="brand-icon">🔔</div>
+    <div class="brand-icon">📣</div>
     <div>
-      <div class="brand-title">TBD Notify Signups</div>
-      <div class="brand-sub">Emails collected via the Worker for "Notify Me" on TBD shows</div>
+      <div class="brand-title">Send Push Announcement</div>
+      <div class="brand-sub">Notify everyone subscribed to a TBD show — no email export needed</div>
     </div>
   </div>
 </header>
 
 <div class="panel" style="margin-top:16px;">
   <div class="panel-header">
-    <span class="panel-title">Signups by show</span>
+    <span class="panel-title">Shows with subscribers</span>
+    <button id="push-btn-refresh" class="btn-sm btn-dark">🔄 Refresh</button>
   </div>
-  <div class="panel-body" id="notify-panel-body">
-    <div class="empty-state" id="notify-empty-state">
-      <div class="empty-state-icon">🔔</div>
-      <p>Enter your Worker's admin token to load the list of people waiting on TBD-show announcements.</p>
+  <div class="panel-body" id="push-panel-body">
+    <div class="empty-state" id="push-empty-state">
+      <div class="empty-state-icon">📣</div>
+      <p>Enter your Worker's admin token to load which TBD shows have people waiting on a push notification.</p>
       <div style="display:flex; gap:8px; max-width:420px; margin:12px auto 0; flex-wrap:wrap; justify-content:center;">
-        <input type="password" id="notify-admin-token" placeholder="Worker admin token" style="flex:1 1 220px; padding:9px 12px; border:1px solid var(--border,#E5E0D5); border-radius:8px;">
-        <button id="notify-btn-fetch" class="btn-dark">🔄 Load Signups</button>
+        <input type="password" id="push-admin-token" placeholder="Worker admin token" style="flex:1 1 220px; padding:9px 12px; border:1px solid var(--border,#E5E0D5); border-radius:8px;">
+        <button id="push-btn-fetch" class="btn-dark">🔄 Load Subscribers</button>
       </div>
-      <p class="hint" style="margin-top:10px;">This token is only stored in your browser's local storage on this device — see WORKER-NOTIFY-ADDITION.md for how to set it on the Worker.</p>
+      <p class="hint" style="margin-top:10px;">This token is only stored in your browser's local storage on this device — see WORKER-PUSH-SETUP.md for one-time setup.</p>
     </div>
   </div>
 </div>
@@ -1656,84 +1657,114 @@ ${itemsXml}
   });
 
   // =====================================================================
-  //  TBD NOTIFY SIGNUPS — reads from the same Worker as the interest counter.
-  //  Requires the /notify-list endpoint + ADMIN_TOKEN described in
-  //  WORKER-NOTIFY-ADDITION.md to be added to the Worker first.
+  //  SEND PUSH ANNOUNCEMENT — reads subscriber counts from the Worker,
+  //  and sends a Web Push notification to everyone subscribed to a show
+  //  when you're ready to announce it. Replaces the old email/CSV flow.
+  //  Requires the /push-list and /push-send routes + VAPID keys described
+  //  in WORKER-PUSH-SETUP.md.
   // =====================================================================
-  const NOTIFY_API = 'https://gccs-interest.zbcaptures.workers.dev';
+  const PUSH_API = 'https://gccs-interest.zbcaptures.workers.dev';
+  let pushSubscriberData = {};
 
-  (function initNotifyPanel() {
-    const tokenInput = document.getElementById('notify-admin-token');
+  (function initPushPanel() {
+    const tokenInput = document.getElementById('push-admin-token');
     if (!tokenInput) return;
-    const saved = localStorage.getItem('gccs-admin-notify-token');
+    const saved = localStorage.getItem('gccs-admin-push-token');
     if (saved) tokenInput.value = saved;
-    const btn = document.getElementById('notify-btn-fetch');
-    if (btn) btn.addEventListener('click', fetchNotifySignups);
+    const fetchBtn = document.getElementById('push-btn-fetch');
+    if (fetchBtn) fetchBtn.addEventListener('click', fetchPushSubscribers);
+    const refreshBtn = document.getElementById('push-btn-refresh');
+    if (refreshBtn) refreshBtn.addEventListener('click', fetchPushSubscribers);
   })();
 
-  async function fetchNotifySignups() {
-    const tokenInput = document.getElementById('notify-admin-token');
+  async function fetchPushSubscribers() {
+    const tokenInput = document.getElementById('push-admin-token');
     const token = tokenInput.value.trim();
     if (!token) { toast('Enter the Worker admin token first.', true); return; }
-    try { localStorage.setItem('gccs-admin-notify-token', token); } catch (e) {}
-    const btn = document.getElementById('notify-btn-fetch');
-    const origLabel = btn.textContent;
-    btn.disabled = true; btn.textContent = 'Loading…';
+    try { localStorage.setItem('gccs-admin-push-token', token); } catch (e) {}
+
+    const btn = document.getElementById('push-btn-fetch') || document.getElementById('push-btn-refresh');
+    const origLabel = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = 'Loading…'; }
     try {
-      const r = await fetch(`${NOTIFY_API}/notify-list?token=${encodeURIComponent(token)}`);
+      const r = await fetch(`${PUSH_API}/push-list?token=${encodeURIComponent(token)}`);
       if (r.status === 401 || r.status === 403) throw new Error('Token rejected — check the ADMIN_TOKEN set on your Worker.');
       if (!r.ok) throw new Error('Worker returned an error (' + r.status + ').');
-      const data = await r.json(); // { showId: [emails...], ... }
-      renderNotifyResults(data);
-      toast('Loaded notify signups');
+      pushSubscriberData = await r.json(); // { showId: count, ... }
+      renderPushResults();
+      toast('Loaded subscriber counts');
     } catch (err) {
       toast(err.message, true);
     } finally {
-      btn.disabled = false; btn.textContent = origLabel;
+      if (btn) { btn.disabled = false; btn.textContent = origLabel; }
     }
   }
 
-  function renderNotifyResults(data) {
-    const body = document.getElementById('notify-panel-body');
-    const showIds = Object.keys(data || {}).filter(id => Array.isArray(data[id]) && data[id].length);
+  function renderPushResults() {
+    const body = document.getElementById('push-panel-body');
+    const showIds = Object.keys(pushSubscriberData || {}).filter((id) => pushSubscriberData[id] > 0);
     if (!showIds.length) {
-      body.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🔔</div><p>No signups yet — once someone submits their email on a TBD show, it'll show up here.</p></div>`;
+      body.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📣</div><p>No one's subscribed yet — once a visitor taps "Notify Me" on a TBD show, it'll show up here.</p></div>`;
       return;
     }
-    const totalEmails = showIds.reduce((sum, id) => sum + data[id].length, 0);
-    let html = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
-      <span class="hint">${showIds.length} show${showIds.length === 1 ? '' : 's'} · ${totalEmails} total signup${totalEmails === 1 ? '' : 's'}</span>
-      <button type="button" class="btn-sm btn-dark" id="notify-btn-csv">⬇️ Download CSV</button>
-    </div>`;
-    html += showIds.map(id => `
-      <div class="event-row" style="cursor:default;">
-        <div class="event-main">
-          <div class="event-name">${escapeHtml(id)}</div>
-          <div class="event-sub" style="font-size:12px;color:var(--muted);word-break:break-word;">${data[id].map(escapeHtml).join(', ')}</div>
+    const totalSubs = showIds.reduce((sum, id) => sum + pushSubscriberData[id], 0);
+    let html = `<div style="margin-bottom:12px;"><span class="hint">${showIds.length} show${showIds.length === 1 ? '' : 's'} · ${totalSubs} total subscriber${totalSubs === 1 ? '' : 's'}</span></div>`;
+    html += showIds.map((id) => {
+      const ev = (typeof events !== 'undefined') ? events.find((e2) => e2.id === id) : null;
+      const label = ev ? (ev.name || id) : id;
+      return `
+      <div class="event-row" style="cursor:default; align-items:flex-start;">
+        <div class="event-main" style="cursor:default;">
+          <div class="event-name">${escapeHtml(label)}</div>
+          <div class="event-sub" style="font-size:12px;color:var(--muted);">${escapeHtml(id)} · ${pushSubscriberData[id]} subscriber${pushSubscriberData[id] === 1 ? '' : 's'}</div>
+          <div class="push-compose" id="push-compose-${escapeHtml(id)}" style="margin-top:10px; display:flex; flex-direction:column; gap:8px;">
+            <input type="text" class="push-title-input" placeholder="Notification title" value="${escapeHtml(ev ? `${ev.name || 'Show'} just got a date!` : '')}" style="padding:8px 10px; border:1px solid var(--border,#E5E0D5); border-radius:8px;">
+            <input type="text" class="push-body-input" placeholder="Short message (shown under the title)" value="${escapeHtml(ev && ev.dateDisplay ? `It's happening ${ev.dateDisplay}.` : '')}" style="padding:8px 10px; border:1px solid var(--border,#E5E0D5); border-radius:8px;">
+            <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+              <button type="button" class="btn-sm btn-primary push-send-btn" data-id="${escapeHtml(id)}">📣 Send to ${pushSubscriberData[id]} subscriber${pushSubscriberData[id] === 1 ? '' : 's'}</button>
+              <span class="hint">Opens gccardshows.com/#${escapeHtml(id)} when tapped</span>
+            </div>
+          </div>
         </div>
-      </div>
-    `).join('');
+      </div>`;
+    }).join('');
     body.innerHTML = html;
 
-    const csvBtn = document.getElementById('notify-btn-csv');
-    if (csvBtn) csvBtn.addEventListener('click', () => downloadNotifyCsv(data, showIds));
+    body.querySelectorAll('.push-send-btn').forEach((btn) => {
+      btn.addEventListener('click', () => sendPushAnnouncement(btn.dataset.id, btn));
+    });
   }
 
-  function downloadNotifyCsv(data, showIds) {
-    let csv = 'show_id,email\n';
-    showIds.forEach((id) => {
-      data[id].forEach((email) => {
-        csv += `"${String(id).replace(/"/g, '""')}","${String(email).replace(/"/g, '""')}"\n`;
+  async function sendPushAnnouncement(id, btnEl) {
+    const tokenInput = document.getElementById('push-admin-token');
+    const token = tokenInput.value.trim();
+    if (!token) { toast('Enter the Worker admin token first.', true); return; }
+
+    const compose = document.getElementById(`push-compose-${id}`);
+    const title = compose.querySelector('.push-title-input').value.trim() || 'Gulf Coast Card Shows';
+    const messageBody = compose.querySelector('.push-body-input').value.trim();
+    if (!messageBody) { toast('Add a short message before sending.', true); return; }
+
+    if (!confirm(`Send this push notification to ${pushSubscriberData[id]} subscriber(s) now? This can't be undone.`)) return;
+
+    const origLabel = btnEl.textContent;
+    btnEl.disabled = true; btnEl.textContent = 'Sending…';
+    try {
+      const r = await fetch(`${PUSH_API}/push-send?token=${encodeURIComponent(token)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, title, body: messageBody, url: `https://gccardshows.com/#${id}` }),
       });
-    });
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'tbd-notify-signups.csv';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    toast('Downloaded CSV');
+      if (r.status === 401 || r.status === 403) throw new Error('Token rejected — check the ADMIN_TOKEN set on your Worker.');
+      if (!r.ok) throw new Error('Worker returned an error (' + r.status + ').');
+      const result = await r.json();
+      toast(`📣 Sent to ${result.sent} subscriber${result.sent === 1 ? '' : 's'}${result.failed ? ` (${result.failed} failed)` : ''}`);
+      delete pushSubscriberData[id];
+      renderPushResults();
+    } catch (err) {
+      toast(err.message, true);
+      btnEl.disabled = false; btnEl.textContent = origLabel;
+    }
   }
 </script>
 </body>

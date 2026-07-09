@@ -712,10 +712,6 @@
   .card-notify-block { margin-top: 10px; }
   .notify-toggle-btn { background: #FFF8E1; border-color: #F5C542; color: #8A6D00; }
   html.dark .notify-toggle-btn { background: #3A3110; border-color: #8A6D00; color: #F5D76E; }
-  .notify-inline-form { display: none; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
-  .notify-inline-form.open { display: flex; }
-  #detail-notify-body .notify-inline-form { display: flex; }
-  .notify-email-input { flex: 1 1 180px; min-width: 0; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--card-bg); color: var(--text); font-size: 14px; }
   .notify-submit-btn { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--red); background: var(--red); color: #fff; font-weight: 700; font-size: 13px; cursor: pointer; white-space: nowrap; }
   .notify-submit-btn:disabled { opacity: 0.6; cursor: default; }
   .notify-confirmed-msg { display: inline-block; font-size: 13px; font-weight: 700; color: #2E7D32; background: #E8F5E9; border: 1px solid #A5D6A7; border-radius: 8px; padding: 7px 12px; }
@@ -1168,7 +1164,7 @@
 
     <div class="detail-section notify-block" id="detail-notify-sec" hidden>
       <h3>🔔 Get Notified</h3>
-      <p class="notify-desc">This show's date hasn't been announced yet — leave your email and we'll let you know as soon as it is.</p>
+      <p class="notify-desc">This show's date hasn't been announced yet — turn on notifications and we'll let you know the moment it is.</p>
       <div id="detail-notify-body"></div>
     </div>
 
@@ -2804,9 +2800,21 @@
     } catch (e) { /* optimistic update already shown — a background sync failure isn't worth interrupting the user for */ }
   }
 
-  // ===== "Notify me" — for TBD shows, let visitors leave an email so we can
-  // ping them once the date/details are announced. Reuses the same Worker as
-  // the interest counter (see INTEREST_API above), just a different route. =====
+  // ===== "Notify me" — for TBD shows, let visitors subscribe to a browser
+  // push notification for when the date/details are announced. Uses the
+  // same Worker as the interest counter (see INTEREST_API above), plus the
+  // service worker registered at the bottom of this page. =====
+  const VAPID_PUBLIC_KEY = 'BGDljPiRIL6F4JiG0c8RzYERHbtMkNoG7xV8swgn_hUXIcK6VymeXs79oY1flz6kpIn14i7AEKyTbuwDiq6KPLw';
+
+  function urlBase64ToUint8Array(base64url) {
+    const padding = '='.repeat((4 - (base64url.length % 4)) % 4);
+    const base64 = (base64url + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const raw = atob(base64);
+    const bytes = new Uint8Array(raw.length);
+    for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
+    return bytes;
+  }
+
   let notifySubscribed = new Set();
   try {
     notifySubscribed = new Set(JSON.parse(localStorage.getItem('gccs-notify-subscribed') || '[]'));
@@ -2814,36 +2822,20 @@
 
   function isNotifySubscribed(id) { return notifySubscribed.has(id); }
 
-  function isValidEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v || '').trim()); }
+  function pushSupported() {
+    return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+  }
 
-  // compact=true -> the small card version (toggle button + collapsible form)
-  // compact=false -> the detail-modal version (form shown directly, no toggle)
+  // compact=true -> the small card version. compact=false -> the detail-modal version.
+  // Both render the same button now — kept as two entry points so the
+  // surrounding markup (card vs. modal section) can still style them differently.
   function notifyBlockInnerHtml(id, compact) {
     const safeId = escapeHtml(id);
     if (isNotifySubscribed(id)) {
-      return `<span class="notify-confirmed-msg">🔔 We'll email you when this is announced</span>`;
+      return `<span class="notify-confirmed-msg">🔔 You'll be notified when this is announced</span>`;
     }
-    if (compact) {
-      return `<button type="button" class="card-action-btn notify-toggle-btn" onclick="toggleNotifyForm('${safeId}')">🔔 Notify Me When Announced</button>
-        <div class="notify-inline-form" id="notify-form-${safeId}">
-          <input type="email" class="notify-email-input" id="notify-email-${safeId}" placeholder="you@example.com" aria-label="Email address for notification">
-          <button type="button" class="notify-submit-btn" onclick="submitNotify('${safeId}', document.getElementById('notify-email-${safeId}'), this)">Notify Me</button>
-        </div>`;
-    }
-    return `<div class="notify-inline-form open">
-        <input type="email" class="notify-email-input" id="detail-notify-email" placeholder="you@example.com" aria-label="Email address for notification">
-        <button type="button" class="notify-submit-btn" onclick="submitNotify('${safeId}', document.getElementById('detail-notify-email'), this)">Notify Me</button>
-      </div>`;
-  }
-
-  function toggleNotifyForm(id) {
-    const form = document.getElementById(`notify-form-${id}`);
-    if (!form) return;
-    const nowOpen = form.classList.toggle('open');
-    if (nowOpen) {
-      const input = document.getElementById(`notify-email-${id}`);
-      if (input) input.focus();
-    }
+    const cls = compact ? 'card-action-btn notify-toggle-btn' : 'notify-submit-btn';
+    return `<button type="button" class="${cls}" onclick="subscribeToNotify('${safeId}', this)">🔔 Notify Me When Announced</button>`;
   }
 
   function refreshNotifyUI(id) {
@@ -2859,29 +2851,45 @@
     });
   }
 
-  async function submitNotify(id, inputEl, btnEl) {
-    const email = inputEl ? inputEl.value.trim() : '';
-    if (!isValidEmail(email)) {
-      showToast('Enter a valid email address first.', 'error');
-      if (inputEl) inputEl.focus();
+  async function subscribeToNotify(id, btnEl) {
+    if (!INTEREST_API) { showToast("Notify signups aren't available right now — check back soon.", 'error'); return; }
+    if (!pushSupported()) {
+      showToast('Notifications aren\'t supported in this browser. On iPhone, add this site to your Home Screen first (Share → Add to Home Screen), then try again from there.', 'error');
       return;
     }
-    if (!INTEREST_API) { showToast("Notify signups aren't available right now — check back soon.", 'error'); return; }
-    if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'Submitting…'; }
+
+    if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'Requesting permission…'; }
     try {
-      const r = await fetch(`${INTEREST_API}/notify`, {
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        showToast('Notifications are blocked for this site — enable them in your browser settings to get notified.', 'error');
+        if (btnEl) { btnEl.disabled = false; btnEl.textContent = '🔔 Notify Me When Announced'; }
+        return;
+      }
+
+      const registration = await navigator.serviceWorker.ready;
+      let subscription = await registration.pushManager.getSubscription();
+      if (!subscription) {
+        subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+        });
+      }
+
+      const r = await fetch(`${INTEREST_API}/push-subscribe`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, email }),
+        body: JSON.stringify({ id, subscription: subscription.toJSON() }),
       });
       if (!r.ok) throw new Error('bad response');
+
       notifySubscribed.add(id);
       try { localStorage.setItem('gccs-notify-subscribed', JSON.stringify([...notifySubscribed])); } catch (e) {}
-      showToast("🔔 You're on the list — we'll email you when it's announced.", 'success', 3000);
+      showToast("🔔 You're set — we'll notify you the moment this is announced.", 'success', 3000);
       refreshNotifyUI(id);
     } catch (e) {
-      showToast('Something went wrong — please try again in a moment.', 'error');
-      if (btnEl) { btnEl.disabled = false; btnEl.textContent = 'Notify Me'; }
+      showToast('Something went wrong setting up notifications — please try again.', 'error');
+      if (btnEl) { btnEl.disabled = false; btnEl.textContent = '🔔 Notify Me When Announced'; }
     }
   }
 

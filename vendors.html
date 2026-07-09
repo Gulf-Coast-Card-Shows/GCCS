@@ -178,10 +178,11 @@
   .mobile-menu-item:hover { background: var(--border); }
 
   /* HERO */
-  .hero { max-width: 1120px; margin: 0 auto; padding: 48px 32px 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+  .hero { max-width: 1120px; margin: 0 auto; padding: 48px 32px 32px; display: flex; justify-content: flex-end; }
+  .hero-text-block { text-align: right; max-width: 480px; }
   .hero-eyebrow { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
   .hero-title { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 800; font-size: 56px; line-height: 1.05; color: var(--dark); margin-bottom: 16px; }
-  .hero-desc { font-size: 16px; color: var(--muted); line-height: 1.6; margin-bottom: 24px; max-width: 380px; }
+  .hero-desc { font-size: 16px; color: var(--muted); line-height: 1.6; margin-bottom: 24px; max-width: 380px; margin-left: auto; }
   .hero-tags { display: flex; gap: 10px; flex-wrap: wrap; }
   .hero-tag { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 13px; padding: 7px 16px; border-radius: 50px; border: 2px solid; }
   .hero-tag.red { color: var(--red); border-color: var(--red); background: #FFF0F0; }
@@ -500,7 +501,7 @@
      phone layout, which left mid-size tablets with a cramped grid and a
      hero that was neither the roomy desktop version nor the stacked mobile one. */
   @media (max-width: 1024px) and (min-width: 769px) {
-    .hero { gap: 28px; padding: 40px 24px 28px; }
+    .hero { padding: 40px 24px 28px; }
     .hero-title { font-size: 46px; }
     .shows-grid { grid-template-columns: repeat(2, 1fr); }
     .controls-card { padding: 16px 18px; }
@@ -512,7 +513,9 @@
     .nav-logo { min-width: 0; gap: 8px; flex: 1 1 auto; overflow: hidden; }
     .pokeball-icon { width: 38px; height: 38px; font-size: 21px; }
     .nav-title { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .hero { grid-template-columns: 1fr; }
+    .hero { justify-content: center; }
+    .hero-text-block { text-align: center; max-width: 100%; }
+    .hero-desc { margin-left: 0; margin-right: 0; }
     .hero-map-wrap { height: 240px; }
     .stat-strip { grid-template-columns: 1fr; }
     .stat-strip.no-featured { grid-template-columns: 1fr; }
@@ -725,9 +728,10 @@
 </noscript>
 
 <section class="hero" id="main-content">
-  <p class="hero-eyebrow">Gulf Coast Card Shows</p>
-  <h1 class="hero-title">Vendors &amp; Dealers</h1>
-  <p class="hero-desc">Trading card dealers and vendors from across Florida, Alabama, Mississippi &amp; Georgia — and the shows where you'll find their tables.</p>
+  <div class="hero-text-block">
+    <h1 class="hero-title">Vendors &amp; Dealers</h1>
+    <p class="hero-desc">Trading card dealers and vendors from across Florida, Alabama, Mississippi &amp; Georgia — and the shows where you'll find their tables.</p>
+  </div>
 </section>
 
 <section class="vendors-toolbar" aria-label="Filter vendors">
@@ -961,24 +965,6 @@
   /* ==VENDORS-DATA-START== */
   const VENDORS = [
     {
-      id: "ven-1783608813424",
-      name: "MagiKart Collectibles",
-      description: "Friends vending Pokémon cards & building a fun, welcoming community for all collectors!",
-      states: ["FL", "AL", "MS", "GA"],
-      cardTypes: ["pokemon", "sports"],
-      showsAttended: "Anchor Up, Coastal Collectors Expo,",
-      website: "https://www.facebook.com/Magikartcollectibles/", websiteLabel: "📘 Facebook",
-    },
-    {
-      id: "ven-1783609527353",
-      name: "Pokeshop251",
-      description: "PokeShop251 is your one-stop-shop for all things Pokemon! Our online trading card store provides a comprehensive selection of English and Japanese Pokemon products. We pride ourselves on offering only the highest quality products and exceptional customer service. Our team of professionals is dedicated to helping Pokemon fans and collectors find everything they need to complete their collections.",
-      states: ["FL", "AL", "MS"],
-      cardTypes: ["pokemon"],
-      showsAttended: "Card Jam, Gulf Coast Card Show, Coastal Collectors Expo",
-      website: "https://www.pokeshop251.com/", websiteLabel: "🌐 pokeshop251.com",
-    },
-    {
       id: "ven-1783609654812",
       name: "Anchor Up Sports",
       description: "Anchor Up Sports was born in Pensacola, FL from a simple idea: the card show experience should feel like coming home. Whether you're chasing a childhood hero's rookie card or hunting the latest hits, we believe the best moments happen face-to-face, surrounded by people who share your passion.\n\nWhat started as a small gathering of local collectors has grown into one of the Gulf Coast's most anticipated trading card events. Every show we host is built on the same foundation — community first, always.\n\nWe handle the logistics so vendors can focus on selling and collectors can focus on finding their next great pickup.\n\nBeyond the shows, we also buy sports card collections in Pensacola — from single graded cards to full estates — so collectors and families have a trusted local option when it's time to sell.",
@@ -988,31 +974,13 @@
       website: "https://anchorupcardshows.com/", websiteLabel: "🌐 anchorupcardshows.com",
     },
     {
-      id: "ven-1783608965167",
-      name: "The Trainer Gallery",
-      description: "Your “go to” hub for Pokémon and One Piece cards—The Trainer Gallery buys, sells, and trades with collectors who love the chase.",
+      id: "ven-1783609527353",
+      name: "Pokeshop251",
+      description: "PokeShop251 is your one-stop-shop for all things Pokemon! Our online trading card store provides a comprehensive selection of English and Japanese Pokemon products. We pride ourselves on offering only the highest quality products and exceptional customer service. Our team of professionals is dedicated to helping Pokemon fans and collectors find everything they need to complete their collections.",
       states: ["FL", "AL", "MS"],
-      cardTypes: ["pokemon", "onepiece"],
-      showsAttended: "Anchor Up, Coastal Collectors Expo",
-      website: "https://www.facebook.com/profile.php?id=61589489793251", websiteLabel: "📘 Facebook",
-    },
-    {
-      id: "ven-1783610967548",
-      name: "Video Game Trading Post",
-      description: "Specializing in all video games, statues, collectibles and more!",
-      states: ["FL", "AL"],
-      cardTypes: ["pokemon", "comics"],
-      showsAttended: "Coastal Collectors Expo",
-      website: "https://www.facebook.com/VGTPFlorida/", websiteLabel: "📘 Facebook",
-    },
-    {
-      id: "ven-1783611035108",
-      name: "Pokeshop 850",
-      description: "Welcome to PokeShop 850! Step into our vibrant shop and immerse yourself in a world where Pokémon dreams\ncome true.\n1. Rare Treasures\n2. Friendly Guidance\n3. Guaranteed Authenticity\n4. Memorabilia and Merchandise\n5. Buy / Sell / Trade",
-      states: ["FL", "AL"],
       cardTypes: ["pokemon"],
-      showsAttended: "Cards on the Coast",
-      website: "pokeshop850.com", websiteLabel: "🌐 Website",
+      showsAttended: "Card Jam, Gulf Coast Card Show, Coastal Collectors Expo",
+      website: "https://www.pokeshop251.com/", websiteLabel: "🌐 pokeshop251.com",
     },
     {
       id: "ven-1783609413607",
@@ -1040,6 +1008,24 @@
       cardTypes: ["pokemon"],
       showsAttended: "Anchor Up, Coastal Collectors Expo, The Flip",
       website: "https://www.facebook.com/profile.php?id=61589436191030", websiteLabel: "📘 Facebook",
+    },
+    {
+      id: "ven-1783608965167",
+      name: "The Trainer Gallery",
+      description: "Your “go to” hub for Pokémon and One Piece cards—The Trainer Gallery buys, sells, and trades with collectors who love the chase.",
+      states: ["FL", "AL", "MS"],
+      cardTypes: ["pokemon", "onepiece"],
+      showsAttended: "Anchor Up, Coastal Collectors Expo",
+      website: "https://www.facebook.com/profile.php?id=61589489793251", websiteLabel: "📘 Facebook",
+    },
+    {
+      id: "ven-1783608813424",
+      name: "MagiKart Collectibles",
+      description: "Friends vending Pokémon cards & building a fun, welcoming community for all collectors!",
+      states: ["FL", "AL", "MS", "GA"],
+      cardTypes: ["pokemon", "sports"],
+      showsAttended: "Anchor Up, Coastal Collectors Expo,",
+      website: "https://www.facebook.com/Magikartcollectibles/", websiteLabel: "📘 Facebook",
     }
   ];
   /* ==VENDORS-DATA-END== */

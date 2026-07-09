@@ -76,3 +76,38 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
+// ===== Web Push — TBD show announcements =====
+// The payload sent by the Worker is JSON: { title, body, url }.
+self.addEventListener('push', (event) => {
+  let data = { title: 'Gulf Coast Card Shows', body: 'A show you follow has an update.', url: '/' };
+  try {
+    if (event.data) data = { ...data, ...event.data.json() };
+  } catch (e) { /* fall back to defaults above */ }
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: '/icons/icon-192.png',
+      badge: '/icons/icon-192.png',
+      data: { url: data.url || '/' },
+      tag: data.url || 'gccs-notification', // replaces any earlier notification for the same show
+    })
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const targetUrl = (event.notification.data && event.notification.data.url) || '/';
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientsList) => {
+      for (const client of clientsList) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          client.navigate(targetUrl);
+          return client.focus();
+        }
+      }
+      return self.clients.openWindow(targetUrl);
+    })
+  );
+});
