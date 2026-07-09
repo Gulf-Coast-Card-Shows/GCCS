@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Card Show Vendors &amp; Dealers | Gulf Coast Card Shows</title>
+<meta name="description" content="Find trading card dealers and vendors along the Gulf Coast — Pokémon, sports cards, and TCG sellers, and which shows in FL, AL, MS &amp; GA they attend.">
+<link rel="canonical" href="https://gccardshows.com/vendors.html">
+<meta name="theme-color" content="#E53935">
+
+<!-- Open Graph -->
+<meta property="og:site_name" content="Gulf Coast Card Shows">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Card Show Vendors &amp; Dealers | Gulf Coast Card Shows">
+<meta property="og:description" content="Find trading card dealers and vendors along the Gulf Coast, and which shows they attend.">
+<meta property="og:url" content="https://gccardshows.com/vendors.html">
+<meta property="og:image" content="https://gccardshows.com/og-image.png">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Card Show Vendors &amp; Dealers | Gulf Coast Card Shows">
+<meta name="twitter:description" content="Find trading card dealers and vendors along the Gulf Coast, and which shows they attend.">
+<meta name="twitter:image" content="https://gccardshows.com/og-image.png">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='white' stroke='%231A1A2E' stroke-width='4'/%3E%3Cpath d='M2 50 Q2 2 50 2 Q98 2 98 50 Z' fill='%23E53935'/%3E%3Crect x='2' y='45' width='96' height='10' fill='%231A1A2E'/%3E%3Ccircle cx='50' cy='50' r='16' fill='white' stroke='%231A1A2E' stroke-width='4'/%3E%3Ccircle cx='50' cy='50' r='7' fill='%23E53935'/%3E%3C/svg%3E">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="GC Card Shows">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #F5F0E8;
+    --card-bg: #FFFFFF;
+    --nav-bg: #FDFAF4;
+    --red: #E53935;
+    --yellow: #FFD600;
+    --blue: #1565C0;
+    --dark: #1A1A2E;
+    --muted: #6B7280;
+    --border: #E5E0D5;
+    --next-bg: #FFF8E1;
+    --next-border: #FFD600;
+    --featured-bg: #EFF6FF;
+    --featured-border: #60A5FA;
+    --radius: 18px;
+    --shadow: 0 2px 16px rgba(0,0,0,0.07);
+  }
+
+  html.dark {
+    --bg: #0F0F1A;
+    --card-bg: #1A1A2E;
+    --nav-bg: #13131F;
+    --dark: #F0EDE6;
+    --muted: #9CA3AF;
+    --border: #2E2E45;
+    --next-bg: #1F1A08;
+    --next-border: #B8960A;
+    --featured-bg: #0B1E38;
+    --featured-border: #2563EB;
+    --shadow: 0 2px 16px rgba(0,0,0,0.35);
+  }
+
+  html.dark .show-card.tbd {
+    background: #141420;
+    border-color: #3a3a55;
+  }
+
+  html.dark .hero-tag.red { background: #2a0a0a; }
+  html.dark .hero-tag.blue { background: #071428; }
+  html.dark .hero-tag.orange { background: #1a0f04; }
+
+  html.dark .next-label { color: #D4A800; }
+  html.dark .next-date { color: #C87533; }
+
+  html.dark input, html.dark textarea {
+    background: #0F0F1A;
+    color: #F0EDE6;
+  }
+
+  html.dark .contact-icon { filter: brightness(0.85); }
+  html.dark .upcoming-badge { background: #D1D5DB; color: #1A1A2E; }
+  html.dark .add-card { background: #0D0D1A; }
+
+  html.dark footer { color: #4B5563; }
+  html.dark footer a { color: #4B5563; }
+
+  /* Dark mode toggle button */
+  .dark-toggle {
+    background: transparent;
+    border: 2px solid var(--border);
+    border-radius: 50px;
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    color: var(--dark);
+  }
+  .dark-toggle:hover { background: var(--border); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .skip-link {
+    position: absolute; top: -100px; left: 12px; z-index: 1200;
+    background: var(--dark); color: #fff; padding: 12px 20px; border-radius: 10px;
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px; text-decoration: none;
+    transition: top 0.15s ease;
+  }
+  .skip-link:focus { top: 12px; }
+  body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--dark); min-height: 100vh; }
+  body { background-image: url('images/image1.png'); background-repeat: repeat; background-size: 100px auto; background-blend-mode: normal; }
+  body::before { content: ''; position: fixed; inset: 0; background-color: var(--bg); opacity: 0.95; z-index: -1; pointer-events: none; }
+
+  /* Smooth dark-mode transition — color/background/border-color changes ease
+     in instead of snapping instantly when the theme toggles. */
+  body, .show-card, .controls-card, .calendar-wrap, .calendar-day, .next-show-card,
+  .count-card, nav, .state-nav, .modal-content, .faq-item, input, select, textarea {
+    transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  }
+
+  /* Global press micro-interaction — any tappable pill/button gives a quick,
+     satisfying scale-down on press rather than feeling static. */
+  button, .nav-btn, .mobile-menu-toggle, .ctrl-btn, .view-toggle-btn, .view-toggle-ics,
+  .calendar-nav-btn, .calendar-today-btn, .filters-toggle, .card-action-btn,
+  .state-nav a, .state-nav strong, .archive-toggle {
+    transition: transform 0.12s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  button:active, .nav-btn:active, .mobile-menu-toggle:active, .ctrl-btn:active,
+  .view-toggle-btn:active, .view-toggle-ics:active, .calendar-nav-btn:active,
+  .calendar-today-btn:active, .filters-toggle:active, .card-action-btn:active,
+  .state-nav a:active, .state-nav strong:active, .archive-toggle:active {
+    transform: scale(0.96);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+
+  /* NAV */
+  nav {
+    background: var(--nav-bg); border-bottom: 1px solid var(--border);
+    padding: 0 32px; display: flex; align-items: center; justify-content: space-between;
+    height: 68px; position: sticky; top: 0; z-index: 1000;
+  }
+  .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .pokeball-icon {
+    width: 44px; height: 44px; border-radius: 10px; background: #fff; border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: var(--shadow);
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: pokeball-spin-in 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .nav-logo:hover .pokeball-icon { transform: rotate(20deg) scale(1.08); }
+  @keyframes pokeball-spin-in {
+    from { transform: rotate(-200deg) scale(0.5); opacity: 0; }
+    to { transform: rotate(0) scale(1); opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pokeball-icon { animation: none; transition: none; }
+    .nav-logo:hover .pokeball-icon { transform: none; }
+  }
+  .nav-title { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 700; font-size: 18px; color: var(--dark); }
+  .nav-links { display: flex; gap: 10px; align-items: center; }
+  .nav-btn { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 13px; padding: 9px 18px; border-radius: 50px; border: 2px solid var(--border); background: transparent; color: var(--dark); cursor: pointer; text-decoration: none; transition: all 0.2s; letter-spacing: 0.03em; text-transform: uppercase; }
+  .nav-btn:hover { background: var(--border); }
+  .nav-btn.active { background: var(--red); border-color: var(--red); color: #fff; }
+  .mobile-menu-wrap { display: none; position: relative; }
+  .mobile-menu-toggle { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px; padding: 9px 12px; border-radius: 50px; border: 2px solid var(--border); background: transparent; color: var(--dark); cursor: pointer; text-transform: uppercase; letter-spacing: 0.03em; display: inline-flex; align-items: center; gap: 6px; }
+  .mobile-menu-toggle:hover { background: var(--border); }
+  .mobile-menu-panel { position: absolute; top: calc(100% + 10px); right: 0; min-width: 190px; padding: 8px; border-radius: 12px; border: 1px solid var(--border); background: var(--nav-bg); box-shadow: var(--shadow); display: none; flex-direction: column; gap: 6px; }
+  .mobile-menu-panel.open { display: flex; }
+  .mobile-menu-item { width: 100%; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 13px; padding: 11px 12px; border-radius: 9px; border: 0; background: transparent; color: var(--dark); cursor: pointer; text-align: left; text-decoration: none; }
+  .mobile-menu-item:hover { background: var(--border); }
+
+  /* HERO */
+  .hero { max-width: 1120px; margin: 0 auto; padding: 48px 32px 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+  .hero-eyebrow { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .hero-title { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 800; font-size: 56px; line-height: 1.05; color: var(--dark); margin-bottom: 16px; }
+  .hero-desc { font-size: 16px; color: var(--muted); line-height: 1.6; margin-bottom: 24px; max-width: 380px; }
+  .hero-tags { display: flex; gap: 10px; flex-wrap: wrap; }
+  .hero-tag { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 13px; padding: 7px 16px; border-radius: 50px; border: 2px solid; }
+  .hero-tag.red { color: var(--red); border-color: var(--red); background: #FFF0F0; }
+  .hero-tag.blue { color: var(--blue); border-color: var(--blue); background: #E3F2FD; }
+  .hero-tag.orange { color: #E65100; border-color: #E65100; background: #FFF3E0; }
+
+  .state-nav {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    max-width: 1200px; margin: 0 auto; padding: 14px 24px 16px;
+    position: sticky; top: 68px; z-index: 900;
+    background: var(--nav-bg);
+    box-shadow: 0 0 0 100vmax var(--nav-bg), 0 1px 0 var(--border);
+    clip-path: inset(0 -100vmax);
+  }
+  .state-nav-label { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .state-nav a, .state-nav strong {
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 13px; padding: 6px 14px; border-radius: 50px;
+    border: 2px solid var(--border); text-decoration: none; color: var(--dark);
+  }
+  .state-nav strong { border-color: var(--red); color: var(--red); background: #FFF0F0; font-weight: 800; }
+  .state-nav a:hover { border-color: var(--blue); color: var(--blue); }
+  html.dark .state-nav a { color: var(--dark); }
+  html.dark .state-nav strong { background: #2a0a0a; }
+
+  /* MAP */
+  .hero-map-wrap {
+    background: var(--card-bg); border-radius: var(--radius); border: 1px solid var(--border);
+    box-shadow: var(--shadow); height: 320px; overflow: hidden; position: relative;
+    z-index: 0; /* isolates Leaflet's internal panes (z-index up to ~700) so they can never escape above the sticky header below */
+  }
+  #hero-map { width: 100%; height: 100%; border-radius: var(--radius); }
+  .map-label {
+    position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+    background: rgba(26,26,46,0.85); color: #fff; font-family: 'Nunito', sans-serif;
+    font-weight: 700; font-size: 11px; padding: 5px 12px; border-radius: 50px;
+    pointer-events: none; z-index: 10; white-space: nowrap; letter-spacing: 0.05em;
+  }
+
+  /* STAT STRIP */
+  .stat-strip { max-width: 1120px; margin: 0 auto 32px; padding: 0 32px; display: grid; grid-template-columns: 1.15fr 1.15fr 1fr; gap: 16px; }
+  .stat-strip.no-featured { grid-template-columns: 2fr 1fr; }
+  .next-show-card { background: var(--next-bg); border: 2px solid var(--next-border); border-radius: var(--radius); padding: 24px 28px; }
+  .featured-show-card { background: var(--featured-bg); border: 2px solid var(--featured-border); border-radius: var(--radius); padding: 24px 28px; }
+  .featured-show-card.hidden { display: none; }
+  .next-label { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 12px; color: #B8860B; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .next-name { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 700; font-size: 24px; color: var(--dark); margin-bottom: 6px; }
+  .next-date { font-size: 14px; color: #92400E; margin-bottom: 6px; line-height: 1.5; }
+  .next-loc { font-size: 14px; color: var(--muted); }
+  .count-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 28px; box-shadow: var(--shadow); }
+  .count-label { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .count-number { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 800; font-size: 48px; color: var(--dark); line-height: 1; margin-bottom: 6px; }
+  .count-sub { font-size: 14px; color: var(--muted); }
+
+  /* SHOWS GRID */
+  .shows-section { max-width: 1120px; margin: 0 auto; padding: 0 32px 64px; }
+  .shows-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  .empty-state {
+    grid-column: 1 / -1; text-align: center; padding: 56px 32px;
+    background: var(--card-bg); border: 1px dashed var(--border); border-radius: var(--radius);
+  }
+  .empty-state-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-state-heading { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 700; font-size: 19px; color: var(--dark); margin-bottom: 8px; }
+  .empty-state-body { font-family: 'Inter', sans-serif; font-size: 14px; color: var(--muted); max-width: 380px; margin: 0 auto 20px; line-height: 1.6; }
+  .empty-state-action {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 13px; padding: 10px 20px;
+    border-radius: 50px; border: none; background: var(--red); color: #fff; cursor: pointer;
+  }
+  .empty-state-action:hover { filter: brightness(1.08); }
+
+  /* ===== View toggle (list / calendar) ===== */
+  .view-toggle { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 18px; }
+  .view-toggle-btn {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 13px; padding: 9px 16px;
+    border-radius: 50px; border: 2px solid var(--border); background: var(--card-bg); color: var(--dark);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .view-toggle-btn:hover { border-color: var(--blue); }
+  .view-toggle-btn.active { background: var(--dark); border-color: var(--dark); color: var(--card-bg); }
+  .view-toggle-ics {
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 12px; padding: 9px 14px;
+    border-radius: 50px; border: 2px dashed var(--border); background: transparent; color: var(--muted);
+    cursor: pointer; margin-left: auto;
+  }
+  .view-toggle-ics:hover { border-color: var(--red); color: var(--red); }
+
+  /* ===== Calendar view ===== */
+  .calendar-wrap { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; max-width: 100%; overflow-x: hidden; box-sizing: border-box; }
+  .calendar-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .calendar-month-label { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 700; font-size: 20px; color: var(--dark); flex: 1; text-align: center; }
+  .calendar-nav-btn {
+    width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--border); background: transparent;
+    color: var(--dark); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .calendar-nav-btn:hover { background: var(--border); }
+  .calendar-today-btn {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px; padding: 7px 14px;
+    border-radius: 50px; border: 2px solid var(--border); background: transparent; color: var(--dark); cursor: pointer;
+    flex-shrink: 0;
+  }
+  .calendar-today-btn:hover { background: var(--border); }
+  .calendar-weekday-row { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; margin-bottom: 6px; }
+  .calendar-weekday-row div { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; text-align: center; padding-bottom: 4px; overflow: hidden; }
+  .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+  .calendar-day {
+    min-height: 92px; min-width: 0; border: 1px solid var(--border); border-radius: 10px; padding: 6px;
+    display: flex; flex-direction: column; gap: 3px; background: var(--bg); box-sizing: border-box; overflow: hidden;
+  }
+  .calendar-day.other-month { opacity: 0.35; }
+  .calendar-day.today { border-color: var(--red); border-width: 2px; }
+  .calendar-day.past { opacity: 0.5; }
+  .calendar-day-num { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px; color: var(--dark); }
+  .calendar-event-pill {
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 10px; padding: 3px 6px; border-radius: 6px;
+    background: var(--next-bg); border: 1px solid var(--next-border); color: var(--dark); cursor: pointer;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left;
+    display: block; width: 100%; min-width: 0; box-sizing: border-box;
+  }
+  .calendar-event-pill:hover { filter: brightness(0.95); }
+  .calendar-more { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 10px; color: var(--muted); background: none; border: none; text-align: left; padding: 0; width: 100%; }
+  html.dark .calendar-event-pill { background: #1F1A08; border-color: #B8960A; }
+
+  @media (max-width: 768px) {
+    .calendar-wrap { padding: 12px 8px; }
+    .calendar-day { min-height: 58px; padding: 3px; border-radius: 7px; }
+    .calendar-day-num { font-size: 10px; }
+    .calendar-event-pill, .calendar-more { font-size: 8px; padding: 2px 3px; border-radius: 4px; }
+    .calendar-month-label { font-size: 15px; }
+    .calendar-weekday-row div { font-size: 9px; }
+    .calendar-grid, .calendar-weekday-row { gap: 3px; }
+    .view-toggle-ics { margin-left: 0; width: 100%; text-align: center; }
+  }
+  .show-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); transition: transform 0.2s, box-shadow 0.2s; }
+  .show-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.12); }
+  .show-card.tbd { border-style: dashed; border-color: #ccc; background: #FAFAFA; }
+  .show-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 8px; }
+  .header-badges { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+  .upcoming-badge { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 11px; background: var(--dark); color: #fff; padding: 4px 10px; border-radius: 50px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .show-card.tbd .upcoming-badge { background: #999; }
+  .show-name { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 700; font-size: 22px; color: var(--dark); margin-bottom: 16px; line-height: 1.2; }
+
+  /* Type-color coding, borrowing the *logic* Pokémon's own UI uses (each
+     category gets a consistent accent color) without borrowing any of their
+     actual assets, palette, or wordmark. */
+  .type-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: -8px 0 16px; }
+  .type-tag {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 10px; padding: 4px 10px;
+    border-radius: 50px; border: 1.5px solid; text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .type-tag.type-pokemon  { background: #FFF6D9; border-color: #E6B800; color: #8A6D00; }
+  .type-tag.type-sports   { background: #E3F0FF; border-color: #3B82F6; color: #1D4ED8; }
+  .type-tag.type-mtg      { background: #F2E9FF; border-color: #8B5CF6; color: #6D28D9; }
+  .type-tag.type-onepiece { background: #FFE9E5; border-color: #F97362; color: #C0301C; }
+  .type-tag.type-yugioh   { background: #FFEFDB; border-color: #F59E0B; color: #92400E; }
+  .type-tag.type-lorcana  { background: #E5F9F3; border-color: #14B8A6; color: #0F766E; }
+  .type-tag.type-comics   { background: #ECEDFF; border-color: #6366F1; color: #4338CA; }
+  html.dark .type-tag.type-pokemon  { background: #2A2200; }
+  html.dark .type-tag.type-sports   { background: #0B1E38; }
+  html.dark .type-tag.type-mtg      { background: #200F38; }
+  html.dark .type-tag.type-onepiece { background: #331109; }
+  html.dark .type-tag.type-yugioh   { background: #2E1B02; }
+  html.dark .type-tag.type-lorcana  { background: #072A22; }
+  html.dark .type-tag.type-comics   { background: #161233; }
+  .show-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .field-group { display: flex; flex-direction: column; gap: 3px; }
+  .field-label { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+  .field-value { font-size: 14px; color: var(--dark); font-weight: 500; line-height: 1.4; }
+  .field-value.free { color: #2E7D32; font-weight: 700; }
+  .field-value.unknown { color: var(--muted); font-style: italic; }
+  .field-value a.website-link { color: var(--blue); text-decoration: none; font-weight: 600; }
+  .field-value a.website-link:hover { text-decoration: underline; }
+  html.dark .field-value a.website-link { color: #60A5FA; }
+  .field-value.organizer { color: var(--dark); font-weight: 600; }
+
+  /* ADD CTA */
+  .add-section { max-width: 1120px; margin: 0 auto 64px; padding: 0 32px; }
+
+  .faq-section { max-width: 860px; margin: 0 auto 64px; padding: 0 32px; }
+  .faq-title { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 700; font-size: 28px; color: var(--dark); margin-bottom: 20px; text-align: center; }
+  .faq-list { display: flex; flex-direction: column; gap: 10px; }
+  .faq-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 4px 20px; box-shadow: var(--shadow); }
+  .faq-item summary { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 15px; color: var(--dark); padding: 16px 0; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::after { content: '+'; font-size: 20px; color: var(--muted); flex-shrink: 0; transition: transform 0.2s; }
+  .faq-item[open] summary::after { transform: rotate(45deg); }
+  .faq-item p { font-size: 14px; color: var(--muted); line-height: 1.6; padding: 0 0 18px; }
+
+  .js-required-notice { max-width: 1120px; margin: 0 auto; padding: 14px 32px; text-align: center; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 14px; background: var(--next-bg); color: #92400E; }
+  .add-card { background: var(--dark); border-radius: var(--radius); padding: 40px; text-align: center; position: relative; overflow: hidden; }
+  .add-card::before { content: '🎴'; position: absolute; font-size: 120px; opacity: 0.06; top: -20px; left: -20px; }
+  .add-card::after { content: '⚡'; position: absolute; font-size: 120px; opacity: 0.06; bottom: -20px; right: -20px; }
+  .add-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 28px; color: #fff; margin-bottom: 10px; }
+  .add-desc { font-size: 15px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
+  .add-btn { display: inline-block; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 15px; background: var(--yellow); color: var(--dark); padding: 13px 32px; border-radius: 50px; border: none; cursor: pointer; text-decoration: none; transition: transform 0.2s, box-shadow 0.2s; letter-spacing: 0.02em; }
+  .add-btn:hover { transform: scale(1.04); box-shadow: 0 6px 20px rgba(255,214,0,0.4); }
+
+  /* FOOTER */
+  footer { border-top: 1px solid var(--border); padding: 24px 32px; text-align: center; font-size: 13px; color: var(--muted); }
+
+  /* MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1100; align-items: center; justify-content: center; padding: 24px; }
+
+  /* ===== Skeleton loading states ===== */
+  .skeleton-shimmer {
+    width: 100%; height: 100%; border-radius: inherit;
+    background: linear-gradient(100deg, var(--border) 30%, var(--card-bg) 50%, var(--border) 70%);
+    background-size: 200% 100%;
+    animation: skeleton-sweep 1.4s ease-in-out infinite;
+  }
+  @keyframes skeleton-sweep {
+    from { background-position: 150% 0; }
+    to { background-position: -50% 0; }
+  }
+  .show-card.skeleton-card { padding: 0; height: 340px; overflow: hidden; cursor: default; }
+  .show-card.skeleton-card:hover { transform: none; box-shadow: var(--shadow); }
+  .map-skeleton {
+    position: absolute; inset: 0; border-radius: var(--radius); overflow: hidden;
+    background: var(--card-bg); z-index: 5;
+  }
+  .map-skeleton.hidden { display: none; }
+
+  /* ===== Poké Ball-inspired section divider =====
+     An original abstract motif (red/white/black stripe + center button) —
+     not a reproduction of any trademarked logo or artwork. */
+  .pokeball-divider { display: flex; align-items: center; justify-content: center; margin: 8px auto 40px; max-width: 1120px; padding: 0 32px; }
+  .pokeball-divider .stripe { flex: 1; height: 3px; border-radius: 3px; }
+  .pokeball-divider .stripe.left { background: linear-gradient(90deg, transparent, var(--red) 90%); }
+  .pokeball-divider .stripe.right { background: linear-gradient(90deg, var(--red) 10%, transparent); }
+  .pokeball-divider .center {
+    width: 22px; height: 22px; border-radius: 50%; margin: 0 12px; flex-shrink: 0;
+    background: linear-gradient(180deg, var(--red) 0 48%, var(--dark) 48% 52%, #fff 52% 100%);
+    border: 2px solid var(--dark); position: relative; box-shadow: var(--shadow);
+  }
+  .pokeball-divider .center::after {
+    content: ''; position: absolute; inset: 6px; border-radius: 50%; background: #fff; border: 2px solid var(--dark);
+  }
+  html.dark .pokeball-divider .center { border-color: #000; }
+  html.dark .pokeball-divider .center::after { border-color: #000; }
+
+  /* ===== Toast notifications (replaces native alert()) ===== */
+  .toast-container {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    z-index: 1200; display: flex; flex-direction: column-reverse; gap: 10px;
+    width: 100%; max-width: 380px; padding: 0 16px; pointer-events: none;
+  }
+  .toast {
+    background: var(--dark); color: #fff; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 13px;
+    padding: 13px 18px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    display: flex; align-items: center; gap: 10px; pointer-events: auto;
+    animation: toast-in 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+    border-left: 4px solid var(--blue);
+  }
+  .toast.success { border-left-color: #22C55E; }
+  .toast.error { border-left-color: var(--red); }
+  .toast.leaving { animation: toast-out 0.2s ease forwards; }
+  html.dark .toast { background: #F5F0E8; color: #1A1A2E; }
+  @keyframes toast-in {
+    from { opacity: 0; transform: translateY(12px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes toast-out {
+    to { opacity: 0; transform: translateY(8px) scale(0.96); }
+  }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--card-bg); border-radius: var(--radius); padding: 36px; max-width: 540px; width: 100%; position: relative; max-height: 90vh; overflow-y: auto; }
+  .modal-close { position: absolute; top: 16px; right: 16px; background: var(--border); border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .modal-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 24px; margin-bottom: 24px; }
+  /* Featured event detail modal — blurs the background */
+  .modal-overlay.blur-bg { background: rgba(10, 15, 30, 0.55); backdrop-filter: blur(10px) saturate(120%); }
+  .show-card.clickable { cursor: pointer; transition: transform .2s cubic-bezier(0.2, 0.8, 0.3, 1.1), box-shadow .2s ease, border-color .2s ease; position: relative; }
+  .show-card.clickable:hover { transform: translateY(-5px); box-shadow: 0 14px 34px rgba(0,0,0,0.18); border-color: var(--blue); }
+  .show-card.clickable:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+  .show-card.clickable .card-action-btn { position: relative; z-index: 2; }
+  .details-badge { background: #1565C0; color:#fff; font-size: 11px; font-weight: 800; padding: 4px 8px; border-radius: 999px; letter-spacing: .3px; text-transform: uppercase; }
+  .detail-modal { max-width: 720px; }
+  .detail-hero { background: linear-gradient(135deg, #E53935 0%, #1A1A2E 100%); color: #fff; margin: -36px -36px 24px; padding: 32px 36px; border-radius: var(--radius) var(--radius) 0 0; }
+  .detail-hero h2 { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 30px; margin: 0 0 6px; line-height: 1.15; }
+  .detail-hero .detail-sub { font-size: 15px; opacity: .92; }
+  .detail-hero-actions { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+  .detail-hero-actions .fav-btn { color: rgba(255,255,255,0.85); }
+  .detail-hero-actions .fav-btn.active { color: #FFD54A; }
+  .detail-hero-actions .interest-btn {
+    background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.35); color: #fff;
+  }
+  .detail-hero-actions .interest-btn.active { background: rgba(255,255,255,0.28); border-color: #fff; }
+  .detail-section { margin-bottom: 22px; }
+  .detail-section h3 { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 15px; text-transform: uppercase; letter-spacing: .6px; color: var(--red); margin: 0 0 8px; }
+  .detail-section p, .detail-section li { font-size: 15px; line-height: 1.6; color: var(--text); margin: 0 0 6px; }
+  #detail-about, #detail-loc-notes { white-space: pre-line; }
+  .detail-section ul { padding-left: 20px; margin: 0; }
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; }
+  .detail-grid .detail-cell { background: #f7f5ef; padding: 12px 14px; border-radius: 10px; }
+  .detail-grid .detail-cell .k { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: #6B7280; font-weight: 700; }
+  .detail-grid .detail-cell .v { font-size: 15px; font-weight: 600; color: #1A1A2E; margin-top: 2px; }
+  .detail-cta { display: inline-block; background: var(--red); color:#fff; padding: 12px 20px; border-radius: 10px; font-weight: 800; text-decoration: none; margin-right: 8px; }
+  .detail-cta.secondary { background: #1A1A2E; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+  label { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  input, textarea { font-family: 'Inter', sans-serif; font-size: 14px; padding: 10px 14px; border: 2px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--dark); outline: none; transition: border-color 0.2s; }
+  input:focus, textarea:focus { border-color: var(--blue); }
+  textarea { resize: vertical; min-height: 80px; }
+  .submit-btn { width: 100%; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 15px; background: var(--red); color: #fff; padding: 14px; border-radius: 50px; border: none; cursor: pointer; margin-top: 8px; transition: transform 0.2s; }
+  .submit-btn:hover { transform: scale(1.02); }
+
+  /* Leaflet popup customization */
+  .leaflet-popup-content-wrapper { border-radius: 12px !important; font-family: 'Nunito', sans-serif !important; box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important; }
+  .leaflet-popup-content { margin: 12px 16px !important; font-size: 13px; line-height: 1.5; }
+  .popup-name { font-weight: 900; font-size: 14px; color: #1A1A2E; margin-bottom: 4px; }
+  .popup-date { font-weight: 700; color: #E53935; margin-bottom: 2px; }
+  .popup-loc { color: #6B7280; font-size: 12px; }
+
+  /* Tablet tuning — the old setup jumped straight from desktop to the 768px
+     phone layout, which left mid-size tablets with a cramped grid and a
+     hero that was neither the roomy desktop version nor the stacked mobile one. */
+  @media (max-width: 1024px) and (min-width: 769px) {
+    .hero { gap: 28px; padding: 40px 24px 28px; }
+    .hero-title { font-size: 46px; }
+    .shows-grid { grid-template-columns: repeat(2, 1fr); }
+    .controls-card { padding: 16px 18px; }
+    .ctrl-group { flex: 1 1 45%; min-width: 160px; }
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 0 14px; gap: 10px; }
+    .nav-logo { min-width: 0; gap: 8px; flex: 1 1 auto; overflow: hidden; }
+    .pokeball-icon { width: 38px; height: 38px; font-size: 21px; }
+    .nav-title { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .hero { grid-template-columns: 1fr; }
+    .hero-map-wrap { height: 240px; }
+    .stat-strip { grid-template-columns: 1fr; }
+    .stat-strip.no-featured { grid-template-columns: 1fr; }
+    .shows-grid { grid-template-columns: 1fr; }
+    .show-fields { grid-template-columns: 1fr; }
+    .hero-title { font-size: 40px; }
+    .form-row { grid-template-columns: 1fr; }
+    .nav-links .nav-btn { display: none; }
+    .nav-links { gap: 8px; flex: 0 0 auto; }
+    .mobile-menu-wrap { display: block; }
+
+    /* Keep the state pills on a single row instead of wrapping to a second
+       line. The "Browse by State:" label eats a lot of width on a phone, so
+       it's hidden here (the pills are self-explanatory without it); nowrap +
+       scroll-x is a fallback so it's still guaranteed to never wrap even on
+       the narrowest phones or with larger accessibility text sizes. */
+    .state-nav {
+      flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch;
+      scrollbar-width: none; padding: 12px 16px 14px; gap: 8px;
+    }
+    .state-nav::-webkit-scrollbar { display: none; }
+    .state-nav-label { display: none; }
+    .state-nav a, .state-nav strong { flex: 0 0 auto; padding: 6px 12px; font-size: 12px; }
+
+    /* Mobile-only tweaks for the advanced filters panel — collapsed-by-default
+       behavior itself now applies at every screen size (see the unconditional
+       rules below); this just switches it to a stacked column on narrow
+       screens instead of the wrapped-row layout used on desktop. */
+    .extra-filters.open { flex-direction: column; }
+  }
+
+  .filters-toggle {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    width: 100%; background: transparent; border: none; padding: 10px 0 6px; cursor: pointer;
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 13px; color: var(--dark);
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .filters-toggle .chev { transition: transform 0.2s; font-size: 12px; color: var(--muted); }
+  .filters-toggle[aria-expanded="true"] .chev { transform: rotate(180deg); }
+  .extra-filters { display: none; flex-wrap: wrap; gap: 14px 18px; width: 100%; }
+  .extra-filters.open { display: flex; }
+
+  .contact-row {
+    display:flex; align-items:center; gap:14px; padding:14px 16px;
+    background:var(--bg); border-radius:12px; border:1px solid var(--border);
+    text-decoration:none; color:var(--dark); transition:transform 0.15s, box-shadow 0.15s;
+  }
+  .contact-row:hover { transform:translateY(-2px); box-shadow:var(--shadow); }
+  .contact-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+  .contact-label { font-family:'Nunito',sans-serif; font-weight:700; font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:2px; }
+  .contact-val { font-family:'Nunito',sans-serif; font-weight:800; font-size:15px; color:var(--dark); }
+
+  /* ===== Added: state badges, controls, calendar/report buttons ===== */
+  .state-badge {
+    font-family:'Nunito',sans-serif; font-weight:800; font-size:11px;
+    padding:4px 10px; border-radius:50px; letter-spacing:0.06em;
+    text-transform:uppercase; color:#fff; margin-left:2px;
+    display:inline-flex; align-items:center; gap:4px;
+  }
+  .state-FL { background:#2E7D32; }              /* Florida — green */
+  .state-AL { background:#F9A825; color:#1A1A2E;} /* Alabama — yellow */
+  .state-MS { background:#C62828; }              /* Mississippi — red */
+  .state-TN { background:#1565C0; }              /* Tennessee — blue */
+  .state-GA { background:#6A1B9A; }              /* Georgia — purple */
+  .state-LA { background:#00838F; }              /* Louisiana — teal */
+  .state-TX { background:#D84315; }              /* Texas — orange-red */
+  .state-UNK { background:#6B7280; }
+
+  .controls-section { max-width:1120px; margin:0 auto 24px; padding:0 32px; }
+  .controls-card {
+    background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius);
+    padding:18px 22px; box-shadow:var(--shadow);
+    display:flex; flex-wrap:wrap; gap:14px 18px; align-items:flex-end;
+  }
+  .ctrl-group { display:flex; flex-direction:column; gap:4px; flex:1 1 220px; min-width:180px; }
+  .ctrl-label {
+    font-family:'Nunito',sans-serif; font-weight:800; font-size:11px;
+    color:var(--muted); text-transform:uppercase; letter-spacing:0.08em;
+  }
+  .ctrl-input, .ctrl-select {
+    font-family:'Inter',sans-serif; font-size:14px; padding:9px 12px;
+    border:2px solid var(--border); border-radius:10px;
+    background:var(--card-bg); color:var(--dark); width:100%;
+  }
+  .ctrl-input:focus, .ctrl-select:focus { outline:none; border-color:var(--blue); }
+  .ctrl-btn {
+    font-family:'Nunito',sans-serif; font-weight:800; font-size:13px;
+    padding:10px 16px; border-radius:10px; border:none; cursor:pointer;
+    background:var(--dark); color:var(--card-bg); transition:opacity 0.15s;
+    white-space:nowrap;
+  }
+  .ctrl-btn:hover { opacity:0.85; }
+  .ctrl-btn.secondary { background:transparent; color:var(--muted); border:2px solid var(--border); }
+  .ctrl-status { font-size:12px; color:var(--muted); flex-basis:100%; margin-top:-4px; }
+  .ctrl-status.error { color:var(--red); }
+
+  .distance-pill {
+    display:inline-flex; align-items:center; font-family:'Nunito',sans-serif; font-weight:800;
+    font-size:11px; padding:4px 10px; border-radius:50px;
+    background:var(--secondary, #E3F2FD); color:var(--blue);
+    border:1px solid var(--blue);
+  }
+  html.dark .distance-pill { background:#071428; }
+
+  .card-actions {
+    display:flex; flex-wrap:wrap; gap:8px; margin-top:14px;
+    padding-top:14px; border-top:1px dashed var(--border);
+  }
+  .card-action-btn {
+    font-family:'Nunito',sans-serif; font-weight:700; font-size:12px;
+    padding:7px 12px; border-radius:8px; text-decoration:none;
+    border:2px solid var(--border); color:var(--dark); background:var(--card-bg);
+    transition:all 0.15s; display:inline-flex; align-items:center; gap:6px;
+  }
+  .card-action-btn:hover { transform:translateY(-1px); box-shadow:var(--shadow); }
+  .card-action-btn.calendar { border-color:#2E7D32; color:#2E7D32; }
+  .card-action-btn.directions { border-color: var(--blue); color: var(--blue); }
+  .card-action-btn.report { border-color:var(--red); color:var(--red); margin-left:auto; }
+
+  /* Favorite star toggle */
+  .fav-btn {
+    background: none; border: none; font-size: 22px; line-height: 1; cursor: pointer;
+    padding: 2px; color: var(--muted); transition: transform 0.15s ease;
+  }
+  .fav-btn:hover { transform: scale(1.15); }
+  .fav-btn.active { color: #F0B90B; }
+
+  /* "Interested" counter — hidden entirely if no Worker endpoint is configured
+     (see INTEREST_API in the script below) so the feature degrades gracefully. */
+  .interest-btn { cursor: pointer; }
+  .interest-btn.active { border-color: #2563EB; color: #2563EB; background: #EFF6FF; }
+  html.dark .interest-btn.active { background: #0B1E38; }
+  body.interest-disabled .interest-btn { display: none; }
+
+  /* Notify-me (TBD shows) */
+  .notify-block { margin-top: 10px; }
+  .card-notify-block { margin-top: 10px; }
+  .notify-toggle-btn { background: #FFF8E1; border-color: #F5C542; color: #8A6D00; }
+  html.dark .notify-toggle-btn { background: #3A3110; border-color: #8A6D00; color: #F5D76E; }
+  .notify-inline-form { display: none; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .notify-inline-form.open { display: flex; }
+  #detail-notify-body .notify-inline-form { display: flex; }
+  .notify-email-input { flex: 1 1 180px; min-width: 0; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--card-bg); color: var(--text); font-size: 14px; }
+  .notify-submit-btn { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--red); background: var(--red); color: #fff; font-weight: 700; font-size: 13px; cursor: pointer; white-space: nowrap; }
+  .notify-submit-btn:disabled { opacity: 0.6; cursor: default; }
+  .notify-confirmed-msg { display: inline-block; font-size: 13px; font-weight: 700; color: #2E7D32; background: #E8F5E9; border: 1px solid #A5D6A7; border-radius: 8px; padding: 7px 12px; }
+  html.dark .notify-confirmed-msg { color: #A5D6A7; background: #14301A; border-color: #2E7D32; }
+  .notify-desc { color: var(--muted); font-size: 14px; margin: 0 0 10px; }
+
+  .last-updated {
+    font-family:'Nunito',sans-serif; font-size:12px; color:var(--muted);
+    text-align:center; padding:12px 32px 0;
+  }
+
+  /* ===== Vendor directory page ===== */
+  .vendors-toolbar { max-width: 1100px; margin: 0 auto 28px; padding: 0 24px; display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end; }
+  .vendors-toolbar .ctrl-group { flex: 1 1 200px; min-width: 160px; }
+  .vendors-grid { max-width: 1100px; margin: 0 auto; padding: 0 24px 40px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
+  .vendor-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  .vendor-card-name { font-family: 'Baloo 2', sans-serif; font-size: 19px; font-weight: 700; margin: 0; }
+  .vendor-card-desc { font-size: 14px; color: var(--muted); line-height: 1.5; margin: 0; }
+  .vendor-tag-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .vendor-tag { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: var(--featured-bg); border: 1px solid var(--featured-border); color: var(--blue); }
+  .vendor-state-tag { background: #FFF3E0; border-color: #FFB74D; color: #E65100; }
+  html.dark .vendor-tag { background: #0B1E38; border-color: #2563EB; }
+  html.dark .vendor-state-tag { background: #3A2410; border-color: #E65100; color: #FFB74D; }
+  .vendor-shows { font-size: 13px; color: var(--muted); margin: 0; }
+  .vendor-shows strong { color: var(--text); }
+  .vendor-card-actions { margin-top: auto; display: flex; gap: 8px; flex-wrap: wrap; padding-top: 6px; }
+  .vendor-empty-state { max-width: 560px; margin: 0 auto; padding: 48px 24px; text-align: center; color: var(--muted); }
+  .vendor-empty-state h3 { color: var(--text); font-family: 'Baloo 2', sans-serif; font-size: 22px; margin-bottom: 8px; }
+  .vendor-list-cta { max-width: 700px; margin: 0 auto 48px; padding: 0 24px; }
+</style>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<nav>
+  <a class="nav-logo" href="index.html">
+    <img src="images/image2.png" alt="Gulf Coast Card Shows" style="height:48px; width:auto;">
+  </a>
+  <div class="nav-links">
+    <a href="index.html#shows" class="nav-btn">Upcoming Shows</a>
+    <a href="index.html" class="nav-btn">Add Your Show</a>
+    <a href="vendors.html" class="nav-btn active">Vendors</a>
+    <a href="#" class="nav-btn" onclick="openContact(); return false;">Contact</a>
+    <a href="https://buymeacoffee.com/zbflips8" class="nav-btn" target="_blank" rel="noopener noreferrer">Support</a>
+    <div class="mobile-menu-wrap">
+      <button class="mobile-menu-toggle" id="mobile-menu-toggle" type="button" aria-label="Open navigation menu" aria-controls="mobile-menu" aria-expanded="false" onclick="toggleMobileMenu(event)">☰ Menu</button>
+      <div class="mobile-menu-panel" id="mobile-menu">
+        <a href="index.html" class="mobile-menu-item">Add Your Show</a>
+        <a href="vendors.html" class="mobile-menu-item" style="font-weight:800;">Vendors (viewing)</a>
+        <button class="mobile-menu-item" type="button" onclick="openContact(); closeMobileMenu();">Contact</button>
+        <a href="https://buymeacoffee.com/zbflips8" class="mobile-menu-item" target="_blank" rel="noopener noreferrer" onclick="closeMobileMenu()">Support</a>
+      </div>
+    </div>
+    <button class="dark-toggle" id="dark-toggle" onclick="toggleDark()" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</nav>
+<noscript>
+  <div class="js-required-notice">
+    This page needs JavaScript enabled to display the vendor directory. You can also reach us directly at <a href="mailto:zacbrannen@gmail.com" style="color:inherit;">zacbrannen@gmail.com</a>.
+  </div>
+</noscript>
+
+<section class="hero" id="main-content">
+  <p class="hero-eyebrow">Gulf Coast Card Shows</p>
+  <h1 class="hero-title">Vendors &amp; Dealers</h1>
+  <p class="hero-desc">Trading card dealers and vendors from across Florida, Alabama, Mississippi &amp; Georgia — and the shows where you'll find their tables.</p>
+</section>
+
+<section class="vendors-toolbar" aria-label="Filter vendors">
+  <div class="ctrl-group">
+    <label class="ctrl-label" for="vendor-search-input">Search Vendors</label>
+    <input id="vendor-search-input" class="ctrl-input" type="search" placeholder="Vendor name…" oninput="renderVendors()">
+  </div>
+  <div class="ctrl-group">
+    <label class="ctrl-label" for="vendor-state-filter">Filter by State</label>
+    <select id="vendor-state-filter" class="ctrl-select" onchange="renderVendors()">
+      <option value="">All States</option>
+      <option value="FL">Florida</option>
+      <option value="AL">Alabama</option>
+      <option value="MS">Mississippi</option>
+      <option value="GA">Georgia</option>
+    </select>
+  </div>
+  <div class="ctrl-group">
+    <label class="ctrl-label" for="vendor-type-filter">Filter by Card Type</label>
+    <select id="vendor-type-filter" class="ctrl-select" onchange="renderVendors()">
+      <option value="">All Types</option>
+      <option value="pokemon">Pokémon</option>
+      <option value="sports">Sports Cards</option>
+      <option value="mtg">Magic: The Gathering</option>
+      <option value="onepiece">One Piece TCG</option>
+      <option value="yugioh">Yu-Gi-Oh!</option>
+      <option value="lorcana">Disney Lorcana</option>
+      <option value="comics">Comics &amp; Toys</option>
+    </select>
+  </div>
+</section>
+
+<section aria-label="Vendor listings">
+  <div class="vendors-grid" id="vendors-grid"></div>
+</section>
+
+<div class="pokeball-divider" aria-hidden="true"><div class="stripe left"></div><div class="center"></div><div class="stripe right"></div></div>
+
+<section class="add-section vendor-list-cta">
+  <div class="add-card">
+    <h2 class="add-title">Run a card show business? Get listed.</h2>
+    <p class="add-desc">Tell us about your shop or table so buyers along the Gulf Coast can find you at upcoming shows.</p>
+    <button class="add-btn" onclick="openVendorModal()">+ List Your Business</button>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 Gulf Coast Card Shows · Gulf Coast Trading Card Community · Made with ⚡ for trainers &amp; collectors · <a href="#" onclick="openContact(); return false;" style="color:inherit;">Contact Zac</a></p>
+  <p class="last-updated"><a href="index.html">← Back to the show calendar</a></p>
+</footer>
+
+<!-- LIST YOUR BUSINESS MODAL -->
+<div class="modal-overlay" id="vendor-modal" onclick="closeVendorModalOutside(event)" role="dialog" aria-modal="true" aria-labelledby="vendor-modal-title">
+  <div class="modal">
+    <button class="modal-close" onclick="closeVendorModal()" aria-label="Close">✕</button>
+    <h2 class="modal-title" id="vendor-modal-title">List Your Business 🎴</h2>
+    <p style="font-size:14px; color:var(--muted); margin-bottom:18px;">
+      Submit your info and we'll add you to the vendor directory — usually within a few days.
+    </p>
+    <form id="vendor-form" action="https://formspree.io/f/xzdlvozp" method="POST" onsubmit="handleVendorSubmit(event)">
+      <div class="form-group"><label>Business / Table Name *</label><input type="text" name="vendor_name" placeholder="e.g. 850 Sports Cards" required></div>
+      <div class="form-group"><label>Description</label><textarea name="vendor_description" rows="3" placeholder="What you sell, specialties, how long you've been dealing…"></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>State(s) You Attend Shows In</label><input type="text" name="vendor_states" placeholder="e.g. FL, AL"></div>
+        <div class="form-group"><label>Card Types</label><input type="text" name="vendor_card_types" placeholder="e.g. Pokémon, Sports Cards"></div>
+      </div>
+      <div class="form-group"><label>Shows You Regularly Attend</label><input type="text" name="vendor_shows" placeholder="e.g. The 850 Card Show, Anchor Up Card Show"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Website or Social Link</label><input type="url" name="vendor_website" placeholder="https://…"></div>
+        <div class="form-group"><label>Your Email *</label><input type="email" name="_replyto" placeholder="so we can follow up with you" required></div>
+      </div>
+      <input type="hidden" name="_subject" value="New Vendor Directory Submission — Gulf Coast Card Shows">
+      <button class="submit-btn" type="submit">Submit for Review ⚡</button>
+    </form>
+  </div>
+</div>
+
+<!-- CONTACT MODAL -->
+<div class="modal-overlay" id="contact-modal" onclick="closeContactOutside(event)" role="dialog" aria-modal="true" aria-labelledby="contact-title">
+  <div class="modal" style="max-width:420px;">
+    <button class="modal-close" onclick="closeContact()" aria-label="Close">✕</button>
+    <div style="text-align:center; margin-bottom:24px;">
+      <div style="font-size:52px; margin-bottom:8px;">🎴</div>
+      <h2 class="modal-title" id="contact-title" style="margin-bottom:4px;">Get in Touch</h2>
+      <p style="font-size:14px; color:var(--muted);">Questions, submissions, or just want to talk cards?</p>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <a href="mailto:zacbrannen@gmail.com" class="contact-row">
+        <div class="contact-icon" style="background:#FFF0F0;">📧</div>
+        <div>
+          <div class="contact-label">Email</div>
+          <div class="contact-val">zacbrannen@gmail.com</div>
+        </div>
+      </a>
+      <div class="contact-row" style="cursor:default;">
+        <div class="contact-icon" style="background:#EDE7F6;">🎮</div>
+        <div>
+          <div class="contact-label">Discord</div>
+          <div class="contact-val">@ZBFlips</div>
+        </div>
+      </div>
+      <div class="contact-row" style="cursor:default;">
+        <div class="contact-icon" style="background:#E8F5E9;">👤</div>
+        <div>
+          <div class="contact-label">Organizer</div>
+          <div class="contact-val">Zac Brannen</div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:24px; padding:16px; background:var(--next-bg); border-radius:12px; border:2px solid var(--next-border); text-align:center;">
+      <p style="font-size:13px; color:#92400E; font-weight:600;">Want to list your show?</p>
+      <p style="font-size:13px; color:var(--muted); margin-top:4px;">Use the <strong>Add Your Show</strong> button on the main page — or email Zac directly!</p>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  // --- MOBILE MENU ---
+  function closeMobileMenu() {
+    const menu = document.getElementById('mobile-menu');
+    const toggle = document.getElementById('mobile-menu-toggle');
+    if (!menu || !toggle) return;
+    menu.classList.remove('open');
+    toggle.setAttribute('aria-expanded', 'false');
+  }
+
+  function toggleMobileMenu(e) {
+    if (e) e.stopPropagation();
+    const menu = document.getElementById('mobile-menu');
+    const toggle = document.getElementById('mobile-menu-toggle');
+    if (!menu || !toggle) return;
+    const shouldOpen = !menu.classList.contains('open');
+    menu.classList.toggle('open', shouldOpen);
+    toggle.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+  }
+
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.mobile-menu-wrap')) closeMobileMenu();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeMobileMenu();
+  });
+
+  // --- TOAST NOTIFICATIONS ---
+  function showToast(message, type, duration) {
+    const container = document.getElementById('toast-container');
+    if (!container) { console.log(message); return; }
+    const el = document.createElement('div');
+    el.className = `toast${type ? ' ' + type : ''}`;
+    el.setAttribute('role', type === 'error' ? 'alert' : 'status');
+    el.textContent = message;
+    container.appendChild(el);
+    setTimeout(() => {
+      el.classList.add('leaving');
+      el.addEventListener('animationend', () => el.remove(), { once: true });
+    }, duration || 3200);
+  }
+
+  // --- MOBILE FILTERS PANEL ---
+  function toggleExtraFilters() {
+    const panel = document.getElementById('extra-filters');
+    const btn = document.getElementById('filters-toggle');
+    if (!panel || !btn) return;
+    const open = panel.classList.toggle('open');
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
+  // --- DARK MODE ---
+  function toggleDark() {
+    const isDark = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    document.getElementById('dark-toggle').textContent = isDark ? '☀️' : '🌙';
+  }
+  // Apply saved preference on load
+  (function() {
+    const saved = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (saved === 'dark' || (!saved && prefersDark)) {
+      document.documentElement.classList.add('dark');
+      document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('dark-toggle');
+        if (btn) btn.textContent = '☀️';
+      });
+    }
+  })();
+</script>
+<script>
+  // =====================================================================
+  //  VENDOR DATA
+  //  Add / edit vendor entries here. Prefer keeping the marker comments
+  //  intact if this page ever gets admin.html tooling like index.html's
+  //  shows editor. Each vendor:
+  //   id           unique string, never reuse/change once published
+  //   name         business or table name
+  //   description  1-2 sentence blurb
+  //   states       array of state abbreviations they attend shows in
+  //   cardTypes    array of keys: pokemon, sports, mtg, onepiece, yugioh, lorcana, comics
+  //   showsAttended  free-text list of shows/events (comma separated is fine)
+  //   website / websiteLabel   optional link
+  // =====================================================================
+  /* ==VENDORS-DATA-START== */
+  const VENDORS = [
+    {
+      id: "ven-1783609654812",
+      name: "AnchorUp Sports",
+      description: "Anchor Up Sports was born in Pensacola, FL from a simple idea: the card show experience should feel like coming home. Whether you're chasing a childhood hero's rookie card or hunting the latest hits, we believe the best moments happen face-to-face, surrounded by people who share your passion.\n\nWhat started as a small gathering of local collectors has grown into one of the Gulf Coast's most anticipated trading card events. Every show we host is built on the same foundation — community first, always.\n\nWe handle the logistics so vendors can focus on selling and collectors can focus on finding their next great pickup.\n\nBeyond the shows, we also buy sports card collections in Pensacola — from single graded cards to full estates — so collectors and families have a trusted local option when it's time to sell.",
+      states: ["FL", "AL"],
+      cardTypes: ["pokemon", "sports", "onepiece"],
+      showsAttended: "Anchor Up, Coastal Collectors Expo",
+      website: "https://anchorupcardshows.com/", websiteLabel: "🌐 anchorupcardshows.com",
+    },
+    {
+      id: "ven-1783609527353",
+      name: "Pokeshop251",
+      description: "PokeShop251 is your one-stop-shop for all things Pokemon! Our online trading card store provides a comprehensive selection of English and Japanese Pokemon products. We pride ourselves on offering only the highest quality products and exceptional customer service. Our team of professionals is dedicated to helping Pokemon fans and collectors find everything they need to complete their collections.",
+      states: ["FL", "AL", "MS"],
+      cardTypes: ["pokemon"],
+      showsAttended: "Card Jam, Gulf Coast Card Show, Coastal Collectors Expo",
+      website: "https://www.pokeshop251.com/", websiteLabel: "🌐 pokeshop251.com",
+    },
+    {
+      id: "ven-1783609413607",
+      name: "Ben's Card World",
+      description: "Sports Cards, Magic the Gathering, Yu-Gi-Oh, Pokémon, Back Issue Comics, Collectibles, Posters, Funko, Toys and more all in one location.",
+      states: ["FL"],
+      cardTypes: ["pokemon", "sports", "mtg", "yugioh", "comics"],
+      showsAttended: "Anchor Up",
+      website: "", websiteLabel: "",
+    },
+    {
+      id: "ven-1783609338787",
+      name: "PcolaBreaks",
+      description: "Breaking NFL, NBA, MLB, UFC, Disney, Marvel, Pokemon and whatever else we can get our hands on! Hobby/Retail, Random/PYT, We also do PSA submissions.",
+      states: ["FL"],
+      cardTypes: ["pokemon", "sports", "mtg", "onepiece", "yugioh", "lorcana"],
+      showsAttended: "Cards on the Coast, Coastal Collectors Expo",
+      website: "https://www.instagram.com/pcolabreaks/", websiteLabel: "📸 Instagram",
+    },
+    {
+      id: "ven-1783609087002",
+      name: "Pokeshire Hathaway",
+      description: "Pokemon vendors based out of Pace, FL",
+      states: ["FL", "AL", "MS"],
+      cardTypes: ["pokemon"],
+      showsAttended: "Anchor Up, Coastal Collectors Expo, The Flip",
+      website: "https://www.facebook.com/profile.php?id=61589436191030", websiteLabel: "📘 Facebook",
+    },
+    {
+      id: "ven-1783608965167",
+      name: "The Trainer Gallery",
+      description: "Your “go to” hub for Pokémon and One Piece cards—The Trainer Gallery buys, sells, and trades with collectors who love the chase.",
+      states: ["FL", "AL", "MS"],
+      cardTypes: ["pokemon", "onepiece"],
+      showsAttended: "Anchor Up, Coastal Collectors Expo",
+      website: "https://www.facebook.com/profile.php?id=61589489793251", websiteLabel: "📘 Facebook",
+    },
+    {
+      id: "ven-1783608813424",
+      name: "MagiKart Collectibles",
+      description: "Friends vending Pokémon cards & building a fun, welcoming community for all collectors!",
+      states: ["FL", "AL", "MS", "GA"],
+      cardTypes: ["pokemon", "sports"],
+      showsAttended: "Anchor Up, Coastal Collectors Expo,",
+      website: "https://www.facebook.com/Magikartcollectibles/", websiteLabel: "📘 Facebook",
+    }
+  ];
+  /* ==VENDORS-DATA-END== */
+
+  const CARD_TYPE_LABELS = {
+    pokemon: 'Pokémon', sports: 'Sports Cards', mtg: 'Magic: The Gathering',
+    onepiece: 'One Piece TCG', yugioh: 'Yu-Gi-Oh!', lorcana: 'Disney Lorcana', comics: 'Comics & Toys',
+  };
+  const STATE_LABELS = { FL: 'Florida', AL: 'Alabama', MS: 'Mississippi', GA: 'Georgia' };
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+    }[c]));
+  }
+
+  // ===== Modal focus trap (mirrors index.html) =====
+  let modalReturnFocus = null;
+  function trapModalOpen(modalEl) {
+    if (!modalEl) return;
+    modalReturnFocus = document.activeElement;
+    const focusables = modalEl.querySelectorAll('button, a[href], input, textarea, select, [tabindex]:not([tabindex="-1"])');
+    if (focusables.length) setTimeout(() => focusables[0].focus(), 0);
+  }
+  function trapModalClose() {
+    if (modalReturnFocus && typeof modalReturnFocus.focus === 'function') modalReturnFocus.focus();
+    modalReturnFocus = null;
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab') return;
+    const openModalEl = document.querySelector('.modal-overlay.open');
+    if (!openModalEl) return;
+    const focusables = Array.from(
+      openModalEl.querySelectorAll('button, a[href], input, textarea, select, [tabindex]:not([tabindex="-1"])')
+    ).filter((el) => el.offsetParent !== null);
+    if (!focusables.length) return;
+    const first = focusables[0], last = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+
+  // ===== Contact modal =====
+  function openContact() { const m = document.getElementById('contact-modal'); m.classList.add('open'); document.body.style.overflow = 'hidden'; trapModalOpen(m); }
+  function closeContact() { document.getElementById('contact-modal').classList.remove('open'); document.body.style.overflow = ''; trapModalClose(); }
+  function closeContactOutside(e) { if (e.target === document.getElementById('contact-modal')) closeContact(); }
+
+  function vendorCardHtml(v) {
+    const stateTags = (v.states || []).map((s) =>
+      `<span class="vendor-tag vendor-state-tag">${escapeHtml(STATE_LABELS[s] || s)}</span>`).join('');
+    const typeTags = (v.cardTypes || []).map((t) =>
+      `<span class="vendor-tag">${escapeHtml(CARD_TYPE_LABELS[t] || t)}</span>`).join('');
+    const websiteBtn = v.website
+      ? `<a class="card-action-btn calendar" href="${escapeHtml(v.website)}" target="_blank" rel="noopener">${escapeHtml(v.websiteLabel || '🌐 Website')}</a>`
+      : '';
+    return `<div class="vendor-card">
+      <h2 class="vendor-card-name">${escapeHtml(v.name)}</h2>
+      ${v.description ? `<p class="vendor-card-desc">${escapeHtml(v.description)}</p>` : ''}
+      <div class="vendor-tag-row">${stateTags}${typeTags}</div>
+      ${v.showsAttended ? `<p class="vendor-shows"><strong>Shows:</strong> ${escapeHtml(v.showsAttended)}</p>` : ''}
+      <div class="vendor-card-actions">${websiteBtn}</div>
+    </div>`;
+  }
+
+  function renderVendors() {
+    const grid = document.getElementById('vendors-grid');
+    const q = (document.getElementById('vendor-search-input').value || '').trim().toLowerCase();
+    const stateFilter = document.getElementById('vendor-state-filter').value;
+    const typeFilter = document.getElementById('vendor-type-filter').value;
+
+    const filtered = VENDORS.filter((v) => {
+      if (q && !(v.name || '').toLowerCase().includes(q)) return false;
+      if (stateFilter && !(v.states || []).includes(stateFilter)) return false;
+      if (typeFilter && !(v.cardTypes || []).includes(typeFilter)) return false;
+      return true;
+    });
+
+    if (!VENDORS.length) {
+      grid.innerHTML = '';
+      grid.parentElement.insertAdjacentHTML('beforeend', `<div class="vendor-empty-state" id="vendor-empty-msg">
+        <h3>No vendors listed yet</h3>
+        <p>We're just getting this directory started. If you're a dealer who sets up at Gulf Coast shows, be the first — list your business below.</p>
+      </div>`);
+      return;
+    }
+    const existingEmpty = document.getElementById('vendor-empty-msg');
+    if (existingEmpty) existingEmpty.remove();
+
+    grid.innerHTML = filtered.length
+      ? filtered.map(vendorCardHtml).join('')
+      : '<p style="grid-column:1/-1;text-align:center;color:var(--muted);padding:40px 0;">No vendors match those filters — try clearing one.</p>';
+  }
+
+  function openVendorModal() {
+    const m = document.getElementById('vendor-modal');
+    m.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    trapModalOpen(m);
+  }
+  function closeVendorModal() {
+    document.getElementById('vendor-modal').classList.remove('open');
+    document.body.style.overflow = '';
+    trapModalClose();
+  }
+  function closeVendorModalOutside(e) { if (e.target === document.getElementById('vendor-modal')) closeVendorModal(); }
+  function handleVendorSubmit(e) {
+    e.preventDefault();
+    const form = e.target;
+    const data = new FormData(form);
+    fetch(form.action, { method: 'POST', body: data, headers: { Accept: 'application/json' } })
+      .then((r) => {
+        if (r.ok) {
+          showToast('🎴 Thanks! We\'ll review your listing and add it soon.', 'success', 4000);
+          form.reset();
+          closeVendorModal();
+        } else {
+          showToast('Something went wrong submitting that — try again or email Zac directly.', 'error');
+        }
+      })
+      .catch(() => showToast('Something went wrong submitting that — try again or email Zac directly.', 'error'));
+  }
+
+  renderVendors();
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch((err) => console.warn('SW registration failed:', err));
+    });
+  }
+</script>
+
+<div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="true"></div>
+</body>
+</html>

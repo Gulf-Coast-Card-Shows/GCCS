@@ -24,6 +24,11 @@
 <meta name="twitter:description" content="Upcoming sports card, Pokémon, and trading card shows in Florida. Dates, entry fees, vendor info, and directions — updated regularly.">
 <meta name="twitter:image" content="https://gccardshows.com/og-image.png">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='white' stroke='%231A1A2E' stroke-width='4'/%3E%3Cpath d='M2 50 Q2 2 50 2 Q98 2 98 50 Z' fill='%23E53935'/%3E%3Crect x='2' y='45' width='96' height='10' fill='%231A1A2E'/%3E%3Ccircle cx='50' cy='50' r='16' fill='white' stroke='%231A1A2E' stroke-width='4'/%3E%3Ccircle cx='50' cy='50' r='7' fill='%23E53935'/%3E%3C/svg%3E">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="GC Card Shows">
 <!-- Organization + WebSite structured data — identifies the site itself as an entity -->
 <script type="application/ld+json">
 {
@@ -702,6 +707,21 @@
   html.dark .interest-btn.active { background: #0B1E38; }
   body.interest-disabled .interest-btn { display: none; }
 
+  /* Notify-me (TBD shows) */
+  .notify-block { margin-top: 10px; }
+  .card-notify-block { margin-top: 10px; }
+  .notify-toggle-btn { background: #FFF8E1; border-color: #F5C542; color: #8A6D00; }
+  html.dark .notify-toggle-btn { background: #3A3110; border-color: #8A6D00; color: #F5D76E; }
+  .notify-inline-form { display: none; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .notify-inline-form.open { display: flex; }
+  #detail-notify-body .notify-inline-form { display: flex; }
+  .notify-email-input { flex: 1 1 180px; min-width: 0; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--card-bg); color: var(--text); font-size: 14px; }
+  .notify-submit-btn { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--red); background: var(--red); color: #fff; font-weight: 700; font-size: 13px; cursor: pointer; white-space: nowrap; }
+  .notify-submit-btn:disabled { opacity: 0.6; cursor: default; }
+  .notify-confirmed-msg { display: inline-block; font-size: 13px; font-weight: 700; color: #2E7D32; background: #E8F5E9; border: 1px solid #A5D6A7; border-radius: 8px; padding: 7px 12px; }
+  html.dark .notify-confirmed-msg { color: #A5D6A7; background: #14301A; border-color: #2E7D32; }
+  .notify-desc { color: var(--muted); font-size: 14px; margin: 0 0 10px; }
+
   .last-updated {
     font-family:'Nunito',sans-serif; font-size:12px; color:var(--muted);
     text-align:center; padding:12px 32px 0;
@@ -724,12 +744,14 @@
   <div class="nav-links">
     <a href="#shows" class="nav-btn active">Upcoming Shows</a>
     <a href="#" class="nav-btn" onclick="openModal(); return false;">Add Your Show</a>
+    <a href="vendors.html" class="nav-btn">Vendors</a>
     <a href="#" class="nav-btn" onclick="openContact(); return false;">Contact</a>
     <a href="https://buymeacoffee.com/zbflips8" class="nav-btn" target="_blank" rel="noopener noreferrer">Support</a>
     <div class="mobile-menu-wrap">
       <button class="mobile-menu-toggle" id="mobile-menu-toggle" type="button" aria-label="Open navigation menu" aria-controls="mobile-menu" aria-expanded="false" onclick="toggleMobileMenu(event)">☰ Menu</button>
       <div class="mobile-menu-panel" id="mobile-menu">
         <button class="mobile-menu-item" type="button" onclick="openModal(); closeMobileMenu();">Add Your Show</button>
+        <a href="vendors.html" class="mobile-menu-item">Vendors</a>
         <button class="mobile-menu-item" type="button" onclick="openContact(); closeMobileMenu();">Contact</button>
         <a href="https://buymeacoffee.com/zbflips8" class="mobile-menu-item" target="_blank" rel="noopener noreferrer" onclick="closeMobileMenu()">Support</a>
       </div>
@@ -1143,6 +1165,12 @@
         <button type="button" class="fav-btn" id="detail-fav-btn" aria-label="Save this show to your favorites" aria-pressed="false">☆</button>
         <button type="button" class="card-action-btn interest-btn" id="detail-interest-btn" aria-pressed="false">🙋 — interested</button>
       </div>
+    </div>
+
+    <div class="detail-section notify-block" id="detail-notify-sec" hidden>
+      <h3>🔔 Get Notified</h3>
+      <p class="notify-desc">This show's date hasn't been announced yet — leave your email and we'll let you know as soon as it is.</p>
+      <div id="detail-notify-body"></div>
     </div>
 
     <div class="detail-section" id="detail-about-sec" hidden>
@@ -1986,6 +2014,7 @@
       })()}
       <div class="show-fields">${fields}</div>
       ${actions}
+      ${ev.tbd ? `<div class="notify-block card-notify-block" data-notify-block="${escapeHtml(ev.id)}">${notifyBlockInnerHtml(ev.id, true)}</div>` : ''}
     </div>`;
   }
 
@@ -2584,6 +2613,18 @@
       interestBtn.onclick = () => toggleInterest(ev.id);
       refreshInterestButton(interestBtn);
     }
+    const notifySec = document.getElementById('detail-notify-sec');
+    if (notifySec) {
+      if (ev.tbd) {
+        notifySec.hidden = false;
+        notifySec.dataset.notifyBlock = ev.id;
+        const notifyBody = document.getElementById('detail-notify-body');
+        if (notifyBody) notifyBody.innerHTML = notifyBlockInnerHtml(ev.id, false);
+      } else {
+        notifySec.hidden = true;
+        delete notifySec.dataset.notifyBlock;
+      }
+    }
 
     // About
     const aboutSec = document.getElementById('detail-about-sec');
@@ -2762,6 +2803,87 @@
         document.querySelectorAll(`.interest-btn[data-interest-id="${CSS.escape(id)}"]`).forEach(refreshInterestButton);
       }
     } catch (e) { /* optimistic update already shown — a background sync failure isn't worth interrupting the user for */ }
+  }
+
+  // ===== "Notify me" — for TBD shows, let visitors leave an email so we can
+  // ping them once the date/details are announced. Reuses the same Worker as
+  // the interest counter (see INTEREST_API above), just a different route. =====
+  let notifySubscribed = new Set();
+  try {
+    notifySubscribed = new Set(JSON.parse(localStorage.getItem('gccs-notify-subscribed') || '[]'));
+  } catch (e) { notifySubscribed = new Set(); }
+
+  function isNotifySubscribed(id) { return notifySubscribed.has(id); }
+
+  function isValidEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v || '').trim()); }
+
+  // compact=true -> the small card version (toggle button + collapsible form)
+  // compact=false -> the detail-modal version (form shown directly, no toggle)
+  function notifyBlockInnerHtml(id, compact) {
+    const safeId = escapeHtml(id);
+    if (isNotifySubscribed(id)) {
+      return `<span class="notify-confirmed-msg">🔔 We'll email you when this is announced</span>`;
+    }
+    if (compact) {
+      return `<button type="button" class="card-action-btn notify-toggle-btn" onclick="toggleNotifyForm('${safeId}')">🔔 Notify Me When Announced</button>
+        <div class="notify-inline-form" id="notify-form-${safeId}">
+          <input type="email" class="notify-email-input" id="notify-email-${safeId}" placeholder="you@example.com" aria-label="Email address for notification">
+          <button type="button" class="notify-submit-btn" onclick="submitNotify('${safeId}', document.getElementById('notify-email-${safeId}'), this)">Notify Me</button>
+        </div>`;
+    }
+    return `<div class="notify-inline-form open">
+        <input type="email" class="notify-email-input" id="detail-notify-email" placeholder="you@example.com" aria-label="Email address for notification">
+        <button type="button" class="notify-submit-btn" onclick="submitNotify('${safeId}', document.getElementById('detail-notify-email'), this)">Notify Me</button>
+      </div>`;
+  }
+
+  function toggleNotifyForm(id) {
+    const form = document.getElementById(`notify-form-${id}`);
+    if (!form) return;
+    const nowOpen = form.classList.toggle('open');
+    if (nowOpen) {
+      const input = document.getElementById(`notify-email-${id}`);
+      if (input) input.focus();
+    }
+  }
+
+  function refreshNotifyUI(id) {
+    document.querySelectorAll(`[data-notify-block="${CSS.escape(id)}"]`).forEach((block) => {
+      const isDetail = block.id === 'detail-notify-sec';
+      const html = notifyBlockInnerHtml(id, !isDetail);
+      if (isDetail) {
+        const body = document.getElementById('detail-notify-body');
+        if (body) body.innerHTML = html;
+      } else {
+        block.innerHTML = html;
+      }
+    });
+  }
+
+  async function submitNotify(id, inputEl, btnEl) {
+    const email = inputEl ? inputEl.value.trim() : '';
+    if (!isValidEmail(email)) {
+      showToast('Enter a valid email address first.', 'error');
+      if (inputEl) inputEl.focus();
+      return;
+    }
+    if (!INTEREST_API) { showToast("Notify signups aren't available right now — check back soon.", 'error'); return; }
+    if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'Submitting…'; }
+    try {
+      const r = await fetch(`${INTEREST_API}/notify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, email }),
+      });
+      if (!r.ok) throw new Error('bad response');
+      notifySubscribed.add(id);
+      try { localStorage.setItem('gccs-notify-subscribed', JSON.stringify([...notifySubscribed])); } catch (e) {}
+      showToast("🔔 You're on the list — we'll email you when it's announced.", 'success', 3000);
+      refreshNotifyUI(id);
+    } catch (e) {
+      showToast('Something went wrong — please try again in a moment.', 'error');
+      if (btnEl) { btnEl.disabled = false; btnEl.textContent = 'Notify Me'; }
+    }
   }
 
   // ===== Home base + distance =====
@@ -3231,6 +3353,15 @@
 </script>
 
 <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch((err) => console.warn('SW registration failed:', err));
+    });
+  }
+</script>
 
 </body>
 </html>

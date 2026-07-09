@@ -198,6 +198,82 @@
   </div>
 </div>
 
+<div class="pokeball-divider-admin" style="height:2px;background:var(--border,#E5E0D5);margin:36px 0;"></div>
+
+<header>
+  <div class="brand">
+    <div class="brand-icon">🏪</div>
+    <div>
+      <div class="brand-title">Vendor Directory Admin</div>
+      <div class="brand-sub">vendors.html</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <span id="vendor-file-status">No file open — click "Open vendors.html" to start.</span>
+    <button id="v-btn-open" class="btn-dark">📂 Open vendors.html</button>
+    <input type="file" id="v-file-input-fallback" accept=".html,.htm" style="display:none;">
+    <button id="v-btn-save" class="btn-primary" disabled>💾 Save to vendors.html</button>
+    <button id="v-btn-download" disabled>⬇️ Download copy</button>
+  </div>
+</header>
+
+<div class="layout">
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">Vendors (<span id="vendor-count">0</span>)</span>
+      <button id="v-btn-add" class="btn-sm btn-primary" disabled>+ Add Vendor</button>
+    </div>
+    <div class="panel-body" id="vendor-list-body">
+      <div class="empty-state">
+        <div class="empty-state-icon">🏪</div>
+        <p>Open your site's <strong>vendors.html</strong> file to load and manage vendors here.</p>
+        <button id="v-btn-open-2" class="btn-dark">📂 Open vendors.html</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="v-form-panel">
+    <div class="panel-header">
+      <span class="panel-title" id="v-form-title">No vendor selected</span>
+    </div>
+    <div class="panel-body" id="v-form-body">
+      <div class="empty-state">
+        <div class="empty-state-icon">👈</div>
+        <p>Select a vendor on the left to edit it, or add a new one.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="pokeball-divider-admin" style="height:2px;background:var(--border,#E5E0D5);margin:36px 0;"></div>
+
+<header>
+  <div class="brand">
+    <div class="brand-icon">🔔</div>
+    <div>
+      <div class="brand-title">TBD Notify Signups</div>
+      <div class="brand-sub">Emails collected via the Worker for "Notify Me" on TBD shows</div>
+    </div>
+  </div>
+</header>
+
+<div class="panel" style="margin-top:16px;">
+  <div class="panel-header">
+    <span class="panel-title">Signups by show</span>
+  </div>
+  <div class="panel-body" id="notify-panel-body">
+    <div class="empty-state" id="notify-empty-state">
+      <div class="empty-state-icon">🔔</div>
+      <p>Enter your Worker's admin token to load the list of people waiting on TBD-show announcements.</p>
+      <div style="display:flex; gap:8px; max-width:420px; margin:12px auto 0; flex-wrap:wrap; justify-content:center;">
+        <input type="password" id="notify-admin-token" placeholder="Worker admin token" style="flex:1 1 220px; padding:9px 12px; border:1px solid var(--border,#E5E0D5); border-radius:8px;">
+        <button id="notify-btn-fetch" class="btn-dark">🔄 Load Signups</button>
+      </div>
+      <p class="hint" style="margin-top:10px;">This token is only stored in your browser's local storage on this device — see WORKER-NOTIFY-ADDITION.md for how to set it on the Worker.</p>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -819,6 +895,8 @@ ${itemsXml}
     events.forEach(ev => { ev.featured = (ev.id === chosenId); });
     dirty = true;
     renderList();
+    const chosen = events.find(ev => ev.id === chosenId);
+    toast(chosen ? `⭐ "${chosen.name || 'Show'}" set as featured — remember to save to index.html` : 'Featured show cleared — remember to save to index.html');
   });
 
   // Moves an event up/down within its own group (active or archived) rather
@@ -1234,11 +1312,14 @@ ${itemsXml}
       if (window.__dupCancel) { toast('Cancelled — not saved.', true); return; }
 
       if (isNew) {
-        events.push(updated);
+        events.push(Object.assign({}, ev, updated));
         toast('Show added — remember to save to index.html');
       } else {
         const idx = events.findIndex(e2 => e2.id === ev.id);
-        events[idx] = updated;
+        // Merge onto the existing object rather than replacing it outright —
+        // the form above doesn't expose every field (featured, dateAdded),
+        // so a plain replace would silently wipe those on every save.
+        events[idx] = Object.assign({}, ev, updated);
         toast('Show updated — remember to save to index.html');
       }
       dirty = true;
@@ -1254,6 +1335,380 @@ ${itemsXml}
   }
   function clearFieldErrors() {
     document.querySelectorAll('.field-error').forEach(el => el.classList.remove('field-error'));
+  }
+
+  // =====================================================================
+  //  VENDOR DIRECTORY ADMIN (vendors.html)
+  // =====================================================================
+  const VENDOR_START_MARKER = '/* ==VENDORS-DATA-START== */';
+  const VENDOR_END_MARKER = '/* ==VENDORS-DATA-END== */';
+  const VENDOR_STATE_OPTIONS = ['FL', 'AL', 'MS', 'GA'];
+  const VENDOR_CARD_TYPE_OPTIONS = [
+    { key: 'pokemon', label: 'Pokémon' }, { key: 'sports', label: 'Sports Cards' },
+    { key: 'mtg', label: 'Magic: The Gathering' }, { key: 'onepiece', label: 'One Piece TCG' },
+    { key: 'yugioh', label: 'Yu-Gi-Oh!' }, { key: 'lorcana', label: 'Disney Lorcana' }, { key: 'comics', label: 'Comics & Toys' },
+  ];
+
+  let vendorFileHandle = null;
+  let vendorOriginalText = '';
+  let vendors = [];
+  let vSelectedId = null;
+  let vDirty = false;
+
+  function parseVendorsFromHtml(text) {
+    const s = text.indexOf(VENDOR_START_MARKER), e = text.indexOf(VENDOR_END_MARKER);
+    if (s === -1 || e === -1) {
+      throw new Error('Could not find the VENDORS data markers in this file. Make sure you selected vendors.html.');
+    }
+    const block = text.slice(s + VENDOR_START_MARKER.length, e);
+    const m = block.match(/const\s+VENDORS\s*=\s*(\[[\s\S]*\]);/);
+    if (!m) throw new Error('Found the markers but could not parse the VENDORS array inside them.');
+    let parsed;
+    try { parsed = new Function('return (' + m[1] + ')')(); }
+    catch (err) { throw new Error('The VENDORS array in this file has a syntax error: ' + err.message); }
+    return parsed.map((v, i) => normalizeVendor(v, i));
+  }
+
+  function normalizeVendor(v, i) {
+    return {
+      id: v.id || ('ven-' + String(i + 1).padStart(3, '0')),
+      name: v.name || '',
+      description: v.description || '',
+      states: Array.isArray(v.states) ? v.states.filter(Boolean) : [],
+      cardTypes: Array.isArray(v.cardTypes) ? v.cardTypes.filter(Boolean) : [],
+      showsAttended: v.showsAttended || '',
+      website: v.website || '',
+      websiteLabel: v.websiteLabel || '',
+    };
+  }
+
+  function serializeVendors(list) {
+    return list.map(v => `    {
+      id: "${jsStringEscape(v.id)}",
+      name: "${jsStringEscape(v.name)}",
+      description: "${jsStringEscape(v.description)}",
+      states: [${(v.states || []).map(x => `"${jsStringEscape(x)}"`).join(', ')}],
+      cardTypes: [${(v.cardTypes || []).map(x => `"${jsStringEscape(x)}"`).join(', ')}],
+      showsAttended: "${jsStringEscape(v.showsAttended)}",
+      website: "${jsStringEscape(v.website)}", websiteLabel: "${jsStringEscape(v.websiteLabel)}",
+    }`).join(',\n');
+  }
+
+  function writeVendorsIntoHtml(text, list) {
+    const s = text.indexOf(VENDOR_START_MARKER), e = text.indexOf(VENDOR_END_MARKER);
+    if (s === -1 || e === -1) throw new Error('VENDORS markers not found — cannot save.');
+    const before = text.slice(0, s + VENDOR_START_MARKER.length);
+    const after = text.slice(e);
+    const body = list.length ? `\n  const VENDORS = [\n${serializeVendors(list)}\n  ];\n  ` : `\n  const VENDORS = [];\n  `;
+    return before + body + after;
+  }
+
+  async function openVendorFile() {
+    if (supportsFSAccess) {
+      try {
+        const [handle] = await window.showOpenFilePicker({
+          types: [{ description: 'HTML files', accept: { 'text/html': ['.html', '.htm'] } }]
+        });
+        const file = await handle.getFile();
+        const text = await file.text();
+        const parsed = parseVendorsFromHtml(text);
+        vendorFileHandle = handle;
+        vendorOriginalText = text;
+        vendors = parsed;
+        vSelectedId = null;
+        vDirty = false;
+        afterVendorLoad(file.name);
+      } catch (err) {
+        if (err.name !== 'AbortError') toast(err.message, true);
+      }
+    } else {
+      document.getElementById('v-file-input-fallback').click();
+    }
+  }
+
+  document.getElementById('v-file-input-fallback').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const parsed = parseVendorsFromHtml(text);
+      vendorFileHandle = null;
+      vendorOriginalText = text;
+      vendors = parsed;
+      vSelectedId = null;
+      vDirty = false;
+      afterVendorLoad(file.name);
+    } catch (err) { toast(err.message, true); }
+    e.target.value = '';
+  });
+
+  function afterVendorLoad(name) {
+    setVendorFileStatus(`Opened ${name} — ${vendors.length} vendor${vendors.length === 1 ? '' : 's'} loaded.`, 'ok');
+    document.getElementById('v-btn-save').disabled = false;
+    document.getElementById('v-btn-download').disabled = false;
+    document.getElementById('v-btn-add').disabled = false;
+    renderVendorList();
+    renderVendorForm(null);
+    toast(`Loaded ${vendors.length} vendors`);
+  }
+
+  function setVendorFileStatus(msg, cls) {
+    const el = document.getElementById('vendor-file-status');
+    el.textContent = msg;
+    el.className = cls || '';
+  }
+
+  async function saveVendorFile() {
+    if (!vendorOriginalText) { toast('Open vendors.html first.', true); return; }
+    let newText;
+    try { newText = writeVendorsIntoHtml(vendorOriginalText, vendors); }
+    catch (err) { toast(err.message, true); return; }
+    if (vendorFileHandle) {
+      try {
+        const writable = await vendorFileHandle.createWritable();
+        await writable.write(newText);
+        await writable.close();
+        vendorOriginalText = newText;
+        vDirty = false;
+        setVendorFileStatus(`Saved ✓ — ${vendors.length} vendors written to vendors.html`, 'ok');
+        toast('Saved to vendors.html');
+      } catch (err) { toast('Save failed: ' + err.message, true); }
+    } else {
+      downloadVendorFile(newText);
+    }
+  }
+
+  function downloadVendorFile(text) {
+    const blob = new Blob([text], { type: 'text/html' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'vendors.html';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    vendorOriginalText = text;
+    vDirty = false;
+    setVendorFileStatus(`Downloaded vendors.html (${vendors.length} vendors) — replace your old file with this one.`, 'ok');
+    toast('Downloaded updated vendors.html');
+  }
+
+  document.getElementById('v-btn-open').addEventListener('click', openVendorFile);
+  document.getElementById('v-btn-open-2').addEventListener('click', openVendorFile);
+  document.getElementById('v-btn-save').addEventListener('click', saveVendorFile);
+  document.getElementById('v-btn-download').addEventListener('click', () => {
+    if (!vendorOriginalText) { toast('Open vendors.html first.', true); return; }
+    try { downloadVendorFile(writeVendorsIntoHtml(vendorOriginalText, vendors)); }
+    catch (err) { toast(err.message, true); }
+  });
+  document.getElementById('v-btn-add').addEventListener('click', () => {
+    const blank = { id: 'ven-' + Date.now(), name: '', description: '', states: [], cardTypes: [], showsAttended: '', website: '', websiteLabel: '' };
+    vendors.unshift(blank);
+    vSelectedId = blank.id;
+    vDirty = true;
+    renderVendorList();
+    renderVendorForm(blank.id);
+  });
+
+  function renderVendorList() {
+    const body = document.getElementById('vendor-list-body');
+    document.getElementById('vendor-count').textContent = vendors.length;
+    if (!vendors.length) {
+      body.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🏪</div><p>No vendors yet — click "+ Add Vendor" to create the first one.</p></div>`;
+      return;
+    }
+    body.innerHTML = vendors.map(v => `
+      <div class="event-row${v.id === vSelectedId ? ' selected' : ''}" data-id="${v.id}">
+        <div class="event-main" data-action="v-edit" data-id="${v.id}">
+          <div class="event-name">${escapeHtml(v.name || '(unnamed vendor)')}</div>
+          <div class="event-sub" style="font-size:12px;color:var(--muted);">${escapeHtml((v.states || []).join(', ') || 'No states set')}</div>
+        </div>
+        <button class="btn-icon btn-danger" data-action="v-delete" data-id="${v.id}" title="Delete">🗑️</button>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('vendor-list-body').addEventListener('click', (e) => {
+    const editEl = e.target.closest('[data-action="v-edit"]');
+    const delEl = e.target.closest('[data-action="v-delete"]');
+    if (editEl) {
+      vSelectedId = editEl.dataset.id;
+      renderVendorList();
+      renderVendorForm(vSelectedId);
+    } else if (delEl) {
+      const id = delEl.dataset.id;
+      const v = vendors.find(x => x.id === id);
+      if (v && !confirm(`Delete "${v.name || 'this vendor'}"? This can't be undone.`)) return;
+      vendors = vendors.filter(x => x.id !== id);
+      if (vSelectedId === id) vSelectedId = null;
+      vDirty = true;
+      renderVendorList();
+      renderVendorForm(vSelectedId);
+    }
+  });
+
+  function renderVendorForm(id) {
+    const body = document.getElementById('v-form-body');
+    const title = document.getElementById('v-form-title');
+    if (!id) {
+      title.textContent = 'No vendor selected';
+      body.innerHTML = `<div class="empty-state"><div class="empty-state-icon">👈</div><p>Select a vendor on the left to edit it, or add a new one.</p></div>`;
+      return;
+    }
+    const v = vendors.find(x => x.id === id);
+    if (!v) { renderVendorForm(null); return; }
+    title.textContent = v.name || '(unnamed vendor)';
+    body.innerHTML = `
+      <div class="form-group">
+        <label>Business / Table Name *</label>
+        <input type="text" id="vf-name" value="${escapeHtml(v.name)}" placeholder="e.g. 850 Sports Cards">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="vf-description" rows="3" placeholder="What they sell, specialties, how long they've been dealing…">${escapeHtml(v.description)}</textarea>
+      </div>
+      <div class="form-group">
+        <label>States Attended</label>
+        <div style="display:flex; gap:14px; flex-wrap:wrap;">
+          ${VENDOR_STATE_OPTIONS.map(s => `<label class="checkbox-row" style="margin-bottom:0;"><input type="checkbox" class="vf-state" value="${s}" ${v.states.includes(s) ? 'checked' : ''}> ${s}</label>`).join('')}
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Card Types</label>
+        <div style="display:flex; gap:14px; flex-wrap:wrap;">
+          ${VENDOR_CARD_TYPE_OPTIONS.map(t => `<label class="checkbox-row" style="margin-bottom:0;"><input type="checkbox" class="vf-type" value="${t.key}" ${v.cardTypes.includes(t.key) ? 'checked' : ''}> ${escapeHtml(t.label)}</label>`).join('')}
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Shows Regularly Attended</label>
+        <input type="text" id="vf-shows" value="${escapeHtml(v.showsAttended)}" placeholder="e.g. The 850 Card Show, Anchor Up Card Show">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Website / Social URL</label>
+          <input type="url" id="vf-website" value="${escapeHtml(v.website)}" placeholder="https://…">
+        </div>
+        <div class="form-group">
+          <label>Website Label</label>
+          <input type="text" id="vf-website-label" value="${escapeHtml(v.websiteLabel)}" placeholder="Auto-filled from the URL — edit if you like">
+        </div>
+      </div>
+      <div style="display:flex; gap:10px; margin-top:8px;">
+        <button type="button" class="btn-primary" id="vf-save">💾 Save Vendor</button>
+        <button type="button" id="vf-cancel">Cancel</button>
+      </div>
+    `;
+
+    document.getElementById('vf-website').addEventListener('input', (e) => {
+      const labelInput = document.getElementById('vf-website-label');
+      if (!labelInput.dataset.userEdited) labelInput.value = autoWebsiteLabel(e.target.value);
+    });
+    document.getElementById('vf-website-label').addEventListener('input', (e) => { e.target.dataset.userEdited = '1'; });
+
+    document.getElementById('vf-save').addEventListener('click', () => {
+      const name = document.getElementById('vf-name').value.trim();
+      if (!name) { toast('Business name is required.', true); return; }
+      v.name = name;
+      v.description = document.getElementById('vf-description').value.trim();
+      v.states = Array.from(document.querySelectorAll('.vf-state:checked')).map(el => el.value);
+      v.cardTypes = Array.from(document.querySelectorAll('.vf-type:checked')).map(el => el.value);
+      v.showsAttended = document.getElementById('vf-shows').value.trim();
+      v.website = document.getElementById('vf-website').value.trim();
+      v.websiteLabel = document.getElementById('vf-website-label').value.trim();
+      vDirty = true;
+      toast('Vendor saved — remember to "Save to vendors.html" to write it to disk.');
+      renderVendorList();
+      renderVendorForm(v.id);
+    });
+    document.getElementById('vf-cancel').addEventListener('click', () => {
+      vSelectedId = null;
+      renderVendorList();
+      renderVendorForm(null);
+    });
+  }
+
+  window.addEventListener('beforeunload', (e) => {
+    if (vDirty) { e.preventDefault(); e.returnValue = ''; }
+  });
+
+  // =====================================================================
+  //  TBD NOTIFY SIGNUPS — reads from the same Worker as the interest counter.
+  //  Requires the /notify-list endpoint + ADMIN_TOKEN described in
+  //  WORKER-NOTIFY-ADDITION.md to be added to the Worker first.
+  // =====================================================================
+  const NOTIFY_API = 'https://gccs-interest.zbcaptures.workers.dev';
+
+  (function initNotifyPanel() {
+    const tokenInput = document.getElementById('notify-admin-token');
+    if (!tokenInput) return;
+    const saved = localStorage.getItem('gccs-admin-notify-token');
+    if (saved) tokenInput.value = saved;
+    const btn = document.getElementById('notify-btn-fetch');
+    if (btn) btn.addEventListener('click', fetchNotifySignups);
+  })();
+
+  async function fetchNotifySignups() {
+    const tokenInput = document.getElementById('notify-admin-token');
+    const token = tokenInput.value.trim();
+    if (!token) { toast('Enter the Worker admin token first.', true); return; }
+    try { localStorage.setItem('gccs-admin-notify-token', token); } catch (e) {}
+    const btn = document.getElementById('notify-btn-fetch');
+    const origLabel = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Loading…';
+    try {
+      const r = await fetch(`${NOTIFY_API}/notify-list?token=${encodeURIComponent(token)}`);
+      if (r.status === 401 || r.status === 403) throw new Error('Token rejected — check the ADMIN_TOKEN set on your Worker.');
+      if (!r.ok) throw new Error('Worker returned an error (' + r.status + ').');
+      const data = await r.json(); // { showId: [emails...], ... }
+      renderNotifyResults(data);
+      toast('Loaded notify signups');
+    } catch (err) {
+      toast(err.message, true);
+    } finally {
+      btn.disabled = false; btn.textContent = origLabel;
+    }
+  }
+
+  function renderNotifyResults(data) {
+    const body = document.getElementById('notify-panel-body');
+    const showIds = Object.keys(data || {}).filter(id => Array.isArray(data[id]) && data[id].length);
+    if (!showIds.length) {
+      body.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🔔</div><p>No signups yet — once someone submits their email on a TBD show, it'll show up here.</p></div>`;
+      return;
+    }
+    const totalEmails = showIds.reduce((sum, id) => sum + data[id].length, 0);
+    let html = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+      <span class="hint">${showIds.length} show${showIds.length === 1 ? '' : 's'} · ${totalEmails} total signup${totalEmails === 1 ? '' : 's'}</span>
+      <button type="button" class="btn-sm btn-dark" id="notify-btn-csv">⬇️ Download CSV</button>
+    </div>`;
+    html += showIds.map(id => `
+      <div class="event-row" style="cursor:default;">
+        <div class="event-main">
+          <div class="event-name">${escapeHtml(id)}</div>
+          <div class="event-sub" style="font-size:12px;color:var(--muted);word-break:break-word;">${data[id].map(escapeHtml).join(', ')}</div>
+        </div>
+      </div>
+    `).join('');
+    body.innerHTML = html;
+
+    const csvBtn = document.getElementById('notify-btn-csv');
+    if (csvBtn) csvBtn.addEventListener('click', () => downloadNotifyCsv(data, showIds));
+  }
+
+  function downloadNotifyCsv(data, showIds) {
+    let csv = 'show_id,email\n';
+    showIds.forEach((id) => {
+      data[id].forEach((email) => {
+        csv += `"${String(id).replace(/"/g, '""')}","${String(email).replace(/"/g, '""')}"\n`;
+      });
+    });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'tbd-notify-signups.csv';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    toast('Downloaded CSV');
   }
 </script>
 </body>
