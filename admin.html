@@ -258,18 +258,17 @@
 </header>
 
 <div class="panel" style="margin-top:16px;">
-  <div class="panel-header">
+  <div class="panel-header" style="flex-wrap:wrap; gap:10px;">
     <span class="panel-title">Shows with subscribers</span>
-    <button id="push-btn-refresh" class="btn-sm btn-dark">🔄 Refresh</button>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+      <input type="password" id="push-admin-token" placeholder="Worker admin token" style="padding:7px 10px; border:1px solid var(--border,#E5E0D5); border-radius:8px; font-size:13px; min-width:200px;">
+      <button id="push-btn-refresh" class="btn-sm btn-dark">🔄 Load / Refresh</button>
+    </div>
   </div>
   <div class="panel-body" id="push-panel-body">
     <div class="empty-state" id="push-empty-state">
       <div class="empty-state-icon">📣</div>
-      <p>Enter your Worker's admin token to load which TBD shows have people waiting on a push notification.</p>
-      <div style="display:flex; gap:8px; max-width:420px; margin:12px auto 0; flex-wrap:wrap; justify-content:center;">
-        <input type="password" id="push-admin-token" placeholder="Worker admin token" style="flex:1 1 220px; padding:9px 12px; border:1px solid var(--border,#E5E0D5); border-radius:8px;">
-        <button id="push-btn-fetch" class="btn-dark">🔄 Load Subscribers</button>
-      </div>
+      <p>Enter your Worker's admin token above and click "Load / Refresh" to load which shows have people waiting on a push notification.</p>
       <p class="hint" style="margin-top:10px;">This token is only stored in your browser's local storage on this device — see WORKER-PUSH-SETUP.md for one-time setup.</p>
     </div>
   </div>
@@ -1675,19 +1674,18 @@ ${itemsXml}
     if (!tokenInput) return;
     const saved = localStorage.getItem('gccs-admin-push-token');
     if (saved) tokenInput.value = saved;
-    const fetchBtn = document.getElementById('push-btn-fetch');
-    if (fetchBtn) fetchBtn.addEventListener('click', fetchPushSubscribers);
     const refreshBtn = document.getElementById('push-btn-refresh');
     if (refreshBtn) refreshBtn.addEventListener('click', fetchPushSubscribers);
   })();
 
   async function fetchPushSubscribers() {
     const tokenInput = document.getElementById('push-admin-token');
+    if (!tokenInput) { console.error('push-admin-token input not found in DOM'); return; }
     const token = tokenInput.value.trim();
     if (!token) { toast('Enter the Worker admin token first.', true); return; }
     try { localStorage.setItem('gccs-admin-push-token', token); } catch (e) {}
 
-    const btn = document.getElementById('push-btn-fetch') || document.getElementById('push-btn-refresh');
+    const btn = document.getElementById('push-btn-refresh');
     const origLabel = btn ? btn.textContent : '';
     if (btn) { btn.disabled = true; btn.textContent = 'Loading…'; }
     try {
@@ -1699,6 +1697,7 @@ ${itemsXml}
       renderPushResults();
       toast('Loaded subscriber counts');
     } catch (err) {
+      console.error('fetchPushSubscribers failed:', err);
       toast(err.message, true);
     } finally {
       if (btn) { btn.disabled = false; btn.textContent = origLabel; }
@@ -1709,7 +1708,9 @@ ${itemsXml}
     const count = pushSubscriberData['new-shows'] || 0;
     const ev = lastAddedShowId && typeof events !== 'undefined' ? events.find((e2) => e2.id === lastAddedShowId) : null;
     const defaultTitle = ev ? `New show added: ${ev.name || 'Show'}!` : '';
-    const defaultBody = ev ? `${ev.dateDisplay ? ev.dateDisplay + ' — ' : ''}${ev.location || ''}`.trim() : '';
+    const defaultBody = ev
+      ? (`${ev.dateDisplay ? ev.dateDisplay + ' — ' : ''}${ev.location || ''}`.trim() || 'Check it out on the site!')
+      : '';
     const targetUrl = ev ? `https://gccardshows.com/#${ev.id}` : 'https://gccardshows.com/#shows';
     return `
       <div class="event-row" style="cursor:default; align-items:flex-start; border-color:var(--blue,#2563EB);">
@@ -1769,36 +1770,58 @@ ${itemsXml}
   }
 
   async function sendPushAnnouncement(id, targetUrl, keepSubscribers, btnEl) {
-    const tokenInput = document.getElementById('push-admin-token');
-    const token = tokenInput.value.trim();
-    if (!token) { toast('Enter the Worker admin token first.', true); return; }
-
-    const compose = document.getElementById(`push-compose-${id}`);
-    const title = compose.querySelector('.push-title-input').value.trim() || 'Gulf Coast Card Shows';
-    const messageBody = compose.querySelector('.push-body-input').value.trim();
-    if (!messageBody) { toast('Add a short message before sending.', true); return; }
-
-    const count = pushSubscriberData[id] || 0;
-    if (!confirm(`Send this push notification to ${count} subscriber(s) now? This can't be undone.`)) return;
-
-    const origLabel = btnEl.textContent;
-    btnEl.disabled = true; btnEl.textContent = 'Sending…';
     try {
-      const r = await fetch(`${PUSH_API}/push-send?token=${encodeURIComponent(token)}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, title, body: messageBody, url: targetUrl, keepSubscribers }),
-      });
-      if (r.status === 401 || r.status === 403) throw new Error('Token rejected — check the ADMIN_TOKEN set on your Worker.');
-      if (!r.ok) throw new Error('Worker returned an error (' + r.status + ').');
-      const result = await r.json();
-      toast(`📣 Sent to ${result.sent} subscriber${result.sent === 1 ? '' : 's'}${result.failed ? ` (${result.failed} failed)` : ''}`);
-      if (!keepSubscribers) delete pushSubscriberData[id];
-      if (id === 'new-shows') lastAddedShowId = null; // clear the pre-fill now that it's been sent
-      renderPushResults();
-    } catch (err) {
-      toast(err.message, true);
-      btnEl.disabled = false; btnEl.textContent = origLabel;
+      const tokenInput = document.getElementById('push-admin-token');
+      if (!tokenInput) { console.error('push-admin-token input not found in DOM'); toast('Something went wrong loading the admin panel — try refreshing the page.', true); return; }
+      const token = tokenInput.value.trim();
+      if (!token) { toast('Enter the Worker admin token first.', true); return; }
+
+      const compose = document.getElementById(`push-compose-${id}`);
+      const titleInput = compose.querySelector('.push-title-input');
+      const bodyInput = compose.querySelector('.push-body-input');
+      const title = titleInput.value.trim() || 'Gulf Coast Card Shows';
+      const messageBody = bodyInput.value.trim();
+      if (!messageBody) {
+        toast('Add a short message before sending — the message field is highlighted below.', true);
+        bodyInput.style.borderColor = 'var(--red, #E53935)';
+        bodyInput.style.borderWidth = '2px';
+        bodyInput.focus();
+        return;
+      }
+      bodyInput.style.borderColor = '';
+      bodyInput.style.borderWidth = '';
+
+      const count = pushSubscriberData[id] || 0;
+      if (!confirm(`Send this push notification to ${count} subscriber(s) now? This can't be undone.`)) return;
+
+      const origLabel = btnEl.textContent;
+      btnEl.disabled = true; btnEl.textContent = 'Sending…';
+      try {
+        const r = await fetch(`${PUSH_API}/push-send?token=${encodeURIComponent(token)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, title, body: messageBody, url: targetUrl, keepSubscribers }),
+        });
+        if (r.status === 401 || r.status === 403) throw new Error('Token rejected — check the ADMIN_TOKEN set on your Worker.');
+        if (!r.ok) throw new Error('Worker returned an error (' + r.status + ').');
+        const result = await r.json();
+        console.log('push-send result:', result);
+        if (result.sent === 0 && result.failed > 0) {
+          toast(`⚠️ Sent to 0 subscribers — ${result.failed} failed. Check the Worker's logs in the Cloudflare dashboard for the actual error (often a bad/expired subscription or a VAPID key mismatch).`, true);
+        } else {
+          toast(`📣 Sent to ${result.sent} subscriber${result.sent === 1 ? '' : 's'}${result.failed ? ` (${result.failed} failed)` : ''}`);
+        }
+        if (!keepSubscribers) delete pushSubscriberData[id];
+        if (id === 'new-shows') lastAddedShowId = null; // clear the pre-fill now that it's been sent
+        renderPushResults();
+      } catch (err) {
+        console.error('push-send failed:', err);
+        toast(err.message, true);
+        btnEl.disabled = false; btnEl.textContent = origLabel;
+      }
+    } catch (outerErr) {
+      console.error('sendPushAnnouncement crashed:', outerErr);
+      toast('Something went wrong (see browser console for details): ' + outerErr.message, true);
     }
   }
 </script>
