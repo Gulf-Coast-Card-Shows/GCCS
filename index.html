@@ -420,6 +420,23 @@
   html.dark .urgency-badge.urgency-tomorrow { color: #3A2900; }
   @keyframes urgency-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.75; } }
   @media (prefers-reduced-motion: reduce) { .urgency-badge.urgency-today { animation: none; } }
+  /* "Popular" badge — surfaces the shared "interested" counter as visible
+     social proof on the top few most-interested cards, instead of that data
+     only being visible after clicking the interest button. See
+     updateTrendingBadges() in the interest-counter script below. */
+  .trending-badge {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 11px; padding: 4px 10px;
+    border-radius: 50px; letter-spacing: 0.03em; color: #fff;
+    background: linear-gradient(135deg, #FF7A45, var(--red));
+  }
+  /* "New" badge — flags shows added in the last NEW_BADGE_DAYS days (see
+     isRecentlyAdded() below), so a returning visitor can spot what's changed
+     since their last visit without comparing the whole list by memory. */
+  .new-badge {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 11px; padding: 4px 10px;
+    border-radius: 50px; letter-spacing: 0.03em; color: #fff;
+    background: linear-gradient(135deg, #34D399, #059669);
+  }
   .show-name { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 700; font-size: 22px; color: var(--dark); margin-bottom: 16px; line-height: 1.2; }
 
   /* Type-color coding, borrowing the *logic* Pokémon's own UI uses (each
@@ -578,6 +595,10 @@
     background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.35); color: #fff;
   }
   .detail-hero-actions .interest-btn.active { background: rgba(255,255,255,0.28); border-color: #fff; }
+  .detail-hero-actions .share-btn {
+    background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.35); color: #fff;
+  }
+  .detail-hero-actions .share-btn:hover { background: rgba(255,255,255,0.22); }
   .detail-section { margin-bottom: 22px; }
   .detail-section h3 { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 15px; text-transform: uppercase; letter-spacing: .6px; color: var(--red); margin: 0 0 8px; }
   .detail-section p, .detail-section li { font-size: 15px; line-height: 1.6; color: var(--dark); margin: 0 0 6px; }
@@ -936,6 +957,7 @@
         <select id="sort-select" class="ctrl-select" onchange="applySort()">
           <option value="default">Default order</option>
           <option value="date">Date (soonest first)</option>
+          <option value="interest">Most Interested</option>
           <option value="distance">Distance (nearest first)</option>
           <option value="distance-far">Distance (farthest first)</option>
         </select>
@@ -1211,6 +1233,7 @@
       <div class="detail-hero-actions">
         <button type="button" class="fav-btn" id="detail-fav-btn" aria-label="Save this show to your favorites" aria-pressed="false">☆</button>
         <button type="button" class="card-action-btn interest-btn" id="detail-interest-btn" aria-pressed="false">🙋 — interested</button>
+        <button type="button" class="card-action-btn share-btn" id="detail-share-btn" title="Copy shareable link">🔗 Share</button>
       </div>
     </div>
 
@@ -1950,6 +1973,18 @@
   }
   function eventStartDate(ev) { return parseIsoDate(ev.startDate) || parseIsoDate(ev.endDate); }
 
+  // "New" badge — flags a show as recently added (based on dateAdded, which
+  // admin.html already stamps on every show automatically) so a returning
+  // visitor can spot what's changed since their last visit at a glance.
+  const NEW_BADGE_DAYS = 7;
+  function isRecentlyAdded(ev) {
+    const added = parseIsoDate(ev.dateAdded);
+    if (!added) return false;
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const diffDays = Math.round((today - added) / 86400000);
+    return diffDays >= 0 && diffDays <= NEW_BADGE_DAYS;
+  }
+
   // Small "Today! / Tomorrow! / This Weekend" badge for shows happening soon —
   // helps someone scanning the grid spot what's actually actionable right now.
   // Returns '' (no badge) for anything more than ~6 days out.
@@ -1979,6 +2014,77 @@
       details: `Card show details: https://gccardshows.com\n\n${ev.name}\n${ev.dateDisplay}\n${ev.location || ''}`
     });
     return `https://calendar.google.com/calendar/render?${params.toString()}`;
+  }
+
+  // ===== Event structured data (schema.org/Event JSON-LD) =====
+  // Generated straight from the same EVENTS array the cards render from, so
+  // it can never drift out of sync with what's actually on the page — no
+  // separate data entry. This is what lets Google surface individual shows
+  // in its event-rich search results ("card show pensacola this weekend")
+  // instead of just a plain blue link to the homepage.
+  //
+  // TBD shows are skipped: Event markup requires a startDate, and a TBD
+  // show doesn't have one yet. Shows that have already ended are skipped
+  // too — there's no upside to telling Google about an event that's over,
+  // and it keeps the payload from growing forever as the archive does.
+  function buildEventJsonLd(ev) {
+    const start = eventStartDate(ev);
+    if (!start) return null; // no resolvable date — nothing valid to emit
+    const end = eventEndDate(ev) || start;
+    const iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    const url = `https://gccardshows.com/?show=${encodeURIComponent(ev.id)}`;
+
+    const node = {
+      '@type': 'Event',
+      name: ev.name || 'Card Show',
+      startDate: iso(start),
+      endDate: iso(end),
+      eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+      eventStatus: 'https://schema.org/EventScheduled',
+      url,
+      location: { '@type': 'Place', name: ev.location || 'Gulf Coast', address: ev.location || 'Gulf Coast' },
+    };
+    if (Number.isFinite(ev.lat) && Number.isFinite(ev.lng)) {
+      node.location.geo = { '@type': 'GeoCoordinates', latitude: ev.lat, longitude: ev.lng };
+    }
+    const about = (ev.details && ev.details.about && ev.details.about.trim()) || '';
+    node.description = (about || `${ev.dateDisplay || ''} — ${ev.location || ''}`.trim()).slice(0, 500);
+    if (ev.organizer) node.organizer = { '@type': 'Organization', name: ev.organizer };
+
+    // Price: only asserted when we can back it up. A flat "free" flag is
+    // reliable; a typed-in fee string ("$5", "$5 at the door") only becomes
+    // an Offer if a number can be pulled out of it — an unparseable fee is
+    // left out entirely rather than guessed at.
+    if (ev.entryFree) {
+      node.isAccessibleForFree = true;
+      node.offers = { '@type': 'Offer', price: '0', priceCurrency: 'USD', availability: 'https://schema.org/InStock', url };
+    } else if (ev.entryFee) {
+      const m = String(ev.entryFee).match(/(\d+(?:\.\d{1,2})?)/);
+      if (m) {
+        node.isAccessibleForFree = false;
+        node.offers = { '@type': 'Offer', price: m[1], priceCurrency: 'USD', availability: 'https://schema.org/InStock', url };
+      }
+    }
+    return node;
+  }
+
+  function injectEventsJsonLd() {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const nodes = EVENTS
+      .filter(ev => !ev.tbd)
+      .map(buildEventJsonLd)
+      .filter(Boolean)
+      .filter(node => new Date(node.endDate + 'T00:00:00').getTime() >= today.getTime());
+
+    let script = document.getElementById('events-jsonld');
+    if (!nodes.length) { if (script) script.remove(); return; }
+    if (!script) {
+      script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.id = 'events-jsonld';
+      document.head.appendChild(script);
+    }
+    script.textContent = JSON.stringify({ '@context': 'https://schema.org', '@graph': nodes });
   }
 
   // ===== Distance helpers =====
@@ -2085,6 +2191,7 @@
       <div class="show-card-header">
         <div class="header-badges">
           <span class="upcoming-badge">Upcoming</span>
+          ${isRecentlyAdded(ev) ? '<span class="new-badge">🆕 New</span>' : ''}
           ${urgencyBadgeHtml(ev)}
           <span class="state-badge state-${st}">${st === 'UNK' ? '?' : st} · ${stName}</span>
         </div>
@@ -2120,6 +2227,7 @@
 
     saveFavorites(); // no-op on storage, just syncs the "(N)" count label to current state
     loadInterestCounts();
+    injectEventsJsonLd();
 
     // Single "last verified" timestamp under the Live count.
     const verifiedEl = document.getElementById('count-verified');
@@ -2721,6 +2829,8 @@
       interestBtn.onclick = () => toggleInterest(ev.id);
       refreshInterestButton(interestBtn);
     }
+    const shareBtn = document.getElementById('detail-share-btn');
+    if (shareBtn) shareBtn.onclick = () => shareShow(ev.id);
     const notifySec = document.getElementById('detail-notify-sec');
     if (notifySec) {
       if (ev.tbd) {
@@ -2875,6 +2985,7 @@
       if (!r.ok) throw new Error('bad response');
       interestCounts = await r.json();
       document.querySelectorAll('.interest-btn').forEach(refreshInterestButton);
+      updateTrendingBadges();
     } catch (e) {
       console.warn('Interest counter unavailable:', e.message);
       document.body.classList.add('interest-disabled');
@@ -2888,6 +2999,42 @@
     btn.classList.toggle('active', mine);
     btn.setAttribute('aria-pressed', mine ? 'true' : 'false');
     btn.textContent = `🙋 ${count} interested`;
+    // Stamp the count onto the card itself (not just the button) so the
+    // "Most Interested" sort option can read it without a second lookup.
+    const card = btn.closest('.show-card');
+    if (card) card.dataset.interestCount = count;
+  }
+
+  // ===== "Popular" badge — light social proof on the top few most-interested
+  // shows, so the interest counter is visible before anyone clicks a card,
+  // not just after. Recomputed any time interestCounts changes. =====
+  const TRENDING_MIN_COUNT = 2;
+  const TRENDING_MAX_BADGES = 3;
+  function updateTrendingBadges() {
+    if (document.body.classList.contains('interest-disabled')) return;
+    const trendingIds = new Set(
+      Object.entries(interestCounts)
+        .filter(([, count]) => count >= TRENDING_MIN_COUNT)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, TRENDING_MAX_BADGES)
+        .map(([id]) => id)
+    );
+    document.querySelectorAll('#shows-grid .show-card').forEach(card => {
+      const badgeRow = card.querySelector('.header-badges');
+      if (!badgeRow) return;
+      const existing = badgeRow.querySelector('.trending-badge');
+      if (trendingIds.has(card.dataset.eventId)) {
+        if (!existing) {
+          const span = document.createElement('span');
+          span.className = 'trending-badge';
+          span.title = 'One of the most "interested" shows right now';
+          span.textContent = '🔥 Popular';
+          badgeRow.appendChild(span);
+        }
+      } else if (existing) {
+        existing.remove();
+      }
+    });
   }
 
   async function toggleInterest(id) {
@@ -2899,6 +3046,7 @@
     if (mine) myInterests.delete(id); else myInterests.add(id);
     localStorage.setItem('gccs-interested', JSON.stringify([...myInterests]));
     document.querySelectorAll(`.interest-btn[data-interest-id="${CSS.escape(id)}"]`).forEach(refreshInterestButton);
+    updateTrendingBadges();
     try {
       const r = await fetch(`${INTEREST_API}/interest`, {
         method: 'POST',
@@ -2909,6 +3057,7 @@
         const data = await r.json();
         interestCounts[id] = data.count;
         document.querySelectorAll(`.interest-btn[data-interest-id="${CSS.escape(id)}"]`).forEach(refreshInterestButton);
+        updateTrendingBadges();
       }
     } catch (e) { /* optimistic update already shown — a background sync failure isn't worth interrupting the user for */ }
   }
@@ -3167,6 +3316,12 @@
       cards.sort((a, b) => (parseInt(a.dataset.defaultOrder) || 0) - (parseInt(b.dataset.defaultOrder) || 0));
     } else if (mode === 'date') {
       cards.sort((a, b) => (parseInt(a.dataset.sortDate) || 0) - (parseInt(b.dataset.sortDate) || 0));
+    } else if (mode === 'interest') {
+      if (document.body.classList.contains('interest-disabled')) {
+        showToast('Interest counts are unavailable right now — showing default order instead.', 'error');
+        sel.value = 'default'; applySort(); return;
+      }
+      cards.sort((a, b) => (parseInt(b.dataset.interestCount) || 0) - (parseInt(a.dataset.interestCount) || 0));
     } else if (mode === 'distance' || mode === 'distance-far') {
       if (!homeBase) { setStatus('Set a home base first to sort by distance.', true); sel.value = 'default'; return; }
       const dir = mode === 'distance' ? 1 : -1;

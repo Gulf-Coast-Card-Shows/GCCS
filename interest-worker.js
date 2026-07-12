@@ -172,10 +172,32 @@ async function sendWebPush(subscription, payloadObj, privateKeyJwk, ttlSeconds =
 }
 
 // ============================================================
+//  Lightweight rate limiting for the two public, unauthenticated endpoints
+//  (/interest and /push-subscribe). Uses the same KV namespace as everything
+//  else — a fixed-window counter keyed by client IP + endpoint + the current
+//  window number, so each window is a fresh key that ages out on its own via
+//  expirationTtl rather than needing separate cleanup. This is a simple
+//  abuse-deterrent (stop a script from hammering the endpoint), not a
+//  precision rate limiter — KV reads/writes aren't strictly atomic, so a
+//  determined attacker could squeeze a few extra requests through right at
+//  the edge of a window. That's an acceptable tradeoff for a community
+//  calendar site; it's not guarding anything sensitive.
+// ============================================================
+async function checkRateLimit(env, bucket, ip, limit, windowSeconds) {
+  const windowId = Math.floor(Date.now() / 1000 / windowSeconds);
+  const key = `rl:${bucket}:${ip || 'unknown'}:${windowId}`;
+  const current = parseInt((await env.INTEREST_KV.get(key)) || '0', 10);
+  if (current >= limit) return false;
+  // TTL is double the window so a key that's read right at window's edge
+  // doesn't vanish before the window it belongs to has actually elapsed.
+  await env.INTEREST_KV.put(key, String(current + 1), { expirationTtl: windowSeconds * 2 });
+  return true;
+}
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    const clientIp = request.headers.get('CF-Connecting-IP') || 'unknown';
 
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: corsHeaders() });
@@ -199,6 +221,13 @@ export default {
 
     // ---------- POST /interest ----------
     if (request.method === 'POST' && url.pathname === '/interest') {
+      // 30 toggles/min/IP — generous enough for someone genuinely clicking
+      // through several shows, tight enough to stop a script from inflating
+      // or deflating a count.
+      if (!(await checkRateLimit(env, 'interest', clientIp, 30, 60))) {
+        return json({ error: 'Too many requests — please slow down and try again in a minute.' }, 429);
+      }
+
       let body;
       try { body = await request.json(); } catch (e) { return json({ error: 'Invalid JSON body' }, 400); }
 
@@ -214,6 +243,12 @@ export default {
 
     // ---------- POST /push-subscribe ----------
     if (request.method === 'POST' && url.pathname === '/push-subscribe') {
+      // Subscribing is a rare, one-time action per show per visitor — 10/hour/IP
+      // comfortably covers someone subscribing to several TBD shows in one visit.
+      if (!(await checkRateLimit(env, 'push-subscribe', clientIp, 10, 3600))) {
+        return json({ error: 'Too many requests — please try again later.' }, 429);
+      }
+
       let body;
       try { body = await request.json(); } catch (e) { return json({ error: 'Invalid JSON body' }, 400); }
 
