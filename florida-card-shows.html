@@ -704,6 +704,18 @@
   .detail-grid .detail-cell { background: #f7f5ef; padding: 12px 14px; border-radius: 10px; }
   .detail-grid .detail-cell .k { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: #6B7280; font-weight: 700; }
   .detail-grid .detail-cell .v { font-size: 15px; font-weight: 600; color: #1A1A2E; margin-top: 2px; }
+  /* "Vendors at This Show" cross-links to vendors.html, loaded lazily
+     (see loadVendorsOnce() below) — small pill chips, same shape language
+     as the nav/state pills used everywhere else on the site. */
+  .detail-vendors-list { display: flex; flex-wrap: wrap; gap: 8px; }
+  .detail-vendor-chip {
+    display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 13px;
+    padding: 6px 14px; border-radius: 50px; border: 1.5px solid var(--border);
+    color: var(--dark); text-decoration: none; background: var(--card-bg);
+    transition: background 0.2s, transform 0.12s ease;
+  }
+  .detail-vendor-chip:hover { background: var(--border); }
   .detail-cta { display: inline-block; background: var(--red); color:#fff; padding: 12px 20px; border-radius: 10px; font-weight: 800; text-decoration: none; margin-right: 8px; }
   .detail-cta.secondary { background: #1A1A2E; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
@@ -964,11 +976,11 @@
 <nav class="state-nav" aria-label="Browse card shows by state">
   <span class="state-nav-label">Browse by State:</span>
   <a href="index.html">All States</a>
-  <a href="alabama-card-shows.html">Alabama</a>
-  <strong>Florida</strong>
-  <a href="georgia-card-shows.html">Georgia</a>
-  <a href="louisiana-card-shows.html">Louisiana</a>
-  <a href="mississippi-card-shows.html">Mississippi</a>
+  <a href="alabama-card-shows.html" class="pill-AL">Alabama</a>
+  <strong class="pill-FL pill-active">Florida</strong>
+  <a href="georgia-card-shows.html" class="pill-GA">Georgia</a>
+  <a href="louisiana-card-shows.html" class="pill-LA">Louisiana</a>
+  <a href="mississippi-card-shows.html" class="pill-MS">Mississippi</a>
 </nav>
 <!-- STATE-NAV-END -->
 
@@ -997,7 +1009,7 @@
     <div class="ctrl-group" style="flex:1 1 260px;">
       <label class="ctrl-label" for="search-input">Search Shows</label>
       <input id="search-input" class="ctrl-input" type="search"
-             placeholder="Title, city, or venue…" oninput="applyFilters()" autocomplete="off">
+             placeholder="Title, city, or venue…" oninput="debouncedApplyFilters()" autocomplete="off">
     </div>
     <button type="button" class="filters-toggle" id="filters-toggle" aria-expanded="false" aria-controls="extra-filters" onclick="toggleExtraFilters()">
       <span>⚙️ Advanced Search Options</span><span class="chev">▾</span>
@@ -1393,6 +1405,11 @@
       <h3>Location</h3>
       <p id="detail-loc"></p>
       <p id="detail-loc-notes" style="color:var(--muted); font-size:14px;" hidden></p>
+    </div>
+
+    <div class="detail-section" id="detail-vendors-sec" hidden>
+      <h3>🏪 Vendors at This Show</h3>
+      <div class="detail-vendors-list" id="detail-vendors-list"></div>
     </div>
 
     <div class="detail-section" style="margin-bottom:0;" id="detail-cta-sec">
@@ -1910,7 +1927,7 @@
       lat: 30.4578605, lng: -86.6355762,
       entryFee: "$0", entryFree: true,
       vendorFee: "6ft - $75, 8ft - $95",
-      websiteUrl: "", websiteLabel: "",
+      websiteUrl: "https://www.facebook.com/photo?fbid=28446682891586906&set=gm.2179486106310378&idorvanity=2098811604377829", websiteLabel: "📘 Facebook",
       organizer: "Matthew Luecht",
       tbd: false,
       authServices: { present: null, company: "" },
@@ -2630,6 +2647,17 @@
   }
 
   // ===== Filters (search + hide past) =====
+  // The search box calls debouncedApplyFilters() instead of applyFilters()
+  // directly — without this, every single keystroke re-scans the whole
+  // grid and re-syncs the map, which gets wasteful for a fast typer as the
+  // show list grows. The other filter controls (state/type/radius/toggles)
+  // still call applyFilters() directly since those only fire once per
+  // change, not per keystroke.
+  let applyFiltersDebounceTimer = null;
+  function debouncedApplyFilters() {
+    clearTimeout(applyFiltersDebounceTimer);
+    applyFiltersDebounceTimer = setTimeout(applyFilters, 180);
+  }
   function applyFilters() {
     const grid = document.getElementById('shows-grid');
     if (!grid) return;
@@ -2979,6 +3007,51 @@
     }
     return parts.slice(-2).join(', ');
   }
+
+  // ===== Vendors at This Show =====
+  // vendors.html manages its own separate VENDORS array — rather than
+  // duplicating that data here (and having yet another copy to keep in
+  // sync), this fetches vendors.html itself once, same-origin, and pulls
+  // just the array literal out from between its data markers. Cached after
+  // the first successful load so opening more show details doesn't refetch.
+  let vendorsCache = null;
+  let vendorsLoadPromise = null;
+  function loadVendorsOnce() {
+    if (vendorsLoadPromise) return vendorsLoadPromise;
+    vendorsLoadPromise = fetch('vendors.html')
+      .then(res => { if (!res.ok) throw new Error('HTTP ' + res.status); return res.text(); })
+      .then(text => {
+        const start = text.indexOf('/* ==VENDORS-DATA-START== */');
+        const end = text.indexOf('/* ==VENDORS-DATA-END== */');
+        if (start === -1 || end === -1 || end <= start) throw new Error('VENDORS-DATA markers not found');
+        const match = text.slice(start, end).match(/const\s+VENDORS\s*=\s*(\[[\s\S]*\])\s*;?\s*$/);
+        if (!match) throw new Error('VENDORS array literal not found');
+        // Trusted first-party content (our own vendors.html, same origin), not user input.
+        vendorsCache = new Function('return (' + match[1] + ')')();
+        return vendorsCache;
+      })
+      .catch(err => {
+        console.warn('Could not load vendors.html for "Vendors at This Show" cross-linking:', err);
+        vendorsCache = [];
+        return vendorsCache;
+      });
+    return vendorsLoadPromise;
+  }
+  // vendor.showsAttended is free text Zac types by hand (e.g. "Anchor Up,
+  // Coastal Collectors Expo"), not a structured reference to a show id — so
+  // this checks each comma-separated token against the show's full name in
+  // both directions (a short alias inside the real name, or vice versa).
+  // It's a heuristic, not an exact match: renaming a show without updating
+  // vendors.html just means a vendor silently stops matching, nothing breaks.
+  function vendorsForShow(ev, allVendors) {
+    const showName = (ev.name || '').trim().toLowerCase();
+    if (!showName || !Array.isArray(allVendors) || !allVendors.length) return [];
+    return allVendors.filter(v => {
+      const tokens = (v.showsAttended || '').split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
+      return tokens.some(t => showName.includes(t) || t.includes(showName));
+    });
+  }
+
   function populateEventDetail(ev) {
     const d = ev.details || {};
     document.getElementById('detail-name').textContent = ev.name || '';
@@ -3054,6 +3127,28 @@
       } else { notesEl.hidden = true; }
       locSec.hidden = false;
     } else { locSec.hidden = true; }
+
+    // Vendors at This Show — cross-links to vendors.html's own directory.
+    // Vendor data lives in a separate file and loads lazily/async (see
+    // loadVendorsOnce() below), so this hides the section until we actually
+    // know whether there's anything to show, then double-checks the modal
+    // is still open on this same event before touching the DOM — a visitor
+    // could've clicked through to a different show while the fetch was
+    // still in flight.
+    const vendorsSec = document.getElementById('detail-vendors-sec');
+    const vendorsListEl = document.getElementById('detail-vendors-list');
+    if (vendorsSec && vendorsListEl) {
+      vendorsSec.hidden = true;
+      vendorsListEl.innerHTML = '';
+      const thisName = ev.name || '';
+      loadVendorsOnce().then((allVendors) => {
+        if (document.getElementById('detail-name')?.textContent !== thisName) return;
+        const matches = vendorsForShow(ev, allVendors);
+        if (!matches.length) return;
+        vendorsListEl.innerHTML = matches.map(v => `<a class="detail-vendor-chip" href="vendors.html?vendor=${encodeURIComponent(v.id)}">🏪 ${escapeHtml(v.name || 'Vendor')}</a>`).join('');
+        vendorsSec.hidden = false;
+      });
+    }
 
     // CTAs
     const primary = document.getElementById('detail-cta-primary');

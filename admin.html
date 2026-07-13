@@ -55,6 +55,24 @@
   .panel-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 15px; }
   .panel-body { padding: 14px 16px; }
 
+  /* Data Health Check panel — reuses the site's warm/neutral palette rather
+     than introducing new colors: red for things that break a real feature
+     (map pin, date display, etc.), yellow for things worth a look but not
+     broken. */
+  .health-group + .health-group { margin-top: 18px; }
+  .health-group-title { font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--muted); margin-bottom: 8px; }
+  .health-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 9px 12px; border-radius: 10px; border: 1px solid var(--border);
+    margin-bottom: 6px; font-size: 13px;
+  }
+  .health-row.sev-warn { border-left: 4px solid var(--red); }
+  .health-row.sev-info { border-left: 4px solid var(--yellow); }
+  .health-row .health-name { font-weight: 700; }
+  .health-row .health-msg { color: var(--muted); }
+  .health-row .health-fix { flex-shrink: 0; }
+  .health-ok { text-align: center; padding: 24px; color: var(--muted); }
+
   .empty-state { text-align: center; padding: 60px 24px; color: var(--muted); }
   .empty-state-icon { font-size: 40px; margin-bottom: 12px; }
   .empty-state p { font-size: 14px; margin-bottom: 16px; line-height: 1.6; }
@@ -161,6 +179,36 @@
   </div>
 </header>
 <p class="browser-note" id="browser-note"></p>
+
+<div class="panel" id="quickadd-panel" style="max-width:1200px; margin:0 auto 16px;">
+  <div class="panel-header" style="flex-wrap:wrap; gap:10px;">
+    <span class="panel-title">⚡ Quick Add from Facebook Post</span>
+    <input type="password" id="quickadd-admin-token" placeholder="Worker admin token" style="padding:7px 10px; border:1px solid var(--border,#E5E0D5); border-radius:8px; font-size:13px; min-width:200px;">
+  </div>
+  <div class="panel-body">
+    <div class="form-group">
+      <label>Paste the Facebook/Instagram post text</label>
+      <textarea id="quickadd-text" rows="5" placeholder="Paste the raw caption here — whatever the organizer wrote. Dates, address, fee, whatever's in there."></textarea>
+    </div>
+    <div class="form-actions" style="padding-top:0;">
+      <button type="button" class="btn-primary" id="quickadd-btn" disabled>✨ Extract &amp; Pre-fill Add Show Form</button>
+    </div>
+    <p class="hint" style="margin-top:8px;">Sends the pasted text to your Worker's Claude-powered extractor (see WORKER-SETUP.md for the one-time setup this needs) and opens a pre-filled "Add a new show" form below — always review before saving, this is a head start, not an autopilot. Uses the same admin token as the push panel further down, and costs a small amount of API usage per click.</p>
+  </div>
+</div>
+
+<div class="panel" id="datahealth-panel" style="max-width:1200px; margin:0 auto 16px;">
+  <div class="panel-header">
+    <span class="panel-title">🩺 Data Health Check</span>
+    <span class="hint" id="datahealth-summary"></span>
+  </div>
+  <div class="panel-body" id="datahealth-body">
+    <div class="empty-state">
+      <div class="empty-state-icon">🩺</div>
+      <p>Open index.html and/or vendors.html above to check for missing coordinates, broken TBD shows, incomplete vendor listings, and other things worth a second look.</p>
+    </div>
+  </div>
+</div>
 
 <div class="featured-picker" id="featured-picker">
   <label for="featured-select">⭐ Featured Show</label>
@@ -488,6 +536,7 @@ ${serializeDetails(ev.details)}
     document.getElementById('btn-gen-feeds').disabled = false;
     document.getElementById('btn-gen-sitemap').disabled = false;
     document.getElementById('btn-add').disabled = false;
+    document.getElementById('quickadd-btn').disabled = false;
     renderList();
     renderForm(null);
     toast(`Loaded ${events.length} shows`);
@@ -611,9 +660,12 @@ ${serializeDetails(ev.details)}
     const states = statesPresentIn(list);
     const items = [currentState ? '<a href="index.html">All States</a>' : '<strong>All States</strong>'];
     states.forEach(k => {
+      // pill-XX gives each state its own "gym badge" color (matching the
+      // .state-XX chips already on every card); pill-active adds the mini
+      // pokeball "you are here" marker on whichever pill is the current page.
       items.push(k === currentState
-        ? `<strong>${STATE_NAMES[k]}</strong>`
-        : `<a href="${stateFileSlug(k)}">${STATE_NAMES[k]}</a>`);
+        ? `<strong class="pill-${k} pill-active">${STATE_NAMES[k]}</strong>`
+        : `<a href="${stateFileSlug(k)}" class="pill-${k}">${STATE_NAMES[k]}</a>`);
     });
     return `${NAV_START}\n<nav class="state-nav" aria-label="Browse card shows by state">\n  <span class="state-nav-label">Browse by State:</span>\n  ${items.join('\n  ')}\n</nav>\n${NAV_END}`;
   }
@@ -816,7 +868,149 @@ ${itemsXml}
   }
   let showArchived = false;
 
+  // =====================================================================
+  //  DATA HEALTH CHECK — a cheap pass over whatever's currently loaded
+  //  (shows, vendors, or both) looking for things that are missing or
+  //  inconsistent enough to quietly break a feature on the live site: no
+  //  map pin, a TBD show that's been TBD for a month, a vendor nobody can
+  //  find under any state filter, etc. Runs automatically after every
+  //  render of either list (see the top of renderList()/renderVendorList()
+  //  above) so it always reflects whatever's currently loaded and edited —
+  //  no separate "run check" button to remember to click.
+  // =====================================================================
+  function daysSince(dateStr) {
+    if (!dateStr) return null;
+    const then = new Date(dateStr + 'T00:00:00');
+    if (isNaN(then.getTime())) return null;
+    return Math.floor((Date.now() - then.getTime()) / 86400000);
+  }
+  function jumpToShow(id) {
+    selectedId = id;
+    renderList();
+    renderForm(id);
+    document.getElementById('form-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  function jumpToVendor(id) {
+    vSelectedId = id;
+    renderVendorList();
+    renderVendorForm(id);
+    document.getElementById('v-form-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  window.jumpToShow = jumpToShow;
+  window.jumpToVendor = jumpToVendor;
+
+  function collectShowIssues() {
+    const issues = [];
+    const seenIds = new Map();
+    events.forEach((ev) => {
+      const label = ev.name || '(unnamed show)';
+      const fix = `<button type="button" class="btn-sm health-fix" onclick="jumpToShow('${ev.id}')">Fix →</button>`;
+      const row = (sev, msg) => issues.push({ sev, id: ev.id, label, msg, fix });
+
+      if (typeof ev.lat !== 'number' || typeof ev.lng !== 'number' || Number.isNaN(ev.lat) || Number.isNaN(ev.lng)) {
+        row('warn', "No map coordinates — won't appear on the homepage map. Use \"Find coordinates\" on the form.");
+      }
+      if (!ev.location || !ev.location.trim()) {
+        row('warn', 'No location set at all.');
+      }
+      if (!ev.tbd && (!ev.startDate || !ev.dateDisplay || !ev.dateDisplay.trim())) {
+        row('warn', 'Not marked TBD, but missing a start date or date-display text.');
+      }
+      if (ev.tbd) {
+        const days = daysSince(ev.dateAdded);
+        if (days !== null && days >= 45) {
+          row('info', `Still marked TBD after ${days} days — worth checking if a date's been announced.`);
+        }
+      }
+      if (!ev.websiteUrl) {
+        row('info', 'No website or social link set.');
+      }
+      if (!ev.dateAdded) {
+        row('info', "No \"date added\" — the New badge and default sort order may not work right for this show.");
+      }
+      if (ev.entryFree === false && (!ev.entryFee || !ev.entryFee.trim())) {
+        row('info', 'Marked as not free, but no entry fee amount given.');
+      }
+      if (seenIds.has(ev.id)) {
+        issues.push({ sev: 'warn', id: ev.id, label, msg: `Duplicate id "${ev.id}" — shared with "${seenIds.get(ev.id)}". Duplicate ids can make edits apply to the wrong show.`, fix });
+      } else {
+        seenIds.set(ev.id, label);
+      }
+    });
+    return issues;
+  }
+
+  function collectVendorIssues() {
+    const issues = [];
+    const seenIds = new Map();
+    vendors.forEach((v) => {
+      const label = v.name || '(unnamed vendor)';
+      const fix = `<button type="button" class="btn-sm health-fix" onclick="jumpToVendor('${v.id}')">Fix →</button>`;
+      const row = (sev, msg) => issues.push({ sev, id: v.id, label, msg, fix });
+
+      if (!Array.isArray(v.states) || !v.states.length) {
+        row('warn', "No states set — won't show up under any state filter on vendors.html.");
+      }
+      if (!Array.isArray(v.cardTypes) || !v.cardTypes.length) {
+        row('info', 'No card types set.');
+      }
+      if (!v.website) {
+        row('info', 'No website or social link set.');
+      }
+      if (v.showsAttended && v.showsAttended.trim() && events.length) {
+        const tokens = v.showsAttended.split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
+        const unmatched = tokens.filter(t => !events.some(ev => {
+          const name = (ev.name || '').toLowerCase();
+          return name.includes(t) || t.includes(name);
+        }));
+        if (unmatched.length) {
+          row('info', `"Shows Attended" mentions ${unmatched.map(t => `"${t}"`).join(', ')}, which ${unmatched.length === 1 ? "doesn't" : "don't"} match any show currently in index.html — could be an old name, or just a loose match on our end. Worth a glance if it looks wrong.`);
+        }
+      }
+      if (seenIds.has(v.id)) {
+        issues.push({ sev: 'warn', id: v.id, label, msg: `Duplicate id "${v.id}" — shared with "${seenIds.get(v.id)}".`, fix });
+      } else {
+        seenIds.set(v.id, label);
+      }
+    });
+    return issues;
+  }
+
+  function renderDataHealth() {
+    const body = document.getElementById('datahealth-body');
+    const summary = document.getElementById('datahealth-summary');
+    if (!body) return;
+
+    if (!events.length && !vendors.length) {
+      summary.textContent = '';
+      body.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🩺</div><p>Open index.html and/or vendors.html above to check for missing coordinates, broken TBD shows, incomplete vendor listings, and other things worth a second look.</p></div>`;
+      return;
+    }
+
+    const showIssues = events.length ? collectShowIssues() : [];
+    const vendorIssues = vendors.length ? collectVendorIssues() : [];
+    const total = showIssues.length + vendorIssues.length;
+    summary.textContent = total ? `${total} item${total === 1 ? '' : 's'} worth a look` : '';
+
+    function groupHtml(title, issues) {
+      if (!issues.length) return '';
+      const rows = issues.map(it => `
+        <div class="health-row sev-${it.sev}">
+          <div><span class="health-name">${escapeHtml(it.label)}</span> — <span class="health-msg">${escapeHtml(it.msg)}</span></div>
+          ${it.fix}
+        </div>`).join('');
+      return `<div class="health-group"><div class="health-group-title">${title} (${issues.length})</div>${rows}</div>`;
+    }
+
+    if (!total) {
+      body.innerHTML = `<div class="health-ok">✅ Nothing flagged — ${[events.length ? `${events.length} show${events.length === 1 ? '' : 's'}` : '', vendors.length ? `${vendors.length} vendor${vendors.length === 1 ? '' : 's'}` : ''].filter(Boolean).join(' and ')} look complete.</div>`;
+      return;
+    }
+    body.innerHTML = groupHtml('Shows', showIssues) + groupHtml('Vendors', vendorIssues);
+  }
+
   function renderList() {
+    renderDataHealth();
     const pastCountForHeader = events.filter(hasEventPassed).length;
     const activeCountForHeader = events.length - pastCountForHeader;
     document.getElementById('event-count').textContent = pastCountForHeader
@@ -1512,6 +1706,7 @@ ${itemsXml}
   });
 
   function renderVendorList() {
+    renderDataHealth();
     const body = document.getElementById('vendor-list-body');
     document.getElementById('vendor-count').textContent = vendors.length;
     if (!vendors.length) {
@@ -1656,6 +1851,95 @@ ${itemsXml}
   window.addEventListener('beforeunload', (e) => {
     if (vDirty) { e.preventDefault(); e.returnValue = ''; }
   });
+
+  // =====================================================================
+  //  QUICK ADD FROM FACEBOOK POST — pastes raw announcement text to the
+  //  Worker's /extract-show route (Claude-powered), which pulls out the
+  //  name, date, location, fee, organizer, etc. and hands back structured
+  //  JSON. That JSON pre-fills a brand-new "Add a show" form for you to
+  //  review, adjust, and save exactly like adding one by hand — this never
+  //  saves anything on its own. Requires the /extract-show route + an
+  //  ANTHROPIC_API_KEY secret described in WORKER-SETUP.md. Shares the same
+  //  Worker (and the same admin token, saved to the same localStorage key)
+  //  as the push panel below.
+  // =====================================================================
+  (function initQuickAdd() {
+    const tokenInput = document.getElementById('quickadd-admin-token');
+    const textInput = document.getElementById('quickadd-text');
+    const btn = document.getElementById('quickadd-btn');
+    if (!tokenInput || !textInput || !btn) return;
+
+    const saved = localStorage.getItem('gccs-admin-push-token');
+    if (saved) tokenInput.value = saved;
+
+    btn.addEventListener('click', async () => {
+      const token = tokenInput.value.trim();
+      const text = textInput.value.trim();
+      if (!token) { toast('Enter your Worker admin token first.', true); return; }
+      if (!text) { toast('Paste some post text first.', true); return; }
+      try { localStorage.setItem('gccs-admin-push-token', token); } catch (e) {}
+
+      const originalLabel = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = '✨ Extracting…';
+      try {
+        const r = await fetch(`${PUSH_API}/extract-show?token=${encodeURIComponent(token)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text }),
+        });
+        const data = await r.json().catch(() => ({}));
+        if (r.status === 401 || r.status === 403) throw new Error('Token rejected — check the ADMIN_TOKEN set on your Worker.');
+        if (!r.ok || !data.ok) throw new Error(data.error || `Worker returned an error (${r.status}).`);
+        applyQuickAddResult(data.extracted || {});
+        textInput.value = '';
+        toast('✨ Pre-filled the "Add a new show" form below — review everything before saving!');
+      } catch (err) {
+        toast('Extraction failed: ' + err.message, true);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalLabel;
+      }
+    });
+
+    function applyQuickAddResult(extracted) {
+      selectedId = '__new__';
+      renderList();
+      renderForm('__new__');
+
+      const $ = (id) => document.getElementById(id);
+      const fire = (el, type) => { if (el) el.dispatchEvent(new Event(type, { bubbles: true })); };
+
+      if (extracted.name) $('f-name').value = extracted.name;
+      if (extracted.tbd) { $('f-tbd').checked = true; fire($('f-tbd'), 'change'); }
+      if (extracted.startDate) { $('f-start-date').value = extracted.startDate; fire($('f-start-date'), 'input'); }
+      if (extracted.endDate) { $('f-end-date').value = extracted.endDate; fire($('f-end-date'), 'input'); }
+      if (extracted.time && !extracted.tbd) $('f-time').value = extracted.time;
+      if (extracted.location) { $('f-location').value = extracted.location; fire($('f-location'), 'input'); }
+      if (extracted.organizer) $('f-organizer').value = extracted.organizer;
+      if (extracted.websiteUrl) { $('f-website-url').value = extracted.websiteUrl; fire($('f-website-url'), 'blur'); }
+      if (extracted.about) $('f-about').value = extracted.about;
+
+      if (extracted.entryFree === true) {
+        const r = document.querySelector('input[name="f-entry-mode"][value="free"]');
+        if (r) { r.checked = true; fire(r, 'change'); }
+      } else if (extracted.entryFree === false && extracted.entryFee) {
+        const r = document.querySelector('input[name="f-entry-mode"][value="amount"]');
+        if (r) { r.checked = true; fire(r, 'change'); }
+        if ($('f-entry-amount')) $('f-entry-amount').value = extracted.entryFee;
+      }
+
+      // Best-effort auto-geocode so you usually just need to double-check the
+      // pin rather than click "Find coordinates" yourself. Runs after a tick
+      // so the freshly-rendered form's own listeners are attached first.
+      if (extracted.location) {
+        setTimeout(() => { const geoBtn = $('f-geocode'); if (geoBtn) geoBtn.click(); }, 50);
+      }
+
+      const panel = document.getElementById('form-panel');
+      if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  })();
 
   // =====================================================================
   //  SEND PUSH ANNOUNCEMENT — reads subscriber counts from the Worker,

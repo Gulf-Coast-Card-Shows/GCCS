@@ -1296,6 +1296,24 @@
 
   renderVendors();
 
+  // ===== Deep link: ?vendor=ven-xxx auto-opens that vendor's detail modal =====
+  // Mirrors index.html's own ?show=evt-xxx deep link — lets index.html's
+  // "Vendors at This Show" cross-links jump straight to a vendor's details
+  // instead of just dropping the visitor on the general directory.
+  (function handleVendorDeepLink() {
+    try {
+      const params = new URLSearchParams(location.search);
+      const id = params.get('vendor');
+      if (!id) return;
+      const v = VENDORS.find(x => x.id === id);
+      if (!v) return;
+      // Wait a tick so the grid is in the DOM and modal wiring is live.
+      setTimeout(() => {
+        if (typeof openVendorDetail === 'function') openVendorDetail(id);
+      }, 0);
+    } catch (_) { /* noop */ }
+  })();
+
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/sw.js').catch((err) => console.warn('SW registration failed:', err));
