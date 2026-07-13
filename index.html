@@ -163,6 +163,7 @@
     justify-content: center;
     transition: all 0.2s;
     color: var(--dark);
+    flex-shrink: 0; /* stay a circle instead of getting squashed when the nav row runs out of room */
   }
   .dark-toggle:hover { background: var(--border); }
   .notify-status-btn.active { border-color: var(--next-border); background: var(--next-bg); }
@@ -212,7 +213,7 @@
     padding: 0 32px; display: flex; align-items: center; justify-content: space-between;
     height: 68px; position: sticky; top: 0; z-index: 1000;
   }
-  .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; flex-shrink: 0; }
   .pokeball-icon {
     width: 44px; height: 44px; border-radius: 10px; background: #fff; border: 2px solid var(--border);
     display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: var(--shadow);
@@ -229,12 +230,36 @@
     .nav-logo:hover .pokeball-icon { transform: none; }
   }
   .nav-title { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 700; font-size: 18px; color: var(--dark); }
-  .nav-links { display: flex; gap: 10px; align-items: center; }
-  .nav-btn { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 13px; padding: 9px 18px; border-radius: 50px; border: 2px solid var(--border); background: transparent; color: var(--dark); cursor: pointer; text-decoration: none; transition: all 0.2s; letter-spacing: 0.03em; text-transform: uppercase; }
+  /* min-width:0 lets this flex item actually shrink below its content size —
+     without it, a flex child won't shrink past its natural content width, so
+     it would just push the nav wider instead of scrolling internally below. */
+  .nav-links {
+    display: flex; gap: 10px; align-items: center; min-width: 0;
+    overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  }
+  .nav-links::-webkit-scrollbar { display: none; }
+  /* white-space: nowrap + flex-shrink: 0 stop these pills from ever squishing
+     down and wrapping their own text onto 2-3 lines as the nav narrows —
+     instead, once the row of pills no longer fits, .nav-links above just
+     scrolls horizontally (same fallback already used for .state-nav below). */
+  .nav-btn { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 13px; padding: 9px 18px; border-radius: 50px; border: 2px solid var(--border); background: transparent; color: var(--dark); cursor: pointer; text-decoration: none; transition: all 0.2s; letter-spacing: 0.03em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; }
   .nav-btn:hover { background: var(--border); }
   .nav-btn.active { background: var(--red); border-color: var(--red); color: #fff; }
-  .mobile-menu-wrap { display: none; position: relative; }
-  .mobile-menu-toggle { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px; padding: 9px 12px; border-radius: 50px; border: 2px solid var(--border); background: transparent; color: var(--dark); cursor: pointer; text-transform: uppercase; letter-spacing: 0.03em; display: inline-flex; align-items: center; gap: 6px; }
+  /* Poké Ball accents — the exact two-tone gradient trick already used in
+     .pokeball-divider below, just sized down as a small "you are here"
+     marker. Still just gradients + borders, no art or logos. */
+  .nav-btn.active::before {
+    content: ''; display: inline-block; width: 11px; height: 11px; border-radius: 50%;
+    background: linear-gradient(180deg, var(--red) 0 48%, var(--dark) 48% 52%, #fff 52% 100%);
+    border: 1.5px solid var(--dark); vertical-align: middle; margin-right: 6px;
+  }
+  .mini-pokeball {
+    display: inline-block; width: 12px; height: 12px; border-radius: 50%;
+    background: linear-gradient(180deg, var(--red) 0 48%, var(--dark) 48% 52%, #fff 52% 100%);
+    border: 1.5px solid var(--dark); vertical-align: middle; flex-shrink: 0;
+  }
+  .mobile-menu-wrap { display: none; position: relative; flex-shrink: 0; }
+  .mobile-menu-toggle { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px; padding: 9px 12px; border-radius: 50px; border: 2px solid var(--border); background: transparent; color: var(--dark); cursor: pointer; text-transform: uppercase; letter-spacing: 0.03em; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
   .mobile-menu-toggle:hover { background: var(--border); }
   .mobile-menu-panel { position: absolute; top: calc(100% + 10px); right: 0; min-width: 190px; padding: 8px; border-radius: 12px; border: 1px solid var(--border); background: var(--nav-bg); box-shadow: var(--shadow); display: none; flex-direction: column; gap: 6px; }
   .mobile-menu-panel.open { display: flex; }
@@ -269,6 +294,30 @@
   .state-nav a:hover { border-color: var(--blue); color: var(--blue); }
   html.dark .state-nav a { color: var(--dark); }
   html.dark .state-nav strong { background: #2a0a0a; }
+
+  /* Per-state "gym badge" colors for the Browse by State pills — reuses the
+     exact same hues as the .state-XX chips already shown on each card, so a
+     state means the same color everywhere on the site. The currently-active
+     pill also gets the mini pokeball marker to flag "you are here". */
+  .state-nav strong.pill-active::before {
+    content: ''; display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+    background: linear-gradient(180deg, var(--red) 0 48%, var(--dark) 48% 52%, #fff 52% 100%);
+    border: 1.5px solid var(--dark); vertical-align: middle; margin-right: 5px;
+  }
+  .state-nav .pill-FL { border-color:#2E7D32; color:#2E7D32; background:#E8F5E9; }
+  .state-nav .pill-AL { border-color:#F9A825; color:#8A6D00; background:#FFF8E1; }
+  .state-nav .pill-MS { border-color:#C62828; color:#C62828; background:#FFEBEE; }
+  .state-nav .pill-TN { border-color:#1565C0; color:#1565C0; background:#E3F2FD; }
+  .state-nav .pill-GA { border-color:#6A1B9A; color:#6A1B9A; background:#F3E5F5; }
+  .state-nav .pill-LA { border-color:#00838F; color:#00838F; background:#E0F7FA; }
+  .state-nav .pill-TX { border-color:#D84315; color:#D84315; background:#FBE9E7; }
+  html.dark .state-nav .pill-FL { background:#0d2b12; }
+  html.dark .state-nav .pill-AL { background:#2a2000; }
+  html.dark .state-nav .pill-MS { background:#2a0a0a; }
+  html.dark .state-nav .pill-TN { background:#071428; }
+  html.dark .state-nav .pill-GA { background:#1f0a2e; }
+  html.dark .state-nav .pill-LA { background:#062024; }
+  html.dark .state-nav .pill-TX { background:#2a1006; }
 
   /* MAP */
   .hero-map-wrap {
@@ -411,6 +460,14 @@
   .show-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 8px; }
   .header-badges { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+  /* These small pill badges (upcoming/urgency/trending/new/shiny) are meant to
+     read as one solid shape. Without this, a two-word label like "This
+     Weekend" can break between words when space is tight — e.g. inside the
+     "Next show" line — leaving what looks like two half-pills stacked on top
+     of each other instead of one pill dropping to the next line as a whole. */
+  .upcoming-badge, .urgency-badge, .trending-badge, .new-badge, .shiny-badge {
+    white-space: nowrap;
+  }
   .upcoming-badge { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 11px; background: var(--dark); color: #fff; padding: 4px 10px; border-radius: 50px; letter-spacing: 0.06em; text-transform: uppercase; }
   .show-card.tbd .upcoming-badge { background: #999; }
   .urgency-badge { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 11px; padding: 4px 10px; border-radius: 50px; letter-spacing: 0.03em; }
@@ -436,6 +493,32 @@
     font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 11px; padding: 4px 10px;
     border-radius: 50px; letter-spacing: 0.03em; color: #fff;
     background: linear-gradient(135deg, #34D399, #059669);
+  }
+  /* "Shiny" card — a purely cosmetic easter egg, ~1-in-15 page loads, landing
+     on one random card (see maybeApplyShinyCard()). A nod to shiny-Pokémon
+     rarity done with nothing but a CSS gradient sweep — no artwork involved,
+     and it carries zero meaning about the show itself. */
+  .shiny-badge {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 11px; padding: 4px 10px;
+    border-radius: 50px; letter-spacing: 0.03em; color: #fff;
+    background: linear-gradient(135deg, #A78BFA, #60A5FA, #34D399);
+    background-size: 200% 200%;
+    animation: shiny-badge-shift 3s ease-in-out infinite;
+  }
+  @keyframes shiny-badge-shift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+  .show-card.shiny-card { position: relative; }
+  .show-card.shiny-card::after {
+    content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+    border-radius: inherit; background-size: 250% 250%;
+    background-image: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.35) 50%, transparent 70%);
+    animation: shiny-sweep 3.5s ease-in-out infinite;
+  }
+  html.dark .show-card.shiny-card::after {
+    background-image: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.14) 50%, transparent 70%);
+  }
+  @keyframes shiny-sweep { 0% { background-position: 200% 200%; } 100% { background-position: -50% -50%; } }
+  @media (prefers-reduced-motion: reduce) {
+    .shiny-badge, .show-card.shiny-card::after { animation: none; }
   }
   .show-name { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 700; font-size: 22px; color: var(--dark); margin-bottom: 16px; line-height: 1.2; }
 
@@ -572,6 +655,19 @@
   }
   @keyframes toast-out {
     to { opacity: 0; transform: translateY(8px) scale(0.96); }
+  }
+  /* Confetti burst — see burstConfetti() in the script below. */
+  .confetti-dot {
+    position: fixed; width: 7px; height: 7px; border-radius: 50%;
+    pointer-events: none; z-index: 1300;
+    animation: confetti-burst 0.6s ease-out forwards;
+  }
+  @keyframes confetti-burst {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.4); opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .confetti-dot { display: none; }
   }
   .modal-overlay.open { display: flex; }
   .modal { background: var(--card-bg); border-radius: var(--radius); padding: 36px; max-width: 540px; width: 100%; position: relative; max-height: 90vh; overflow-y: auto; }
@@ -769,6 +865,14 @@
   }
   .fav-btn:hover { transform: scale(1.15); }
   .fav-btn.active { color: #F0B90B; }
+  @keyframes fav-pop {
+    0% { transform: scale(1) rotate(0); }
+    40% { transform: scale(1.35) rotate(-10deg); }
+    70% { transform: scale(0.92) rotate(6deg); }
+    100% { transform: scale(1) rotate(0); }
+  }
+  .fav-btn.fav-pop { animation: fav-pop 0.4s ease; }
+  @media (prefers-reduced-motion: reduce) { .fav-btn.fav-pop { animation: none; } }
 
   /* "Interested" counter — hidden entirely if no Worker endpoint is configured
      (see INTEREST_API in the script below) so the feature degrades gracefully. */
@@ -813,7 +917,7 @@
     <a href="#" class="nav-btn" onclick="openContact(); return false;">Contact</a>
     <a href="https://buymeacoffee.com/zbflips8" class="nav-btn" target="_blank" rel="noopener noreferrer">Support</a>
     <div class="mobile-menu-wrap">
-      <button class="mobile-menu-toggle" id="mobile-menu-toggle" type="button" aria-label="Open navigation menu" aria-controls="mobile-menu" aria-expanded="false" onclick="toggleMobileMenu(event)">☰ Menu</button>
+      <button class="mobile-menu-toggle" id="mobile-menu-toggle" type="button" aria-label="Open navigation menu" aria-controls="mobile-menu" aria-expanded="false" onclick="toggleMobileMenu(event)"><span class="mini-pokeball" aria-hidden="true"></span> Menu</button>
       <div class="mobile-menu-panel" id="mobile-menu">
         <button class="mobile-menu-item" type="button" onclick="openModal(); closeMobileMenu();">Add Your Show</button>
         <a href="vendors.html" class="mobile-menu-item">Vendors</a>
@@ -859,11 +963,11 @@
 <nav class="state-nav" aria-label="Browse card shows by state">
   <span class="state-nav-label">Browse by State:</span>
   <strong>All States</strong>
-  <a href="alabama-card-shows.html">Alabama</a>
-  <a href="florida-card-shows.html">Florida</a>
-  <a href="georgia-card-shows.html">Georgia</a>
-  <a href="louisiana-card-shows.html">Louisiana</a>
-  <a href="mississippi-card-shows.html">Mississippi</a>
+  <a href="alabama-card-shows.html" class="pill-AL">Alabama</a>
+  <a href="florida-card-shows.html" class="pill-FL">Florida</a>
+  <a href="georgia-card-shows.html" class="pill-GA">Georgia</a>
+  <a href="louisiana-card-shows.html" class="pill-LA">Louisiana</a>
+  <a href="mississippi-card-shows.html" class="pill-MS">Mississippi</a>
 </nav>
 <!-- STATE-NAV-END -->
 
@@ -1122,6 +1226,32 @@
     }, duration || 3200);
   }
 
+  // ===== Confetti burst — a small, one-shot "caught!" payoff when marking a
+  // show as Interested. Pure DOM + CSS, self-cleaning (each dot removes
+  // itself after its own animation ends), and skipped entirely under
+  // prefers-reduced-motion. =====
+  function burstConfetti(originEl) {
+    if (!originEl || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const rect = originEl.getBoundingClientRect();
+    const originX = rect.left + rect.width / 2;
+    const originY = rect.top + rect.height / 2;
+    const colors = ['#E53935', '#FFD600', '#1565C0', '#2E7D32', '#FFFFFF'];
+    const COUNT = 12;
+    for (let i = 0; i < COUNT; i++) {
+      const dot = document.createElement('span');
+      dot.className = 'confetti-dot';
+      const angle = (Math.PI * 2 * i) / COUNT + (Math.random() * 0.5 - 0.25);
+      const dist = 36 + Math.random() * 28;
+      dot.style.setProperty('--dx', `${Math.cos(angle) * dist}px`);
+      dot.style.setProperty('--dy', `${Math.sin(angle) * dist}px`);
+      dot.style.left = `${originX}px`;
+      dot.style.top = `${originY}px`;
+      dot.style.background = colors[i % colors.length];
+      document.body.appendChild(dot);
+      dot.addEventListener('animationend', () => dot.remove(), { once: true });
+    }
+  }
+
   // --- MOBILE FILTERS PANEL ---
   function toggleExtraFilters() {
     const panel = document.getElementById('extra-filters');
@@ -1273,11 +1403,15 @@
 
 
 
-<!-- Loaded here instead of <head> so it doesn't block the initial page parse/paint —
-     everything above (nav, hero, state pills, skeleton cards) can render immediately
-     while this downloads in the background, and it's guaranteed ready by the time
-     the map-init code below runs since scripts execute in document order. -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<!-- `defer` so this downloads in parallel with HTML parsing instead of
+     blocking it at this point in the body — the previous version relied on
+     this being a plain synchronous script tag positioned late in the body,
+     which still stalls parsing of everything after it while the file
+     downloads. With `defer`, `L` is no longer guaranteed to exist the
+     instant the next inline script runs, so the actual map initialization
+     lives in initMap() below, invoked from DOMContentLoaded — which only
+     fires once every deferred script (this one included) has finished. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>
 
 <script>
   /* =====================================================================
@@ -1985,6 +2119,25 @@
     return diffDays >= 0 && diffDays <= NEW_BADGE_DAYS;
   }
 
+  // "Shiny" card — purely cosmetic, ~1-in-15 chance per page load, landing on
+  // one random visible card. Rolled once per full render (not on every filter
+  // change) so it doesn't re-roll every time someone types in the search box.
+  const SHINY_CARD_ODDS = 1 / 15;
+  function maybeApplyShinyCard() {
+    const cards = document.querySelectorAll('#shows-grid .show-card');
+    if (!cards.length || Math.random() > SHINY_CARD_ODDS) return;
+    const card = cards[Math.floor(Math.random() * cards.length)];
+    card.classList.add('shiny-card');
+    const badgeRow = card.querySelector('.header-badges');
+    if (badgeRow && !badgeRow.querySelector('.shiny-badge')) {
+      const span = document.createElement('span');
+      span.className = 'shiny-badge';
+      span.title = 'You found a shiny! Purely cosmetic — this show is exactly like any other.';
+      span.textContent = '✨ Shiny';
+      badgeRow.appendChild(span);
+    }
+  }
+
   // Small "Today! / Tomorrow! / This Weekend" badge for shows happening soon —
   // helps someone scanning the grid spot what's actually actionable right now.
   // Returns '' (no badge) for anything more than ~6 days out.
@@ -2164,7 +2317,7 @@
     actions += `<a class="card-action-btn calendar" href="#" onclick="downloadIcs('${escapeHtml(ev.id)}'); return false;" title="Apple Calendar / Outlook (.ics)">🗓️ .ics</a>`;
     actions += `<a class="card-action-btn directions" href="https://maps.google.com/?q=${encodeURIComponent(ev.location || ev.name || '')}" target="_blank" rel="noopener" title="Get directions in Google Maps">🗺️ Directions</a>`;
     actions += `<a class="card-action-btn calendar" href="#" onclick="shareShow('${escapeHtml(ev.id)}'); return false;" title="Copy shareable link">🔗 Share</a>`;
-    actions += `<button type="button" class="card-action-btn interest-btn" data-interest-id="${escapeHtml(ev.id)}" onclick="toggleInterest('${escapeHtml(ev.id)}')" aria-pressed="false">🙋 — interested</button>`;
+    actions += `<button type="button" class="card-action-btn interest-btn" data-interest-id="${escapeHtml(ev.id)}" onclick="toggleInterest('${escapeHtml(ev.id)}', this)" aria-pressed="false">🙋 — interested</button>`;
     actions += `<a class="card-action-btn report" href="#" onclick="openReport('${escapeHtml(ev.name)} ${num}'); return false;">🚩 Report</a>`;
     actions += '</div>';
 
@@ -2228,6 +2381,7 @@
     saveFavorites(); // no-op on storage, just syncs the "(N)" count label to current state
     loadInterestCounts();
     injectEventsJsonLd();
+    maybeApplyShinyCard();
 
     // Single "last verified" timestamp under the Live count.
     const verifiedEl = document.getElementById('count-verified');
@@ -2355,45 +2509,62 @@
   }
 
   // ===== Map =====
-  // Guard against Leaflet CDN failing to load — without this the whole
-  // script would abort and cards/next-show would stay stuck on "Loading…".
+  // Guard against Leaflet CDN failing (or not yet loading) — without this the
+  // whole script would abort and cards/next-show would stay stuck on "Loading…".
+  // Leaflet's <script> tag now loads with `defer` (see comment above it),
+  // so `L` isn't guaranteed to exist yet when this script first runs.
+  // initMap() is called from DOMContentLoaded instead, which only fires
+  // after every deferred script — Leaflet included — has finished executing.
   let map = null;
   let markerIcon = null;
-  const leafletReady = (typeof L !== 'undefined');
-  if (leafletReady) {
-    try {
-      map = L.map('hero-map', { zoomControl: true, scrollWheelZoom: false, attributionControl: false })
-        .setView([30.42, -87.2], 6);
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap &copy; CartoDB',
-        maxZoom: 19
-      }).addTo(map);
+  function initMap() {
+    const leafletReady = (typeof L !== 'undefined');
+    if (leafletReady) {
+      try {
+        map = L.map('hero-map', { zoomControl: true, scrollWheelZoom: false, attributionControl: false })
+          .setView([30.42, -87.2], 6);
 
-      markerIcon = L.divIcon({
-        html: `<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 2px 4px rgba(0,0,0,0.35))">
-          <circle cx="14" cy="14" r="13" fill="white" stroke="#ccc" stroke-width="1"/>
-          <path d="M1 14 Q1 1 14 1 Q27 1 27 14 Z" fill="#E53935"/>
-          <rect x="1" y="13" width="26" height="2.5" fill="#1A1A2E"/>
-          <circle cx="14" cy="14" r="5" fill="white" stroke="#1A1A2E" stroke-width="1.5"/>
-          <circle cx="14" cy="14" r="2.5" fill="#E53935"/>
-        </svg>`,
-        className: '',
-        iconSize: [28, 28],
-        iconAnchor: [14, 14],
-        popupAnchor: [0, -16]
-      });
-    } catch (err) {
-      console.warn('Leaflet init failed, continuing without map:', err);
-      map = null;
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; OpenStreetMap &copy; CartoDB',
+          maxZoom: 19
+        }).addTo(map);
+
+        markerIcon = L.divIcon({
+          html: `<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 2px 4px rgba(0,0,0,0.35))">
+            <circle cx="14" cy="14" r="13" fill="white" stroke="#ccc" stroke-width="1"/>
+            <path d="M1 14 Q1 1 14 1 Q27 1 27 14 Z" fill="#E53935"/>
+            <rect x="1" y="13" width="26" height="2.5" fill="#1A1A2E"/>
+            <circle cx="14" cy="14" r="5" fill="white" stroke="#1A1A2E" stroke-width="1.5"/>
+            <circle cx="14" cy="14" r="2.5" fill="#E53935"/>
+          </svg>`,
+          className: '',
+          iconSize: [28, 28],
+          iconAnchor: [14, 14],
+          popupAnchor: [0, -16]
+        });
+      } catch (err) {
+        console.warn('Leaflet init failed, continuing without map:', err);
+        map = null;
+      }
+    } else {
+      console.warn('Leaflet failed to load — map disabled, cards will still render.');
+      const mapEl = document.getElementById('hero-map');
+      if (mapEl) mapEl.innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted);font-family:Inter,sans-serif;font-size:14px;">Map unavailable — show list below still works.</div>';
     }
-  } else {
-    console.warn('Leaflet failed to load — map disabled, cards will still render.');
-    const mapEl = document.getElementById('hero-map');
-    if (mapEl) mapEl.innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted);font-family:Inter,sans-serif;font-size:14px;">Map unavailable — show list below still works.</div>';
+    const mapSkeletonEl = document.getElementById('map-skeleton');
+    if (mapSkeletonEl) mapSkeletonEl.classList.add('hidden');
+
+    // Cards/next-show already rendered once below (with map still null, since
+    // that runs synchronously during initial parsing, before this deferred
+    // callback fires) — now that the map actually exists, backfill its
+    // markers and re-sync them to whatever's currently visible/filtered.
+    if (map && markerIcon) {
+      renderMapMarkers();
+      if (typeof applyFilters === 'function') applyFilters();
+    }
   }
-  const mapSkeletonEl = document.getElementById('map-skeleton');
-  if (mapSkeletonEl) mapSkeletonEl.classList.add('hidden');
+  document.addEventListener('DOMContentLoaded', initMap);
 
 
   const eventMarkers = {}; // id -> Leaflet marker
@@ -2826,7 +2997,7 @@
     const interestBtn = document.getElementById('detail-interest-btn');
     if (interestBtn) {
       interestBtn.dataset.interestId = ev.id;
-      interestBtn.onclick = () => toggleInterest(ev.id);
+      interestBtn.onclick = () => toggleInterest(ev.id, interestBtn);
       refreshInterestButton(interestBtn);
     }
     const shareBtn = document.getElementById('detail-share-btn');
@@ -2961,8 +3132,16 @@
       btn.classList.toggle('active', nowFav);
       btn.setAttribute('aria-pressed', nowFav ? 'true' : 'false');
       btn.textContent = nowFav ? '⭐' : '☆';
+      if (nowFav) {
+        // Retrigger the pop animation even if this button was already
+        // favorited-and-unfavorited earlier in the session.
+        btn.classList.remove('fav-pop');
+        void btn.offsetWidth;
+        btn.classList.add('fav-pop');
+        btn.addEventListener('animationend', () => btn.classList.remove('fav-pop'), { once: true });
+      }
     });
-    showToast(nowFav ? '⭐ Added to your favorites' : 'Removed from favorites', 'success', 2000);
+    showToast(nowFav ? '⭐ Added to your collection!' : 'Removed from your collection', 'success', 2000);
     // If the "Favorites only" filter is active, unfavoriting a show should
     // drop it from the visible list immediately rather than leaving a stale card.
     if (document.getElementById('favorites-only-toggle')?.checked) applyFilters();
@@ -2998,7 +3177,7 @@
     const mine = myInterests.has(id);
     btn.classList.toggle('active', mine);
     btn.setAttribute('aria-pressed', mine ? 'true' : 'false');
-    btn.textContent = `🙋 ${count} interested`;
+    btn.textContent = `🙋 ${count} trainer${count === 1 ? '' : 's'} interested`;
     // Stamp the count onto the card itself (not just the button) so the
     // "Most Interested" sort option can read it without a second lookup.
     const card = btn.closest('.show-card');
@@ -3037,7 +3216,7 @@
     });
   }
 
-  async function toggleInterest(id) {
+  async function toggleInterest(id, sourceEl) {
     if (!INTEREST_API) return;
     const mine = myInterests.has(id);
     const action = mine ? 'remove' : 'add';
@@ -3047,6 +3226,11 @@
     localStorage.setItem('gccs-interested', JSON.stringify([...myInterests]));
     document.querySelectorAll(`.interest-btn[data-interest-id="${CSS.escape(id)}"]`).forEach(refreshInterestButton);
     updateTrendingBadges();
+    // Confetti bursts from wherever was actually clicked (card or detail
+    // modal), falling back to a lookup if no element was passed through.
+    if (action === 'add') {
+      burstConfetti(sourceEl || document.querySelector(`.interest-btn[data-interest-id="${CSS.escape(id)}"]`));
+    }
     try {
       const r = await fetch(`${INTEREST_API}/interest`, {
         method: 'POST',
