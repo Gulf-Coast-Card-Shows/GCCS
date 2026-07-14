@@ -261,7 +261,17 @@
   .mobile-menu-wrap { display: none; position: relative; flex-shrink: 0; }
   .mobile-menu-toggle { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px; padding: 9px 12px; border-radius: 50px; border: 2px solid var(--border); background: transparent; color: var(--dark); cursor: pointer; text-transform: uppercase; letter-spacing: 0.03em; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
   .mobile-menu-toggle:hover { background: var(--border); }
-  .mobile-menu-panel { position: absolute; top: calc(100% + 10px); right: 0; min-width: 190px; padding: 8px; border-radius: 12px; border: 1px solid var(--border); background: var(--nav-bg); box-shadow: var(--shadow); display: none; flex-direction: column; gap: 6px; }
+  /* position:fixed (not absolute) is required here — .mobile-menu-wrap's
+     containing block is .nav-links, which has overflow-x:auto (see above).
+     Setting overflow-x on an element forces overflow-y to auto too, so an
+     absolutely-positioned child that renders outside .nav-links' box (like
+     this dropdown, which drops below the nav bar) gets silently clipped
+     and never appears — the class toggles correctly but nothing paints.
+     position:fixed escapes that clipping since fixed elements are placed
+     relative to the viewport, not the nearest scrolling ancestor. Its
+     top/right are set inline by JS (see toggleMobileMenu) to match the
+     button's on-screen position each time it opens. */
+  .mobile-menu-panel { position: fixed; min-width: 190px; padding: 8px; border-radius: 12px; border: 1px solid var(--border); background: var(--nav-bg); box-shadow: var(--shadow); display: none; flex-direction: column; gap: 6px; z-index: 1050; }
   .mobile-menu-panel.open { display: flex; }
   .mobile-menu-item { width: 100%; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 13px; padding: 11px 12px; border-radius: 9px; border: 0; background: transparent; color: var(--dark); cursor: pointer; text-align: left; text-decoration: none; }
   .mobile-menu-item:hover { background: var(--border); }
@@ -945,6 +955,7 @@
     <a href="#shows" class="nav-btn active">Upcoming Shows</a>
     <a href="#" class="nav-btn" onclick="openModal(); return false;">Add Your Show</a>
     <a href="vendors.html" class="nav-btn">Vendors</a>
+    <a href="collectors-guide.html" class="nav-btn">Guide</a>
     <a href="#" class="nav-btn" onclick="openContact(); return false;">Contact</a>
     <a href="https://buymeacoffee.com/zbflips8" class="nav-btn" target="_blank" rel="noopener noreferrer">Support</a>
     <div class="mobile-menu-wrap">
@@ -952,6 +963,7 @@
       <div class="mobile-menu-panel" id="mobile-menu">
         <button class="mobile-menu-item" type="button" onclick="openModal(); closeMobileMenu();">Add Your Show</button>
         <a href="vendors.html" class="mobile-menu-item">Vendors</a>
+        <a href="collectors-guide.html" class="mobile-menu-item">Collector's Guide</a>
         <button class="mobile-menu-item" type="button" onclick="openContact(); closeMobileMenu();">Contact</button>
         <a href="https://buymeacoffee.com/zbflips8" class="mobile-menu-item" target="_blank" rel="noopener noreferrer" onclick="closeMobileMenu()">Support</a>
       </div>
@@ -1233,15 +1245,29 @@
     toggle.setAttribute('aria-expanded', 'false');
   }
 
+  function positionMobileMenu() {
+    const menu = document.getElementById('mobile-menu');
+    const toggle = document.getElementById('mobile-menu-toggle');
+    if (!menu || !toggle) return;
+    const rect = toggle.getBoundingClientRect();
+    menu.style.top = (rect.bottom + 10) + 'px';
+    menu.style.right = (window.innerWidth - rect.right) + 'px';
+  }
+
   function toggleMobileMenu(e) {
     if (e) e.stopPropagation();
     const menu = document.getElementById('mobile-menu');
     const toggle = document.getElementById('mobile-menu-toggle');
     if (!menu || !toggle) return;
     const shouldOpen = !menu.classList.contains('open');
+    if (shouldOpen) positionMobileMenu();
     menu.classList.toggle('open', shouldOpen);
     toggle.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
   }
+
+  window.addEventListener('resize', function() {
+    if (document.getElementById('mobile-menu')?.classList.contains('open')) positionMobileMenu();
+  });
 
   document.addEventListener('click', function(e) {
     if (!e.target.closest('.mobile-menu-wrap')) closeMobileMenu();
@@ -1699,30 +1725,6 @@
       },
     },
     {
-      id: "evt-1784035870831",
-      name: "PokeBash",
-      startDate: "2026-08-01", endDate: "2026-08-02",
-      dateAdded: "2026-07-14",
-      featured: false,
-      dateDisplay: "Saturday, August 1st & Sunday, August 2nd, 2026",
-      time: "9:00AM to 5:00PM Saturday & Sunday (first hour VIP only)",
-      timeUnknown: false,
-      location: "2824 St. Anthony Avenue , Gonzales, LA, United States, 70737",
-      lat: 30.2385294, lng: -90.9200987,
-      entryFee: "$5, VIP $15", entryFree: false,
-      vendorFee: "",
-      websiteUrl: "https://www.facebook.com/events/1018755890577199/", websiteLabel: "📅 Facebook Event",
-      organizer: "Bayou Boys and Matt Carawan",
-      tbd: false,
-      authServices: { present: false, company: "" },
-      details: {
-        about: "The largest Pokemon Card Show in the state. Come join Bayou Boys and Buy, Sell, and Trade with us. Over 140+ Vendor tables.\n9:00 - 10:00 VIP $15\n10:00 - 5:00 General $5",
-        atAGlance: [{label:"Saturday & Sunday Hours",value:"9:00AM to 5:00PM"}, {label:"First Hour is VIP ONLY",value:""}, {label:"Admission",value:"$5 normal, $15 VIP"}, {label:"Vendor Tables",value:"140+"}],
-        whatToExpect: [],
-        locationNotes: "",
-      },
-    },
-    {
       id: "evt-006",
       name: "Cards on the Coast",
       startDate: "2026-08-08", endDate: "2026-08-08",
@@ -1743,30 +1745,6 @@
         about: "The Emerald Coast's Premier Card Show is back! Cards on the Coast 2026 will be on August 8th from 9am-4pm at the University of West Florida with over 200 tables!",
         atAGlance: [{label:"Saturday Hours",value:"9:00AM to 4:00PM"}, {label:"Parking",value:"Free"}, {label:"Vendor Tables",value:"220+"}],
         whatToExpect: ["Pokemon", "Sports Cards and Collectibles", "One Piece TCG"],
-        locationNotes: "",
-      },
-    },
-    {
-      id: "evt-1784035692244",
-      name: "Madison County Card Show",
-      startDate: "2026-08-08", endDate: "2026-08-08",
-      dateAdded: "2026-07-14",
-      featured: false,
-      dateDisplay: "Saturday, August 8th, 2026",
-      time: "9:00AM to 3:00PM",
-      timeUnknown: false,
-      location: "501 Soldiers Colony Rd, Canton, MS 39046",
-      lat: 32.5932425, lng: -90.07182,
-      entryFee: "$0", entryFree: true,
-      vendorFee: "",
-      websiteUrl: "https://www.facebook.com/events/942140482143675", websiteLabel: "📅 Facebook Event",
-      organizer: "Micah Conner",
-      tbd: false,
-      authServices: { present: false, company: "" },
-      details: {
-        about: "The first ever Madison County Card Show will feature 65+ vendor tables of all types of sports cards, Pokemon, TCG, vintage, modern, and wax! There will also be space for show attendees to trade, rip, and take a break! You will not wanna miss this show!",
-        atAGlance: [{label:"Saturday Hours",value:"9:00AM to 3:00PM"}],
-        whatToExpect: ["Pokemon", "Sports TCG", "Vintage & Modern"],
         locationNotes: "",
       },
     },
@@ -2037,7 +2015,7 @@
       lat: 30.4578605, lng: -86.6355762,
       entryFee: "$0", entryFree: true,
       vendorFee: "6ft - $75, 8ft - $95",
-      websiteUrl: "https://www.facebook.com/photo/?fbid=28446682891586906&set=gm.2179486106310378&idorvanity=2098811604377829", websiteLabel: "📘 Facebook",
+      websiteUrl: "", websiteLabel: "",
       organizer: "Matthew Luecht",
       tbd: false,
       authServices: { present: null, company: "" },
