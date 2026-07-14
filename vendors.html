@@ -717,9 +717,27 @@
   html.dark .type-tag.type-yugioh   { background: #2E1B02; }
   html.dark .type-tag.type-lorcana  { background: #072A22; }
   html.dark .type-tag.type-comics   { background: #161233; }
-  .vendor-state-tag { background: #FFF3E0; border-color: #FFB74D; color: #E65100; }
   html.dark .vendor-tag { background: #0B1E38; border-color: #2563EB; }
-  html.dark .vendor-state-tag { background: #3A2410; border-color: #E65100; color: #FFB74D; }
+  /* State tags reuse the exact same per-state palette as the "Browse by
+     State" pills on the main site (see .state-nav .pill-XX in index.html),
+     so a state means the same color everywhere across both pages instead
+     of vendors.html having its own separate, uncoordinated orange for every
+     state. Falls back to the generic .vendor-tag blue above for any state
+     code that isn't one of these (shouldn't happen in practice). */
+  .vendor-tag.state-FL { border-color:#2E7D32; color:#2E7D32; background:#E8F5E9; }
+  .vendor-tag.state-AL { border-color:#F9A825; color:#8A6D00; background:#FFF8E1; }
+  .vendor-tag.state-MS { border-color:#C62828; color:#C62828; background:#FFEBEE; }
+  .vendor-tag.state-TN { border-color:#1565C0; color:#1565C0; background:#E3F2FD; }
+  .vendor-tag.state-GA { border-color:#6A1B9A; color:#6A1B9A; background:#F3E5F5; }
+  .vendor-tag.state-LA { border-color:#00838F; color:#00838F; background:#E0F7FA; }
+  .vendor-tag.state-TX { border-color:#D84315; color:#D84315; background:#FBE9E7; }
+  html.dark .vendor-tag.state-FL { background:#0d2b12; }
+  html.dark .vendor-tag.state-AL { background:#2a2000; }
+  html.dark .vendor-tag.state-MS { background:#2a0a0a; }
+  html.dark .vendor-tag.state-TN { background:#071428; }
+  html.dark .vendor-tag.state-GA { background:#1f0a2e; }
+  html.dark .vendor-tag.state-LA { background:#062024; }
+  html.dark .vendor-tag.state-TX { background:#2a1006; }
   .vendor-shows { font-size: 13px; color: var(--muted); margin: 0; }
   .vendor-shows strong { color: var(--dark); }
   .vendor-card-actions { margin-top: auto; display: flex; gap: 8px; flex-wrap: wrap; padding-top: 6px; }
@@ -1109,6 +1127,14 @@
     }[c]));
   }
 
+  // "Shows Attended" is a free-text field admins type by hand, so it's prone
+  // to the usual small typos — a trailing comma left over from editing, a
+  // double comma, extra spaces. This tidies it up for display only; the
+  // underlying data in VENDORS is left exactly as typed.
+  function formatShowsAttended(s) {
+    return (s || '').split(',').map(t => t.trim()).filter(Boolean).join(', ');
+  }
+
   // ===== Modal focus trap (mirrors index.html) =====
   let modalReturnFocus = null;
   function trapModalOpen(modalEl) {
@@ -1141,7 +1167,7 @@
 
   function vendorCardHtml(v) {
     const stateTags = (v.states || []).map((s) =>
-      `<span class="vendor-tag vendor-state-tag">${escapeHtml(STATE_LABELS[s] || s)}</span>`).join('');
+      `<span class="vendor-tag vendor-state-tag state-${escapeHtml(s)}">${escapeHtml(STATE_LABELS[s] || s)}</span>`).join('');
     const typeTags = (v.cardTypes || []).map((t) =>
       `<span class="type-tag type-${escapeHtml(t)}">${escapeHtml(CARD_TYPE_LABELS[t] || t)}</span>`).join('');
     const websiteBtn = v.website
@@ -1154,7 +1180,7 @@
       </div>
       ${v.description ? `<p class="vendor-card-desc">${escapeHtml(v.description)}</p>` : ''}
       <div class="vendor-tag-row">${stateTags}${typeTags}</div>
-      ${v.showsAttended ? `<p class="vendor-shows"><strong>Shows:</strong> ${escapeHtml(v.showsAttended)}</p>` : ''}
+      ${v.showsAttended ? `<p class="vendor-shows"><strong>Shows:</strong> ${escapeHtml(formatShowsAttended(v.showsAttended))}</p>` : ''}
       <div class="vendor-card-actions">${websiteBtn}</div>
     </div>`;
   }
@@ -1226,7 +1252,7 @@
     const typeTags = (v.cardTypes || []).map((t) =>
       `<span class="type-tag type-${escapeHtml(t)}">${escapeHtml(CARD_TYPE_LABELS[t] || t)}</span>`).join('');
     const stateTags = (v.states || []).map((s) =>
-      `<span class="vendor-tag vendor-state-tag">${escapeHtml(STATE_LABELS[s] || s)}</span>`).join('');
+      `<span class="vendor-tag vendor-state-tag state-${escapeHtml(s)}">${escapeHtml(STATE_LABELS[s] || s)}</span>`).join('');
     tagRow.innerHTML = stateTags + typeTags;
 
     const aboutSec = document.getElementById('vd-about-sec');
@@ -1237,7 +1263,7 @@
 
     const showsSec = document.getElementById('vd-shows-sec');
     if (v.showsAttended && v.showsAttended.trim()) {
-      document.getElementById('vd-shows').textContent = v.showsAttended.trim();
+      document.getElementById('vd-shows').textContent = formatShowsAttended(v.showsAttended);
       showsSec.hidden = false;
     } else { showsSec.hidden = true; }
 

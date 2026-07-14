@@ -720,6 +720,15 @@
   .detail-cta.secondary { background: #1A1A2E; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
   .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+  .form-note { font-family: 'Inter', sans-serif; font-size: 13px; color: var(--muted); margin: -6px 0 16px; }
+  /* "Add more details" — the Add Your Show form used to put all 14 fields
+     in front of you at once. Splitting off everything optional behind a
+     toggle means the 6 required fields are the whole story for someone in
+     a hurry, while the extra detail is still one click away for anyone
+     who wants to fill it in. Same visual language as the "Advanced Search
+     Options" toggle above the show list. */
+  .addshow-more-panel { display: none; flex-direction: column; }
+  .addshow-more-panel.open { display: flex; }
   label { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
   input, textarea { font-family: 'Inter', sans-serif; font-size: 14px; padding: 10px 14px; border: 2px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--dark); outline: none; transition: border-color 0.2s; }
   input:focus, textarea:focus { border-color: var(--blue); }
@@ -751,6 +760,15 @@
     .pokeball-icon { width: 38px; height: 38px; font-size: 21px; }
     .nav-title { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .hero { grid-template-columns: 1fr; }
+    /* Trims the marketing copy visually on phones, where scroll distance to
+       the first real show matters a lot more — the full text stays in the
+       HTML (still readable/indexable), this just clips the rendered box to
+       2 lines with an ellipsis, same technique already used for vendor card
+       descriptions on vendors.html. */
+    .hero-desc {
+      display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2;
+      -webkit-box-orient: vertical; overflow: hidden; max-width: none;
+    }
     .hero-map-wrap { height: 240px; }
     .stat-strip { grid-template-columns: 1fr; }
     .stat-strip.no-featured { grid-template-columns: 1fr; }
@@ -1165,30 +1183,39 @@
     <button class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
     <h2 class="modal-title" id="add-show-title">Add Your Show 🎴</h2>
     <form id="show-form" action="https://formspree.io/f/xzdlvozp" method="POST" onsubmit="handleSubmit(event)">
+    <p class="form-note">Fields marked * are the essentials — everything else is optional, add what you know.</p>
     <div class="form-row">
       <div class="form-group"><label>Event Name *</label><input type="text" name="event_name" placeholder="e.g. Gulf Coast Card Swap" required></div>
-      <div class="form-group"><label>Organizer / Contact</label><input type="text" name="organizer" placeholder="Your name or org"></div>
-    </div>
-    <div class="form-row">
       <div class="form-group"><label>Event Date *</label><input type="date" name="event_date" required></div>
-      <div class="form-group"><label>End Date (if multi-day)</label><input type="date" name="event_end_date"></div>
     </div>
     <div class="form-row">
       <div class="form-group"><label>Start Time *</label><input type="time" name="start_time" required></div>
       <div class="form-group"><label>End Time *</label><input type="time" name="end_time" required></div>
     </div>
     <div class="form-group"><label>Event Location / Venue *</label><input type="text" name="location" placeholder="Venue name, full address, city, state, ZIP" required></div>
-    <div class="form-row">
-      <div class="form-group"><label>Entry Fee</label><input type="text" name="entry_fee" placeholder="$0 or $5, etc."></div>
-      <div class="form-group"><label>Vendor Table Fee</label><input type="text" name="vendor_fee" placeholder="$50, etc."></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>Tables Available</label><input type="number" name="tables_available" placeholder="e.g. 40"></div>
-      <div class="form-group"><label>Card Types Featured</label><input type="text" name="card_types" placeholder="Pokémon, MTG, Sports…"></div>
-    </div>
-    <div class="form-group"><label>Website or Social Link</label><input type="url" name="website" placeholder="https://..."></div>
-    <div class="form-group"><label>Additional Notes</label><textarea name="notes" placeholder="Parking, special guests, raffles, etc."></textarea></div>
     <div class="form-group"><label>Your Email *</label><input type="email" name="_replyto" placeholder="so we can follow up with you" required></div>
+
+    <button type="button" class="filters-toggle" id="addshow-more-toggle" aria-expanded="false" aria-controls="addshow-more-panel" onclick="toggleAddShowMore()">
+      <span>+ Add more details (organizer, fees, website…)</span>
+      <span class="chev">▾</span>
+    </button>
+    <div class="addshow-more-panel" id="addshow-more-panel">
+      <div class="form-row">
+        <div class="form-group"><label>Organizer / Contact</label><input type="text" name="organizer" placeholder="Your name or org"></div>
+        <div class="form-group"><label>End Date (if multi-day)</label><input type="date" name="event_end_date"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Entry Fee</label><input type="text" name="entry_fee" placeholder="$0 or $5, etc."></div>
+        <div class="form-group"><label>Vendor Table Fee</label><input type="text" name="vendor_fee" placeholder="$50, etc."></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Tables Available</label><input type="number" name="tables_available" placeholder="e.g. 40"></div>
+        <div class="form-group"><label>Card Types Featured</label><input type="text" name="card_types" placeholder="Pokémon, MTG, Sports…"></div>
+      </div>
+      <div class="form-group"><label>Website or Social Link</label><input type="url" name="website" placeholder="https://..."></div>
+      <div class="form-group"><label>Additional Notes</label><textarea name="notes" placeholder="Parking, special guests, raffles, etc."></textarea></div>
+    </div>
+
     <input type="hidden" name="_subject" value="New Card Show Submission — Gulf Coast Card Shows">
     <button class="submit-btn" type="submit">Submit Show for Review ⚡</button>
     </form>
@@ -1273,6 +1300,14 @@
     btn.setAttribute('aria-expanded', open ? 'true' : 'false');
   }
 
+  function toggleAddShowMore() {
+    const panel = document.getElementById('addshow-more-panel');
+    const btn = document.getElementById('addshow-more-toggle');
+    if (!panel || !btn) return;
+    const open = panel.classList.toggle('open');
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
   // --- DARK MODE ---
   function toggleDark() {
     const isDark = document.documentElement.classList.toggle('dark');
@@ -1290,6 +1325,33 @@
         if (btn) btn.textContent = '☀️';
       });
     }
+  })();
+
+  // Mobile-only: put the "Next Show" card above the map instead of below the
+  // state pills, so a phone visitor sees an actual upcoming show sooner —
+  // otherwise it's hero copy, then the map, then state pills, then finally a
+  // show. This relocates the existing #next-show-card element itself (same
+  // node, same id, all its rendering code untouched) rather than cloning it,
+  // so there's only ever one live copy in the DOM either way.
+  (function relocateNextShowCardOnMobile() {
+    const mql = window.matchMedia('(max-width: 768px)');
+    const heroMapWrap = document.querySelector('.hero-map-wrap');
+    const heroSection = heroMapWrap ? heroMapWrap.parentElement : null;
+    const nextShowCard = document.getElementById('next-show-card');
+    const statStrip = document.getElementById('stat-strip');
+    if (!heroMapWrap || !heroSection || !nextShowCard || !statStrip) return;
+
+    function apply(isMobile) {
+      if (isMobile) {
+        if (nextShowCard.nextElementSibling !== heroMapWrap) {
+          heroSection.insertBefore(nextShowCard, heroMapWrap);
+        }
+      } else if (nextShowCard.parentElement !== statStrip) {
+        statStrip.insertBefore(nextShowCard, statStrip.firstChild);
+      }
+    }
+    apply(mql.matches);
+    mql.addEventListener('change', (e) => apply(e.matches));
   })();
 </script>
 
@@ -1636,6 +1698,30 @@
       },
     },
     {
+      id: "evt-1784035870831",
+      name: "PokeBash",
+      startDate: "2026-08-01", endDate: "2026-08-02",
+      dateAdded: "2026-07-14",
+      featured: false,
+      dateDisplay: "Saturday, August 1st & Sunday, August 2nd, 2026",
+      time: "9:00AM to 5:00PM Saturday & Sunday (first hour VIP only)",
+      timeUnknown: false,
+      location: "2824 St. Anthony Avenue , Gonzales, LA, United States, 70737",
+      lat: 30.2385294, lng: -90.9200987,
+      entryFee: "$5, VIP $15", entryFree: false,
+      vendorFee: "",
+      websiteUrl: "https://www.facebook.com/events/1018755890577199/", websiteLabel: "📅 Facebook Event",
+      organizer: "Bayou Boys and Matt Carawan",
+      tbd: false,
+      authServices: { present: false, company: "" },
+      details: {
+        about: "The largest Pokemon Card Show in the state. Come join Bayou Boys and Buy, Sell, and Trade with us. Over 140+ Vendor tables.\n9:00 - 10:00 VIP $15\n10:00 - 5:00 General $5",
+        atAGlance: [{label:"Saturday & Sunday Hours",value:"9:00AM to 5:00PM"}, {label:"First Hour is VIP ONLY",value:""}, {label:"Admission",value:"$5 normal, $15 VIP"}, {label:"Vendor Tables",value:"140+"}],
+        whatToExpect: [],
+        locationNotes: "",
+      },
+    },
+    {
       id: "evt-006",
       name: "Cards on the Coast",
       startDate: "2026-08-08", endDate: "2026-08-08",
@@ -1656,6 +1742,30 @@
         about: "The Emerald Coast's Premier Card Show is back! Cards on the Coast 2026 will be on August 8th from 9am-4pm at the University of West Florida with over 200 tables!",
         atAGlance: [{label:"Saturday Hours",value:"9:00AM to 4:00PM"}, {label:"Parking",value:"Free"}, {label:"Vendor Tables",value:"220+"}],
         whatToExpect: ["Pokemon", "Sports Cards and Collectibles", "One Piece TCG"],
+        locationNotes: "",
+      },
+    },
+    {
+      id: "evt-1784035692244",
+      name: "Madison County Card Show",
+      startDate: "2026-08-08", endDate: "2026-08-08",
+      dateAdded: "2026-07-14",
+      featured: false,
+      dateDisplay: "Saturday, August 8th, 2026",
+      time: "9:00AM to 3:00PM",
+      timeUnknown: false,
+      location: "501 Soldiers Colony Rd, Canton, MS 39046",
+      lat: 32.5932425, lng: -90.07182,
+      entryFee: "$0", entryFree: true,
+      vendorFee: "",
+      websiteUrl: "https://www.facebook.com/events/942140482143675", websiteLabel: "📅 Facebook Event",
+      organizer: "Micah Conner",
+      tbd: false,
+      authServices: { present: false, company: "" },
+      details: {
+        about: "The first ever Madison County Card Show will feature 65+ vendor tables of all types of sports cards, Pokemon, TCG, vintage, modern, and wax! There will also be space for show attendees to trade, rip, and take a break! You will not wanna miss this show!",
+        atAGlance: [{label:"Saturday Hours",value:"9:00AM to 3:00PM"}],
+        whatToExpect: ["Pokemon", "Sports TCG", "Vintage & Modern"],
         locationNotes: "",
       },
     },
@@ -1926,7 +2036,7 @@
       lat: 30.4578605, lng: -86.6355762,
       entryFee: "$0", entryFree: true,
       vendorFee: "6ft - $75, 8ft - $95",
-      websiteUrl: "https://www.facebook.com/photo?fbid=28446682891586906&set=gm.2179486106310378&idorvanity=2098811604377829", websiteLabel: "📘 Facebook",
+      websiteUrl: "https://www.facebook.com/photo/?fbid=28446682891586906&set=gm.2179486106310378&idorvanity=2098811604377829", websiteLabel: "📘 Facebook",
       organizer: "Matthew Luecht",
       tbd: false,
       authServices: { present: null, company: "" },
@@ -3401,7 +3511,15 @@
   async function subscribeToNotify(id, btnEl) {
     if (!INTEREST_API) { showToast("Notify signups aren't available right now — check back soon.", 'error'); return; }
     if (!pushSupported()) {
-      showToast('Notifications aren\'t supported in this browser. On iPhone, add this site to your Home Screen first (Share → Add to Home Screen), then try again from there.', 'error');
+      // The "add to Home Screen" fix is real, but it's an iOS/WebKit-only
+      // requirement — telling an Android visitor to do it (e.g. on a phone
+      // browser that simply doesn't ship the Push API) is just wrong advice.
+      // Only show it when we're actually on an iOS device.
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      const msg = isIOS
+        ? 'Notifications aren\'t supported in this browser. On iPhone, add this site to your Home Screen first (Share → Add to Home Screen), then try again from there.'
+        : 'Notifications aren\'t supported in this browser. Try Chrome, Firefox, or Samsung Internet instead — a few browsers (including some Android builds) don\'t support push notifications yet.';
+      showToast(msg, 'error');
       return;
     }
 
