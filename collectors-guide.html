@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Collector's Guide | Gulf Coast Card Shows</title>
+<meta name="description" content="What to bring, how to talk price, how to spot a fake, and the lingo you need to not get clowned at your next Gulf Coast card show. Pokémon, sports cards, MTG, and more.">
+<link rel="canonical" href="https://gccardshows.com/collectors-guide.html">
+<meta name="theme-color" content="#E53935">
+
+<!-- Open Graph -->
+<meta property="og:site_name" content="Gulf Coast Card Shows">
+<meta property="og:type" content="website">
+<meta property="og:title" content="The Collector's Guide | Gulf Coast Card Shows">
+<meta property="og:description" content="What to bring, how to talk price, how to spot a fake, and the lingo you need to not get clowned at your next Gulf Coast card show.">
+<meta property="og:url" content="https://gccardshows.com/collectors-guide.html">
+<meta property="og:image" content="https://gccardshows.com/og-image.png">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The Collector's Guide | Gulf Coast Card Shows">
+<meta name="twitter:description" content="What to bring, how to talk price, how to spot a fake, and the lingo you need to not get clowned at your next Gulf Coast card show.">
+<meta name="twitter:image" content="https://gccardshows.com/og-image.png">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='white' stroke='%231A1A2E' stroke-width='4'/%3E%3Cpath d='M2 50 Q2 2 50 2 Q98 2 98 50 Z' fill='%23E53935'/%3E%3Crect x='2' y='45' width='96' height='10' fill='%231A1A2E'/%3E%3Ccircle cx='50' cy='50' r='16' fill='white' stroke='%231A1A2E' stroke-width='4'/%3E%3Ccircle cx='50' cy='50' r='7' fill='%23E53935'/%3E%3C/svg%3E">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="GC Card Shows">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #F5F0E8;
+    --card-bg: #FFFFFF;
+    --nav-bg: #FDFAF4;
+    --red: #E53935;
+    --yellow: #FFD600;
+    --blue: #1565C0;
+    --dark: #1A1A2E;
+    --muted: #6B7280;
+    --border: #E5E0D5;
+    --next-bg: #FFF8E1;
+    --next-border: #FFD600;
+    --radius: 18px;
+    --shadow: 0 2px 16px rgba(0,0,0,0.07);
+  }
+
+  html.dark {
+    --bg: #0F0F1A;
+    --card-bg: #1A1A2E;
+    --nav-bg: #13131F;
+    --dark: #F0EDE6;
+    --muted: #9CA3AF;
+    --border: #2E2E45;
+    --next-bg: #1F1A08;
+    --next-border: #B8960A;
+    --shadow: 0 2px 16px rgba(0,0,0,0.35);
+  }
+
+  html.dark footer { color: #4B5563; }
+  html.dark footer a { color: #4B5563; }
+  html.dark .contact-icon { filter: brightness(0.85); }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--dark); min-height: 100vh; }
+  body { background-image: url('images/image1.png'); background-repeat: repeat; background-size: 100px auto; background-blend-mode: normal; }
+  body::before { content: ''; position: fixed; inset: 0; background-color: var(--bg); opacity: 0.95; z-index: -1; pointer-events: none; }
+
+  body, nav, .modal-content, .guide-card {
+    transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  }
+  button, .nav-btn, .mobile-menu-toggle, .toc-pill {
+    transition: transform 0.12s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  button:active, .nav-btn:active, .mobile-menu-toggle:active, .toc-pill:active {
+    transform: scale(0.96);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+
+  .skip-link {
+    position: absolute; top: -100px; left: 12px; z-index: 1200;
+    background: var(--dark); color: #fff; padding: 12px 20px; border-radius: 10px;
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px; text-decoration: none;
+    transition: top 0.15s ease;
+  }
+  .skip-link:focus { top: 12px; }
+
+  /* NAV — same component as index.html/vendors.html */
+  nav {
+    background: var(--nav-bg); border-bottom: 1px solid var(--border);
+    padding: 0 32px; display: flex; align-items: center; justify-content: space-between;
+    height: 68px; position: sticky; top: 0; z-index: 1000;
+  }
+  .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; flex-shrink: 0; }
+  .nav-links {
+    display: flex; gap: 10px; align-items: center; min-width: 0;
+    overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-btn { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 13px; padding: 9px 18px; border-radius: 50px; border: 2px solid var(--border); background: transparent; color: var(--dark); cursor: pointer; text-decoration: none; letter-spacing: 0.03em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; }
+  .nav-btn:hover { background: var(--border); }
+  .nav-btn.active { background: var(--red); border-color: var(--red); color: #fff; }
+  .mini-pokeball {
+    display: inline-block; width: 12px; height: 12px; border-radius: 50%;
+    background: linear-gradient(180deg, var(--red) 0 48%, var(--dark) 48% 52%, #fff 52% 100%);
+    border: 1.5px solid var(--dark); vertical-align: middle; flex-shrink: 0;
+  }
+  .mobile-menu-wrap { display: none; position: relative; flex-shrink: 0; }
+  .mobile-menu-toggle { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px; padding: 9px 12px; border-radius: 50px; border: 2px solid var(--border); background: transparent; color: var(--dark); cursor: pointer; text-transform: uppercase; letter-spacing: 0.03em; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .mobile-menu-toggle:hover { background: var(--border); }
+  /* position:fixed (not absolute) so this dropdown never gets clipped by
+     .nav-links' overflow-x:auto — see the same fix + explanation in index.html. */
+  .mobile-menu-panel { position: fixed; min-width: 190px; padding: 8px; border-radius: 12px; border: 1px solid var(--border); background: var(--nav-bg); box-shadow: var(--shadow); display: none; flex-direction: column; gap: 6px; z-index: 1050; }
+  .mobile-menu-panel.open { display: flex; }
+  .mobile-menu-item { width: 100%; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 13px; padding: 11px 12px; border-radius: 9px; border: 0; background: transparent; color: var(--dark); cursor: pointer; text-align: left; text-decoration: none; }
+  .mobile-menu-item:hover { background: var(--border); }
+  .dark-toggle {
+    background: transparent; border: 2px solid var(--border); border-radius: 50px;
+    width: 40px; height: 40px; font-size: 18px; cursor: pointer; display: flex;
+    align-items: center; justify-content: center; transition: all 0.2s; color: var(--dark); flex-shrink: 0;
+  }
+  .dark-toggle:hover { background: var(--border); }
+
+  @media (max-width: 768px) {
+    .nav-links .nav-btn { display: none; }
+    .nav-links { gap: 8px; flex: 0 0 auto; }
+    .mobile-menu-wrap { display: block; }
+    nav { padding: 0 14px; }
+  }
+
+  /* HERO */
+  .guide-hero { max-width: 860px; margin: 0 auto; padding: 52px 32px 28px; text-align: center; }
+  .guide-eyebrow { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 14px; }
+  .guide-title { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 800; font-size: 52px; line-height: 1.05; color: var(--dark); margin-bottom: 18px; }
+  .guide-title .accent { color: var(--red); }
+  .guide-sub { font-size: 17px; color: var(--muted); line-height: 1.65; max-width: 620px; margin: 0 auto 22px; }
+  .guide-tags { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .guide-tag { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 13px; padding: 7px 16px; border-radius: 50px; border: 2px solid; }
+  .guide-tag.red { color: var(--red); border-color: var(--red); background: #FFF0F0; }
+  .guide-tag.blue { color: var(--blue); border-color: var(--blue); background: #E3F2FD; }
+  .guide-tag.orange { color: #E65100; border-color: #E65100; background: #FFF3E0; }
+  html.dark .guide-tag.red { background: #2a0a0a; }
+  html.dark .guide-tag.blue { background: #071428; }
+  html.dark .guide-tag.orange { background: #1a0f04; }
+
+  /* TOC — jump nav, sticky like .state-nav elsewhere on the site */
+  .guide-toc {
+    display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; overflow-x: auto;
+    max-width: 1120px; margin: 0 auto; padding: 12px 32px 14px;
+    position: sticky; top: 68px; z-index: 900; background: var(--nav-bg);
+    box-shadow: 0 0 0 100vmax var(--nav-bg), 0 1px 0 var(--border);
+    clip-path: inset(0 -100vmax);
+    -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  }
+  .guide-toc::-webkit-scrollbar { display: none; }
+  .toc-pill {
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 12.5px; padding: 7px 14px; border-radius: 50px;
+    border: 2px solid var(--border); text-decoration: none; color: var(--dark); white-space: nowrap; flex-shrink: 0;
+  }
+  .toc-pill:hover { border-color: var(--blue); color: var(--blue); }
+
+  /* CONTENT */
+  .guide-wrap { max-width: 780px; margin: 0 auto; padding: 8px 32px 24px; }
+  .guide-section { padding: 40px 0; border-bottom: 1px solid var(--border); scroll-margin-top: 136px; }
+  .guide-section:last-of-type { border-bottom: none; }
+  .guide-section h2 {
+    font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 700; font-size: 28px; color: var(--dark);
+    margin-bottom: 6px; display: flex; align-items: center; gap: 10px;
+  }
+  .guide-kicker { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px; color: var(--red); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+  .guide-section p { font-size: 16px; line-height: 1.75; color: var(--dark); margin-bottom: 16px; }
+  .guide-section p:last-child { margin-bottom: 0; }
+  .guide-section strong { color: var(--dark); }
+  .guide-section ul { margin: 0 0 16px 20px; }
+  .guide-section li { font-size: 16px; line-height: 1.75; margin-bottom: 10px; }
+  .guide-section li:last-child { margin-bottom: 0; }
+
+  .callout {
+    background: var(--next-bg); border: 2px solid var(--next-border); border-radius: 14px;
+    padding: 18px 20px; margin: 20px 0; font-size: 15px; line-height: 1.65; color: var(--dark);
+  }
+  .callout strong { color: #92400E; }
+  html.dark .callout strong { color: #D4A800; }
+
+  .hobby-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 18px; }
+  .hobby-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; box-shadow: var(--shadow); }
+  .hobby-card h3 { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px; color: var(--red); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px; }
+  .hobby-card p { font-size: 14.5px; line-height: 1.65; margin: 0; color: var(--dark); }
+
+  .glossary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; }
+  .glossary-term { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; box-shadow: var(--shadow); }
+  .glossary-term dt { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px; color: var(--dark); margin-bottom: 3px; }
+  .glossary-term dd { font-size: 13.5px; line-height: 1.55; color: var(--muted); margin: 0; }
+
+  @media (max-width: 700px) {
+    .guide-hero { padding: 36px 20px 24px; }
+    .guide-title { font-size: 36px; }
+    .guide-sub { font-size: 15px; }
+    .guide-wrap { padding: 8px 20px 24px; }
+    .guide-section { scroll-margin-top: 168px; }
+    .guide-section h2 { font-size: 23px; }
+    .hobby-grid, .glossary-grid { grid-template-columns: 1fr; }
+    .guide-toc { top: 68px; padding: 10px 20px 12px; }
+  }
+
+  /* MODAL (contact) + POKEBALL DIVIDER + FOOTER — shared components */
+  .pokeball-divider { display: flex; align-items: center; justify-content: center; margin: 8px auto 40px; max-width: 1120px; padding: 0 32px; }
+  .pokeball-divider .stripe { flex: 1; height: 3px; border-radius: 3px; }
+  .pokeball-divider .stripe.left { background: linear-gradient(90deg, transparent, var(--red) 90%); }
+  .pokeball-divider .stripe.right { background: linear-gradient(90deg, var(--red) 10%, transparent); }
+  .pokeball-divider .center {
+    width: 22px; height: 22px; border-radius: 50%; margin: 0 12px; flex-shrink: 0;
+    background: linear-gradient(180deg, var(--red) 0 48%, var(--dark) 48% 52%, #fff 52% 100%);
+    border: 2px solid var(--dark); position: relative; box-shadow: var(--shadow);
+  }
+  .pokeball-divider .center::after {
+    content: ''; position: absolute; inset: 6px; border-radius: 50%; background: #fff; border: 2px solid var(--dark);
+  }
+  html.dark .pokeball-divider .center { border-color: #000; }
+  html.dark .pokeball-divider .center::after { border-color: #000; }
+
+  footer { border-top: 1px solid var(--border); padding: 24px 32px; text-align: center; font-size: 13px; color: var(--muted); }
+
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1100; align-items: center; justify-content: center; padding: 24px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--card-bg); border-radius: var(--radius); padding: 36px; max-width: 540px; width: 100%; position: relative; max-height: 90vh; overflow-y: auto; }
+  .modal-close { position: absolute; top: 16px; right: 16px; background: var(--border); border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .modal-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 24px; margin-bottom: 24px; }
+  .contact-row {
+    display:flex; align-items:center; gap:14px; padding:14px 16px;
+    background:var(--bg); border-radius:12px; border:1px solid var(--border);
+    text-decoration:none; color:var(--dark); transition:transform 0.15s, box-shadow 0.15s;
+  }
+  .contact-row:hover { transform:translateY(-2px); box-shadow:var(--shadow); }
+  .contact-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+  .contact-label { font-family:'Nunito',sans-serif; font-weight:700; font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:2px; }
+  .contact-val { font-family:'Nunito',sans-serif; font-weight:800; font-size:15px; color:var(--dark); }
+
+  /* Toasts (unused on this page today, kept for consistency with the shared showToast() helper) */
+  .toast-container {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    z-index: 1200; display: flex; flex-direction: column-reverse; gap: 10px;
+    width: 100%; max-width: 380px; padding: 0 16px; pointer-events: none;
+  }
+  .toast {
+    background: var(--dark); color: #fff; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 13px;
+    padding: 13px 18px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    display: flex; align-items: center; gap: 10px; pointer-events: auto;
+    animation: toast-in 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+    border-left: 4px solid var(--blue);
+  }
+  .toast.success { border-left-color: #22C55E; }
+  .toast.error { border-left-color: var(--red); }
+  .toast.leaving { animation: toast-out 0.2s ease forwards; }
+  html.dark .toast { background: #F5F0E8; color: #1A1A2E; }
+  @keyframes toast-in { from { opacity: 0; transform: translateY(12px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  @keyframes toast-out { to { opacity: 0; transform: translateY(8px) scale(0.96); } }
+</style>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<nav>
+  <a class="nav-logo" href="index.html">
+    <img src="images/image2.png" alt="Gulf Coast Card Shows" style="height:48px; width:auto;">
+  </a>
+  <div class="nav-links">
+    <a href="index.html#shows" class="nav-btn">Upcoming Shows</a>
+    <a href="index.html" class="nav-btn">Add Your Show</a>
+    <a href="vendors.html" class="nav-btn">Vendors</a>
+    <a href="collectors-guide.html" class="nav-btn active">Guide</a>
+    <a href="#" class="nav-btn" onclick="openContact(); return false;">Contact</a>
+    <a href="https://buymeacoffee.com/zbflips8" class="nav-btn" target="_blank" rel="noopener noreferrer">Support</a>
+    <div class="mobile-menu-wrap">
+      <button class="mobile-menu-toggle" id="mobile-menu-toggle" type="button" aria-label="Open navigation menu" aria-controls="mobile-menu" aria-expanded="false" onclick="toggleMobileMenu(event)"><span class="mini-pokeball" aria-hidden="true"></span> Menu</button>
+      <div class="mobile-menu-panel" id="mobile-menu">
+        <a href="index.html" class="mobile-menu-item">Add Your Show</a>
+        <a href="vendors.html" class="mobile-menu-item">Vendors</a>
+        <a href="collectors-guide.html" class="mobile-menu-item" style="font-weight:800;">Collector's Guide (viewing)</a>
+        <button class="mobile-menu-item" type="button" onclick="openContact(); closeMobileMenu();">Contact</button>
+        <a href="https://buymeacoffee.com/zbflips8" class="mobile-menu-item" target="_blank" rel="noopener noreferrer" onclick="closeMobileMenu()">Support</a>
+      </div>
+    </div>
+    <button class="dark-toggle" id="dark-toggle" onclick="toggleDark()" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</nav>
+
+<noscript>
+  <div style="text-align:center; padding:40px 20px; color:#6B7280;">
+    This page works fine without JavaScript — dark mode and the mobile menu just won't toggle. You can also reach us at <a href="mailto:zacbrannen@gmail.com">zacbrannen@gmail.com</a>.
+  </div>
+</noscript>
+
+<section class="guide-hero" id="main-content">
+  <p class="guide-eyebrow">Gulf Coast Card Shows Resources</p>
+  <h1 class="guide-title">The Collector's <span class="accent">Guide</span></h1>
+  <p class="guide-sub">Quick-hit tips for your next show — what to pack, how to talk price, how to tell a slab from a fake, and the lingo so you're not standing at a table nodding along to words you don't know yet. No essays, just the good stuff.</p>
+  <div class="guide-tags">
+    <span class="guide-tag red">🎴 Written by someone who's actually been to these</span>
+    <span class="guide-tag blue">📋 Skimmable, not a novel</span>
+    <span class="guide-tag orange">⚡ Actual lingo, not textbook lingo</span>
+  </div>
+</section>
+
+<nav class="guide-toc" aria-label="Jump to section">
+  <a class="toc-pill" href="#kit">🎒 Pack Your Bag</a>
+  <a class="toc-pill" href="#cash">💵 Talking Price</a>
+  <a class="toc-pill" href="#grading">🏅 Raw vs. Slabbed</a>
+  <a class="toc-pill" href="#fakes">🔍 Don't Get Burned</a>
+  <a class="toc-pill" href="#condition">📋 Condition Cheat Sheet</a>
+  <a class="toc-pill" href="#etiquette">🤝 Table Manners</a>
+  <a class="toc-pill" href="#hobbies">🃏 By Hobby</a>
+  <a class="toc-pill" href="#kids">👨‍👩‍👧 Bringing the Fam</a>
+  <a class="toc-pill" href="#budget">🎯 Set a Lid</a>
+  <a class="toc-pill" href="#glossary">📖 Glossary</a>
+</nav>
+
+<div class="guide-wrap">
+
+  <section class="guide-section" id="kit">
+    <p class="guide-kicker">Before you walk in</p>
+    <h2>🎒 Pack Your Bag Right</h2>
+    <ul>
+      <li><strong>Cash and your payment apps, both ready to go.</strong> Most tables take either these days — see the money section below for the details.</li>
+      <li><strong>A couple of top-loaders and penny sleeves</strong> for anything you pull or buy raw on the spot.</li>
+      <li><strong>Something rigid</strong> — a binder page, a card saver — if you're bringing your own stuff to sell or trade.</li>
+      <li><strong>An actual want list, written down.</strong> "Looking for the alt-art from the last main set, will pay near TCGplayer low" gets you an answer. "Something from that one set" gets you nothing.</li>
+    </ul>
+  </section>
+
+  <section class="guide-section" id="cash">
+    <p class="guide-kicker">Money talks</p>
+    <h2>💵 Talking Price Like You Mean It</h2>
+    <ul>
+      <li><strong>Cash and digital both work at most tables now.</strong> CashApp and Venmo are everywhere, and a lot of vendors run Square for cards — don't assume it's a cash-only room.</li>
+      <li><strong>Signal can still be genuinely bad</strong> at fairgrounds and expo halls, though. Keep some cash as backup in case an app won't load right when you need it.</li>
+      <li><strong>Small bills help everyone,</strong> cash or not — a vendor digging for change on a $9 sale at 9am slows the whole line down.</li>
+      <li><strong>Negotiating is normal, not rude.</strong> "What's your best on this?" or "can you do X if I take two?" always lands fine.</li>
+      <li><strong>Don't insult the card to talk the price down</strong> — calling a clearly-NM card "basically damaged" doesn't work, vendors have heard it a thousand times, and it just burns goodwill.</li>
+      <li><strong>Bundle instead of haggling one card at a time.</strong> A vendor would rather move three cards at a fair price than argue fifty cents on one.</li>
+      <li><strong>Know your number before you open your mouth.</strong> Pull actual sold listings, not "buy it now" asking prices — those are often just somebody's hope.</li>
+    </ul>
+  </section>
+
+  <section class="guide-section" id="grading">
+    <p class="guide-kicker">Slabs, explained</p>
+    <h2>🏅 Raw, Slabbed, and Everything Between</h2>
+    <ul>
+      <li><strong>Raw</strong> = ungraded. Just the card, maybe sleeved.</li>
+      <li><strong>Slabbed</strong> = sent to a grading company, authenticated, sealed in a hard plastic holder with a number on it.</li>
+      <li><strong>PSA</strong> — the name everyone's heard of. Cost and turnaround depend entirely on the service tier you pay for.</li>
+      <li><strong>BGS/Beckett</strong> — gives subgrades (centering, corners, edges, surface), so a 9 built from four 9.5s reads differently than a flat 9 elsewhere.</li>
+      <li><strong>CGC</strong> — newer to cards specifically, often cheaper and faster, big with modern Pokémon.</li>
+      <li><strong>SGC</strong> — shows up most on vintage sports.</li>
+      <li><strong>None of these is "the best."</strong> Just different reputations by hobby and era — PSA still commands a premium on vintage/sports even against an identical-condition CGC card.</li>
+      <li><strong>Thinking about submitting your own?</strong> Factor in the fee, the wait (weeks to months), and the real chance it comes back lower than you hoped. Most regulars only submit stuff they're already fairly sure is a 9 or better.</li>
+    </ul>
+  </section>
+
+  <section class="guide-section" id="fakes">
+    <p class="guide-kicker">Protect your wallet</p>
+    <h2>🔍 Don't Get Burned</h2>
+    <p>Fakes and reprints exist, especially on anything hyped — vintage Charizard, big rookie patches, first-edition holos. Five-second checks that save you real money:</p>
+    <ul>
+      <li><strong>Weight and feel.</strong> Most fakes feel thin or too slick. Real cardstock has heft.</li>
+      <li><strong>Back print quality.</strong> Blurry text or slightly-off color on the back is a tell.</li>
+      <li><strong>The light test (Pokémon especially).</strong> Hold the card up to a light. Real ones have a black layer in the middle that blocks light. A lot of fakes you can see straight through.</li>
+      <li><strong>Cert number lookup.</strong> For anything already graded, look the cert number up on the grading company's own site <em>before</em> you pay, not after.</li>
+    </ul>
+    <div class="callout"><strong>Real talk:</strong> if a vendor gets weird about you checking a cert number or looking closely at a card, that's the red flag — not you being difficult.</div>
+  </section>
+
+  <section class="guide-section" id="condition">
+    <p class="guide-kicker">Read the label</p>
+    <h2>📋 Condition Cheat Sheet</h2>
+    <p>Vendors throw around abbreviations assuming everyone already speaks it. Here's the quick key:</p>
+    <ul>
+      <li><strong>M / Gem Mint</strong> — flawless. Sharp corners, no print lines, basically fresh out of a pack.</li>
+      <li><strong>NM (Near Mint)</strong> — looks perfect at a glance, maybe the faintest whisper of wear if you really hunt for it.</li>
+      <li><strong>LP (Lightly Played)</strong> — visible but minor. Small edge wear, maybe a soft corner.</li>
+      <li><strong>MP (Moderately Played)</strong> — noticeable wear, light scratches, some corner rounding. Still fully displayable.</li>
+      <li><strong>HP (Heavily Played)</strong> — been through it. Creases, heavy whitening, still identifiable and often still cheap and usable.</li>
+      <li><strong>Damaged</strong> — water damage, tears, writing, missing pieces.</li>
+      <li><strong>Whitening</strong> — edges or corners worn down enough to show the white card stock underneath the colored border. The single biggest visual tell on darker-bordered cards.</li>
+      <li>If a vendor just says "played" with no other qualifier, ask which tier they mean — that word alone covers a lot of ground.</li>
+    </ul>
+  </section>
+
+  <section class="guide-section" id="etiquette">
+    <p class="guide-kicker">Don't Be That Guy (or Gal)</p>
+    <h2>🤝 Table Manners</h2>
+    <ul>
+      <li>Ask before you touch. Vendors often have a system to their case, and random hands moving things around isn't it.</li>
+      <li>Digging through a dollar box? Put things back roughly where they were.</li>
+      <li>If you're not buying, don't camp a table for twenty minutes while other people are trying to get to the case.</li>
+      <li>A no on a trade is a no. It's their table, their call, no hard feelings needed.</li>
+      <li>If a kid's mid-excitement asking a vendor about a card, let the moment happen — even if it costs you thirty seconds of a negotiation. That's the whole point of these shows.</li>
+      <li>This community is smaller than it feels. Word gets around fast about who's good to deal with — and who isn't.</li>
+    </ul>
+  </section>
+
+  <section class="guide-section" id="hobbies">
+    <p class="guide-kicker">Know your game</p>
+    <h2>🃏 Notes By Hobby</h2>
+    <p>Every table on the floor speaks a slightly different dialect. A quick primer so you don't get lost:</p>
+    <div class="hobby-grid">
+      <div class="hobby-card">
+        <h3>Pokémon</h3>
+        <p>Chase cards move fast — alt-arts and a fresh set's box-topper especially. "Hit" means something actually worth money, not every rare qualifies. Special-pattern reprints (master ball and similar) can spike overnight, so a binder specifically for those is common at bigger tables.</p>
+      </div>
+      <div class="hobby-card">
+        <h3>Sports Cards</h3>
+        <p><strong>RC</strong> = rookie card (a player's first licensed card). <strong>Auto</strong> = autographed. <strong>Patch/relic</strong> = a swatch of game-used material embedded in the card. <strong>Numbered</strong> (like /99) tells you the print run. A rookie patch auto (RPA) on a hot prospect can be the card of someone's whole day.</p>
+      </div>
+      <div class="hobby-card">
+        <h3>Magic: The Gathering</h3>
+        <p>"Playset" = four copies, the max most formats allow in a deck. Foil carries a premium over non-foil of the same card. Commander/EDH staples hold value even on cards that look unassuming to anyone who doesn't play.</p>
+      </div>
+      <div class="hobby-card">
+        <h3>Yu-Gi-Oh, Lorcana &amp; One Piece TCG</h3>
+        <p>Newer to a lot of Gulf Coast tables but growing fast. Fewer vendors specialize, so pricing swings more table-to-table — five minutes of price research before you go is where this pays off most.</p>
+      </div>
+      <div class="hobby-card">
+        <h3>Comics &amp; Toys</h3>
+        <p>"Key issue" means a first appearance or otherwise story-important issue — that's what drives price, not just age. Raw comics use the same condition language as cards (NM, VF, FN), and CGC slabs comics the same way it slabs cards now.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="guide-section" id="kids">
+    <p class="guide-kicker">Family day</p>
+    <h2>👨‍👩‍👧 Bringing the Fam</h2>
+    <ul>
+      <li>Card shows are honestly one of the better family outings in the hobby — most organizers welcome kids.</li>
+      <li>Plenty of vendors keep a cheap bin specifically so a $5 bill turns into a real find.</li>
+      <li>Aisles get tight once the doors open — plan ahead if you're bringing a stroller.</li>
+      <li>Set the budget with your kid <em>before</em> you're standing at a table. Way less friction than negotiating it in the moment.</li>
+      <li>Let them do the talking if they want to. Vendors light up for a genuinely excited kid, and it's good practice for next time.</li>
+    </ul>
+  </section>
+
+  <section class="guide-section" id="budget">
+    <p class="guide-kicker">Keep your head</p>
+    <h2>🎯 Set a Lid Before You Walk In</h2>
+    <ul>
+      <li>Decide your number before you're standing in front of a case with your heart rate up. The thrill of the hunt is exactly what blows budgets by the third lap around the room.</li>
+      <li>Track what you're spending as you go — easy to lose count once it's split between cash and a payment app or two.</li>
+      <li>Some regulars still go cash-only, no apps, for themselves specifically, because it forces a hard stop when the cash runs out. Worth trying once even if you normally pay digital.</li>
+      <li>Know what you actually walked away with versus what you told yourself you'd spend going in.</li>
+    </ul>
+  </section>
+
+  <section class="guide-section" id="glossary">
+    <p class="guide-kicker">Talk the talk</p>
+    <h2>📖 Lingo Cheat Sheet</h2>
+    <p>Quick reference for the words you'll hear at every single table, all day.</p>
+    <dl class="glossary-grid">
+      <div class="glossary-term"><dt>PC</dt><dd>Personal collection — cards you're keeping, not selling.</dd></div>
+      <div class="glossary-term"><dt>Grail</dt><dd>The card you'd never actually sell, even for a dumb offer.</dd></div>
+      <div class="glossary-term"><dt>Hit</dt><dd>Something you pulled that's genuinely worth money — not just "a rare."</dd></div>
+      <div class="glossary-term"><dt>Whale</dt><dd>Someone spending big, often on singles or a box/case break.</dd></div>
+      <div class="glossary-term"><dt>Flip</dt><dd>Buying something specifically to resell for profit, usually fast.</dd></div>
+      <div class="glossary-term"><dt>Rip</dt><dd>Opening packs or boxes — "let's rip a box."</dd></div>
+      <div class="glossary-term"><dt>Box / Case Break</dt><dd>A group buy where a box or case is opened live and slots are split among buyers beforehand.</dd></div>
+      <div class="glossary-term"><dt>Slab</dt><dd>A graded card, sealed in its hard plastic holder.</dd></div>
+      <div class="glossary-term"><dt>Raw</dt><dd>Ungraded — the opposite of slabbed.</dd></div>
+      <div class="glossary-term"><dt>LGS</dt><dd>Local game/card shop.</dd></div>
+      <div class="glossary-term"><dt>Meta</dt><dd>Whatever's strong or popular in competitive play right now.</dd></div>
+      <div class="glossary-term"><dt>Bulk</dt><dd>Common, low-value cards typically sold by the pound or in big lots.</dd></div>
+    </dl>
+  </section>
+
+</div>
+
+<div class="pokeball-divider" aria-hidden="true"><div class="stripe left"></div><div class="center"></div><div class="stripe right"></div></div>
+
+<footer>
+  <p>© 2026 Gulf Coast Card Shows · Gulf Coast Trading Card Community · Made with ⚡ for trainers &amp; collectors · <a href="#" onclick="openContact(); return false;" style="color:inherit;">Contact Zac</a></p>
+  <p class="last-updated"><a href="index.html">← Back to the show calendar</a></p>
+</footer>
+
+<!-- CONTACT MODAL -->
+<div class="modal-overlay" id="contact-modal" onclick="closeContactOutside(event)" role="dialog" aria-modal="true" aria-labelledby="contact-title">
+  <div class="modal" style="max-width:420px;">
+    <button class="modal-close" onclick="closeContact()" aria-label="Close">✕</button>
+    <div style="text-align:center; margin-bottom:24px;">
+      <div style="font-size:52px; margin-bottom:8px;">🎴</div>
+      <h2 class="modal-title" id="contact-title" style="margin-bottom:4px;">Get in Touch</h2>
+      <p style="font-size:14px; color:var(--muted);">Questions, submissions, or just want to talk cards?</p>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <a href="mailto:zacbrannen@gmail.com" class="contact-row">
+        <div class="contact-icon" style="background:#FFF0F0;">📧</div>
+        <div>
+          <div class="contact-label">Email</div>
+          <div class="contact-val">zacbrannen@gmail.com</div>
+        </div>
+      </a>
+      <div class="contact-row" style="cursor:default;">
+        <div class="contact-icon" style="background:#EDE7F6;">🎮</div>
+        <div>
+          <div class="contact-label">Discord</div>
+          <div class="contact-val">@ZBFlips</div>
+        </div>
+      </div>
+      <div class="contact-row" style="cursor:default;">
+        <div class="contact-icon" style="background:#E8F5E9;">👤</div>
+        <div>
+          <div class="contact-label">Organizer</div>
+          <div class="contact-val">Zac Brannen</div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:24px; padding:16px; background:var(--next-bg); border-radius:12px; border:2px solid var(--next-border); text-align:center;">
+      <p style="font-size:13px; color:#92400E; font-weight:600;">Want to list your show?</p>
+      <p style="font-size:13px; color:var(--muted); margin-top:4px;">Use the <strong>Add Your Show</strong> button on the main page — or email Zac directly!</p>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+<script>
+  // --- MOBILE MENU ---
+  function closeMobileMenu() {
+    const menu = document.getElementById('mobile-menu');
+    const toggle = document.getElementById('mobile-menu-toggle');
+    if (!menu || !toggle) return;
+    menu.classList.remove('open');
+    toggle.setAttribute('aria-expanded', 'false');
+  }
+
+  function positionMobileMenu() {
+    const menu = document.getElementById('mobile-menu');
+    const toggle = document.getElementById('mobile-menu-toggle');
+    if (!menu || !toggle) return;
+    const rect = toggle.getBoundingClientRect();
+    menu.style.top = (rect.bottom + 10) + 'px';
+    menu.style.right = (window.innerWidth - rect.right) + 'px';
+  }
+
+  function toggleMobileMenu(e) {
+    if (e) e.stopPropagation();
+    const menu = document.getElementById('mobile-menu');
+    const toggle = document.getElementById('mobile-menu-toggle');
+    if (!menu || !toggle) return;
+    const shouldOpen = !menu.classList.contains('open');
+    if (shouldOpen) positionMobileMenu();
+    menu.classList.toggle('open', shouldOpen);
+    toggle.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+  }
+
+  window.addEventListener('resize', function() {
+    if (document.getElementById('mobile-menu')?.classList.contains('open')) positionMobileMenu();
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.mobile-menu-wrap')) closeMobileMenu();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeMobileMenu();
+  });
+
+  // --- TOAST NOTIFICATIONS ---
+  function showToast(message, type, duration) {
+    const container = document.getElementById('toast-container');
+    if (!container) { console.log(message); return; }
+    const el = document.createElement('div');
+    el.className = `toast${type ? ' ' + type : ''}`;
+    el.setAttribute('role', type === 'error' ? 'alert' : 'status');
+    el.textContent = message;
+    container.appendChild(el);
+    setTimeout(() => {
+      el.classList.add('leaving');
+      el.addEventListener('animationend', () => el.remove(), { once: true });
+    }, duration || 3200);
+  }
+
+  // --- DARK MODE ---
+  function toggleDark() {
+    const isDark = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    document.getElementById('dark-toggle').textContent = isDark ? '☀️' : '🌙';
+  }
+  (function() {
+    const saved = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (saved === 'dark' || (!saved && prefersDark)) {
+      document.documentElement.classList.add('dark');
+      document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('dark-toggle');
+        if (btn) btn.textContent = '☀️';
+      });
+    }
+  })();
+
+  // --- MODAL FOCUS TRAP ---
+  let modalReturnFocus = null;
+  function trapModalOpen(modalEl) {
+    if (!modalEl) return;
+    modalReturnFocus = document.activeElement;
+    const focusables = modalEl.querySelectorAll('button, a[href], input, textarea, select, [tabindex]:not([tabindex="-1"])');
+    if (focusables.length) setTimeout(() => focusables[0].focus(), 0);
+  }
+  function trapModalClose() {
+    if (modalReturnFocus && typeof modalReturnFocus.focus === 'function') modalReturnFocus.focus();
+    modalReturnFocus = null;
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab') return;
+    const openModalEl = document.querySelector('.modal-overlay.open');
+    if (!openModalEl) return;
+    const focusables = Array.from(
+      openModalEl.querySelectorAll('button, a[href], input, textarea, select, [tabindex]:not([tabindex="-1"])')
+    ).filter((el) => el.offsetParent !== null);
+    if (!focusables.length) return;
+    const first = focusables[0], last = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+
+  // --- CONTACT MODAL ---
+  function openContact() { const m = document.getElementById('contact-modal'); m.classList.add('open'); document.body.style.overflow = 'hidden'; trapModalOpen(m); }
+  function closeContact() { document.getElementById('contact-modal').classList.remove('open'); document.body.style.overflow = ''; trapModalClose(); }
+  function closeContactOutside(e) { if (e.target === document.getElementById('contact-modal')) closeContact(); }
+</script>
+
+</body>
+</html>
