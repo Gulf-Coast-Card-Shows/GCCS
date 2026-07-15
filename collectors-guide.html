@@ -151,14 +151,22 @@
   html.dark .guide-tag.blue { background: #071428; }
   html.dark .guide-tag.orange { background: #1a0f04; }
 
-  /* TOC — jump nav, sticky like .state-nav elsewhere on the site */
-  .guide-toc {
-    display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; overflow-x: auto;
-    max-width: 1120px; margin: 0 auto; padding: 12px 32px 14px;
-    position: sticky; top: 68px; z-index: 900; background: var(--nav-bg);
+  /* TOC — jump nav, sticky like .state-nav elsewhere on the site.
+     The pill row scrolls horizontally; a mask-image fades both edges so a
+     cut-off pill reads as "scroll for more," not as clipped/broken content. */
+  .guide-toc-wrap {
+    position: sticky; top: 68px; z-index: 900;
+    max-width: 1120px; margin: 0 auto;
+    background: var(--nav-bg);
     box-shadow: 0 0 0 100vmax var(--nav-bg), 0 1px 0 var(--border);
     clip-path: inset(0 -100vmax);
+  }
+  .guide-toc {
+    display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; overflow-x: auto;
+    padding: 12px 32px 14px;
     -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
   }
   .guide-toc::-webkit-scrollbar { display: none; }
   .toc-pill {
@@ -208,7 +216,12 @@
     .guide-section { scroll-margin-top: 168px; }
     .guide-section h2 { font-size: 23px; }
     .hobby-grid, .glossary-grid { grid-template-columns: 1fr; }
-    .guide-toc { top: 68px; padding: 10px 20px 12px; }
+    .guide-toc-wrap { top: 68px; }
+    .guide-toc {
+      padding: 10px 20px 12px;
+      -webkit-mask-image: linear-gradient(to right, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);
+      mask-image: linear-gradient(to right, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);
+    }
   }
 
   /* MODAL (contact) + POKEBALL DIVIDER + FOOTER — shared components */
@@ -311,18 +324,20 @@
   </div>
 </section>
 
-<nav class="guide-toc" aria-label="Jump to section">
-  <a class="toc-pill" href="#kit">🎒 Pack Your Bag</a>
-  <a class="toc-pill" href="#cash">💵 Talking Price</a>
-  <a class="toc-pill" href="#grading">🏅 Raw vs. Slabbed</a>
-  <a class="toc-pill" href="#fakes">🔍 Don't Get Burned</a>
-  <a class="toc-pill" href="#condition">📋 Condition Cheat Sheet</a>
-  <a class="toc-pill" href="#etiquette">🤝 Table Manners</a>
-  <a class="toc-pill" href="#hobbies">🃏 By Hobby</a>
-  <a class="toc-pill" href="#kids">👨‍👩‍👧 Bringing the Fam</a>
-  <a class="toc-pill" href="#budget">🎯 Set a Lid</a>
-  <a class="toc-pill" href="#glossary">📖 Glossary</a>
-</nav>
+<div class="guide-toc-wrap">
+  <nav class="guide-toc" aria-label="Jump to section">
+    <a class="toc-pill" href="#kit">🎒 Pack Your Bag</a>
+    <a class="toc-pill" href="#cash">💵 Talking Price</a>
+    <a class="toc-pill" href="#grading">🏅 Raw vs. Slabbed</a>
+    <a class="toc-pill" href="#fakes">🔍 Don't Get Burned</a>
+    <a class="toc-pill" href="#condition">📋 Condition Cheat Sheet</a>
+    <a class="toc-pill" href="#etiquette">🤝 Table Manners</a>
+    <a class="toc-pill" href="#hobbies">🃏 By Hobby</a>
+    <a class="toc-pill" href="#kids">👨‍👩‍👧 Bringing the Fam</a>
+    <a class="toc-pill" href="#budget">🎯 Set a Lid</a>
+    <a class="toc-pill" href="#glossary">📖 Glossary</a>
+  </nav>
+</div>
 
 <div class="guide-wrap">
 
