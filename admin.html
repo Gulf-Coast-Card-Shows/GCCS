@@ -210,6 +210,16 @@
   </div>
 </div>
 
+<div class="panel" id="discord-panel" style="max-width:1200px; margin:0 auto 16px;">
+  <div class="panel-header" style="flex-wrap:wrap; gap:10px;">
+    <span class="panel-title">📢 Discord Announcements</span>
+    <input type="password" id="discord-webhook-url" placeholder="Discord webhook URL" style="padding:7px 10px; border:1px solid var(--border,#E5E0D5); border-radius:8px; font-size:13px; min-width:280px; flex:1;">
+  </div>
+  <div class="panel-body">
+    <p class="hint">Paste a webhook URL from your server (Server Settings → Integrations → Webhooks → New Webhook, point it at #new-shows, copy the URL). Saved only in this browser — it's sent straight to Discord, nowhere else. Once this is filled in, every saved show gets a "📢 Post to Discord" button in its edit form.</p>
+  </div>
+</div>
+
 <div class="featured-picker" id="featured-picker">
   <label for="featured-select">⭐ Featured Show</label>
   <select id="featured-select" disabled>
@@ -844,6 +854,88 @@ ${itemsXml}
   }
   document.getElementById('btn-gen-sitemap').addEventListener('click', generateSitemap);
 
+  // ===== Discord webhook announcements (Tier 2: one-click, no bot) =====
+  // Posts a single show as a Discord embed via a webhook URL — no bot account
+  // or hosting needed. The webhook URL is saved to localStorage only, and is
+  // only ever sent to Discord's own API, never anywhere else.
+  (function initDiscordWebhook() {
+    const input = document.getElementById('discord-webhook-url');
+    if (!input) return;
+    let saved = '';
+    try { saved = localStorage.getItem('gccs-discord-webhook-url') || ''; } catch (e) {}
+    if (saved) input.value = saved;
+    input.addEventListener('change', () => {
+      try { localStorage.setItem('gccs-discord-webhook-url', input.value.trim()); } catch (e) {}
+    });
+  })();
+
+  function getDiscordWebhookUrl() {
+    const input = document.getElementById('discord-webhook-url');
+    if (input && input.value.trim()) return input.value.trim();
+    try { return localStorage.getItem('gccs-discord-webhook-url') || ''; } catch (e) { return ''; }
+  }
+
+  function buildDiscordEmbed(ev) {
+    const dateText = ev.tbd ? 'TBD — stay tuned' : (ev.dateDisplay || 'TBD');
+    const fields = [
+      { name: '📅 Date', value: dateText, inline: true },
+      { name: '📍 Location', value: ev.location || 'TBD', inline: true },
+      { name: '💵 Entry', value: ev.entryFree ? 'Free' : (ev.entryFee || 'Unknown'), inline: true },
+    ];
+    if (ev.vendorFee) fields.push({ name: '🏪 Vendor Tables', value: ev.vendorFee, inline: true });
+    if (ev.organizer) fields.push({ name: '🎤 Organizer', value: ev.organizer, inline: true });
+
+    const embed = {
+      title: ev.tbd ? `🎴 New show incoming: ${ev.name || 'Details Coming Soon'}` : `🎴 ${ev.name || 'New show'}`,
+      url: `https://gccardshows.com/index.html?show=${encodeURIComponent(ev.id)}`,
+      color: 0xE53935,
+      fields,
+      footer: { text: 'Gulf Coast Card Shows' },
+      timestamp: new Date().toISOString(),
+    };
+    const about = ev.details && ev.details.about;
+    if (about) embed.description = about.length > 300 ? about.slice(0, 297) + '…' : about;
+    return embed;
+  }
+
+  async function postShowToDiscord(ev, btnEl) {
+    const url = getDiscordWebhookUrl();
+    if (!url) {
+      toast('Paste a Discord webhook URL into the panel above first.', true);
+      document.getElementById('discord-webhook-url')?.focus();
+      return;
+    }
+    if (!/^https:\/\/(discord\.com|discordapp\.com)\/api\/webhooks\//.test(url)) {
+      toast("That doesn't look like a Discord webhook URL — check for typos.", true);
+      return;
+    }
+    const originalLabel = btnEl ? btnEl.textContent : '';
+    if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'Posting…'; }
+    try {
+      const embed = buildDiscordEmbed(ev);
+      const sep = url.includes('?') ? '&' : '?';
+      const res = await fetch(url + sep + 'wait=true', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ embeds: [embed] }),
+      });
+      if (res.status === 429) {
+        const retryData = await res.json().catch(() => ({}));
+        const wait = Math.ceil(retryData.retry_after || 2);
+        toast(`Discord is rate-limiting posts right now — try again in ${wait}s.`, true);
+      } else if (!res.ok) {
+        toast(`Discord rejected the post (HTTP ${res.status}) — double-check the webhook URL.`, true);
+      } else {
+        toast(`📢 Posted "${ev.name || 'show'}" to Discord!`);
+      }
+    } catch (e) {
+      console.error('Discord post failed:', e);
+      toast('Could not reach Discord — check your connection and the webhook URL.', true);
+    } finally {
+      if (btnEl) { btnEl.disabled = false; btnEl.textContent = originalLabel; }
+    }
+  }
+
   // ===== List rendering =====
   // ===== Past-show detection =====
   // Single source of truth for "has this show already happened?" — used to
@@ -1294,6 +1386,7 @@ ${itemsXml}
 
       <div class="form-actions">
         <button type="button" class="btn-primary" id="f-save">💾 ${isNew ? 'Add Show' : 'Save Changes'}</button>
+        ${!isNew ? `<button type="button" id="f-post-discord" title="Posts this show's current saved details to your Discord webhook">📢 Post to Discord</button>` : ''}
         <button type="button" id="f-cancel">Cancel</button>
       </div>
     `;
@@ -1420,6 +1513,11 @@ ${itemsXml}
       renderList();
       renderForm(null);
     });
+
+    const discordBtn = $('f-post-discord');
+    if (discordBtn) {
+      discordBtn.addEventListener('click', () => postShowToDiscord(ev, discordBtn));
+    }
 
     $('f-save').addEventListener('click', () => {
       const name = $('f-name').value.trim();
