@@ -11,7 +11,7 @@
    (e.g. after adding a new page). Routine show-data edits don't need a bump —
    the network-first strategy already picks those up on the next online visit. */
 
-const CACHE_VERSION = 'gccs-v3'; // bumped: added collectors-guide.html to precache
+const CACHE_VERSION = 'gccs-v4'; // bumped: added trade-nights.html to precache
 const PRECACHE_URLS = [
   '/index.html',
   '/florida-card-shows.html',
@@ -21,6 +21,7 @@ const PRECACHE_URLS = [
   '/louisiana-card-shows.html',
   '/vendors.html',
   '/collectors-guide.html',
+  '/trade-nights.html',
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png',

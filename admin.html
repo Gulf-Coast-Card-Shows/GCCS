@@ -212,11 +212,11 @@
 
 <div class="panel" id="discord-panel" style="max-width:1200px; margin:0 auto 16px;">
   <div class="panel-header" style="flex-wrap:wrap; gap:10px;">
-    <span class="panel-title">📢 Discord Announcements</span>
-    <input type="password" id="discord-webhook-url" placeholder="Discord webhook URL" style="padding:7px 10px; border:1px solid var(--border,#E5E0D5); border-radius:8px; font-size:13px; min-width:280px; flex:1;">
+    <span class="panel-title">📅 Discord Events</span>
+    <input type="password" id="discord-admin-token" placeholder="Worker admin token" style="padding:7px 10px; border:1px solid var(--border,#E5E0D5); border-radius:8px; font-size:13px; min-width:200px; flex:1;">
   </div>
   <div class="panel-body">
-    <p class="hint">Paste a webhook URL from your server (Server Settings → Integrations → Webhooks → New Webhook, point it at #new-shows, copy the URL). Saved only in this browser — it's sent straight to Discord, nowhere else. Once this is filled in, every saved show gets a "📢 Post to Discord" button in its edit form.</p>
+    <p class="hint">Worker admin token: the same one used by the Quick Add / Push panels above (shared automatically once you've entered it anywhere) — saved only in this browser. Requires the Worker's Discord bot to be set up first (ask Claude if you haven't done that yet). Once the token's set, every saved show with a confirmed date gets an "📅 Add to Discord Events" button that creates an entry in your server's Events tab.</p>
   </div>
 </div>
 
@@ -251,6 +251,78 @@
       <div class="empty-state">
         <div class="empty-state-icon">👈</div>
         <p>Select a show on the left to edit it, or add a new one.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="pokeball-divider-admin" style="height:2px;background:var(--border,#E5E0D5);margin:36px 0;"></div>
+
+<header>
+  <div class="brand">
+    <div class="brand-icon">🔁</div>
+    <div>
+      <div class="brand-title">Trade Night Admin</div>
+      <div class="brand-sub">trade-nights.html</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <span id="tn-file-status">No file open — click "Open trade-nights.html" to start.</span>
+    <button id="tn-btn-open" class="btn-dark">📂 Open trade-nights.html</button>
+    <input type="file" id="tn-file-input-fallback" accept=".html,.htm" style="display:none;">
+    <button id="tn-btn-save" class="btn-primary" disabled>💾 Save to trade-nights.html</button>
+    <button id="tn-btn-download" disabled>⬇️ Download copy</button>
+  </div>
+</header>
+
+<div class="panel" id="tn-quickadd-panel" style="max-width:1200px; margin:16px auto 16px;">
+  <div class="panel-header" style="flex-wrap:wrap; gap:10px;">
+    <span class="panel-title">⚡ Quick Add from Facebook Post</span>
+    <input type="password" id="tn-quickadd-admin-token" placeholder="Worker admin token" style="padding:7px 10px; border:1px solid var(--border,#E5E0D5); border-radius:8px; font-size:13px; min-width:200px;">
+  </div>
+  <div class="panel-body">
+    <div class="form-group">
+      <label>Paste the Facebook/Instagram post text</label>
+      <textarea id="tn-quickadd-text" rows="5" placeholder="Paste the raw caption here — whatever the organizer wrote. Dates, address, fee, whatever's in there."></textarea>
+    </div>
+    <div class="form-actions" style="padding-top:0;">
+      <button type="button" class="btn-primary" id="tn-quickadd-btn" disabled>✨ Extract &amp; Pre-fill Add Trade Night Form</button>
+    </div>
+    <p class="hint" style="margin-top:8px;">Sends the pasted text to your Worker's Claude-powered extractor (the same one used by the Shows Quick Add above) and opens a pre-filled "Add a new trade night" form below — always review before saving, this is a head start, not an autopilot. Uses the same admin token as the panels above, and costs a small amount of API usage per click.</p>
+  </div>
+</div>
+
+<div class="featured-picker" id="tn-featured-picker">
+  <label for="tn-featured-select">⭐ Featured Trade Night</label>
+  <select id="tn-featured-select" disabled>
+    <option value="">— None —</option>
+  </select>
+  <span class="hint">Shown in the spotlight box next to "Next Trade Night" on trade-nights.html. Pick one trade night, or "None" to hide that box entirely.</span>
+</div>
+
+<div class="layout">
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">Trade Nights (<span id="tn-count">0</span>)</span>
+      <button id="tn-btn-add" class="btn-sm btn-primary" disabled>+ Add Trade Night</button>
+    </div>
+    <div class="panel-body" id="tn-list-body">
+      <div class="empty-state">
+        <div class="empty-state-icon">🔁</div>
+        <p>Open your site's <strong>trade-nights.html</strong> file to load and manage its trade nights here.</p>
+        <button id="tn-btn-open-2" class="btn-dark">📂 Open trade-nights.html</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="tn-form-panel">
+    <div class="panel-header">
+      <span class="panel-title" id="tn-form-title">No trade night selected</span>
+    </div>
+    <div class="panel-body" id="tn-form-body">
+      <div class="empty-state">
+        <div class="empty-state-icon">👈</div>
+        <p>Select a trade night on the left to edit it, or add a new one.</p>
       </div>
     </div>
   </div>
@@ -310,14 +382,14 @@
     <div class="brand-icon">📣</div>
     <div>
       <div class="brand-title">Send Push Announcement</div>
-      <div class="brand-sub">Notify everyone subscribed to a TBD show — no email export needed</div>
+      <div class="brand-sub">Notify everyone subscribed to a TBD show or trade night — no email export needed</div>
     </div>
   </div>
 </header>
 
 <div class="panel" style="margin-top:16px;">
   <div class="panel-header" style="flex-wrap:wrap; gap:10px;">
-    <span class="panel-title">Shows with subscribers</span>
+    <span class="panel-title">Shows &amp; Trade Nights with subscribers</span>
     <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
       <input type="password" id="push-admin-token" placeholder="Worker admin token" style="padding:7px 10px; border:1px solid var(--border,#E5E0D5); border-radius:8px; font-size:13px; min-width:200px;">
       <button id="push-btn-refresh" class="btn-sm btn-dark">🔄 Load / Refresh</button>
@@ -326,7 +398,7 @@
   <div class="panel-body" id="push-panel-body">
     <div class="empty-state" id="push-empty-state">
       <div class="empty-state-icon">📣</div>
-      <p>Enter your Worker's admin token above and click "Load / Refresh" to load which shows have people waiting on a push notification.</p>
+      <p>Enter your Worker's admin token above and click "Load / Refresh" to load which shows and trade nights have people waiting on a push notification.</p>
       <p class="hint" style="margin-top:10px;">This token is only stored in your browser's local storage on this device — see WORKER-PUSH-SETUP.md for one-time setup.</p>
     </div>
   </div>
@@ -350,17 +422,21 @@
 
   // ===== Toast =====
   let toastTimer = null;
-  let previewMap = null;
-  let previewMarker = null;
-  function showPreviewMap(lat, lng) {
-    const container = document.getElementById('geo-preview-map');
+  // Keyed by container id so the Shows form and the Trade Nights form can
+  // each keep their own live preview map without stomping on each other.
+  const previewMaps = {};
+  function showPreviewMap(lat, lng, containerId) {
+    containerId = containerId || 'geo-preview-map';
+    const container = document.getElementById(containerId);
     if (!container || typeof L === 'undefined') return;
     container.classList.add('visible');
-    if (previewMap) { previewMap.remove(); previewMap = null; previewMarker = null; }
-    previewMap = L.map(container, { zoomControl: false, attributionControl: false, scrollWheelZoom: false }).setView([lat, lng], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(previewMap);
-    previewMarker = L.marker([lat, lng]).addTo(previewMap);
-    setTimeout(() => previewMap && previewMap.invalidateSize(), 60);
+    const existing = previewMaps[containerId];
+    if (existing) { existing.remove(); delete previewMaps[containerId]; }
+    const map = L.map(container, { zoomControl: false, attributionControl: false, scrollWheelZoom: false }).setView([lat, lng], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map);
+    L.marker([lat, lng]).addTo(map);
+    previewMaps[containerId] = map;
+    setTimeout(() => map.invalidateSize(), 60);
   }
   function toast(msg, isErr) {
     const el = document.getElementById('toast');
@@ -831,6 +907,7 @@ ${itemsXml}
         loc: `https://gccardshows.com/${stateFileSlug(k)}`,
         priority: '0.8',
       })),
+      { loc: 'https://gccardshows.com/trade-nights.html', priority: '0.8' },
     ];
     const entries = urls.map(u => `  <url>
     <loc>${u.loc}</loc>
@@ -850,90 +927,144 @@ ${itemsXml}
     a.click();
     a.remove();
     const stateCount = statesPresentIn(events).length;
-    toast(`Generated sitemap.xml — homepage + ${stateCount} state page${stateCount === 1 ? '' : 's'}. Upload it to your site root.`);
+    toast(`Generated sitemap.xml — homepage + ${stateCount} state page${stateCount === 1 ? '' : 's'} + trade-nights.html. Upload it to your site root.`);
   }
   document.getElementById('btn-gen-sitemap').addEventListener('click', generateSitemap);
 
-  // ===== Discord webhook announcements (Tier 2: one-click, no bot) =====
-  // Posts a single show as a Discord embed via a webhook URL — no bot account
-  // or hosting needed. The webhook URL is saved to localStorage only, and is
-  // only ever sent to Discord's own API, never anywhere else.
-  (function initDiscordWebhook() {
-    const input = document.getElementById('discord-webhook-url');
+  // ===== Discord Scheduled Events (Tier 3: bot-powered, no channel post) =====
+  // Creates an entry in the server's Events tab via the Worker's bot-backed
+  // /discord-event endpoint. There used to also be a Tier 2 webhook that
+  // posted a plain channel message, but that was retired — once every show
+  // automatically shows up in the Events tab, a redundant channel post just
+  // adds noise, so this button only does the one thing now.
+
+  // Shares the same localStorage key as the Quick Add / Push panels' "Worker
+  // admin token" fields — fill it in anywhere and it shows up everywhere.
+  (function initDiscordAdminToken() {
+    const input = document.getElementById('discord-admin-token');
     if (!input) return;
     let saved = '';
-    try { saved = localStorage.getItem('gccs-discord-webhook-url') || ''; } catch (e) {}
+    try { saved = localStorage.getItem('gccs-admin-push-token') || ''; } catch (e) {}
     if (saved) input.value = saved;
     input.addEventListener('change', () => {
-      try { localStorage.setItem('gccs-discord-webhook-url', input.value.trim()); } catch (e) {}
+      try { localStorage.setItem('gccs-admin-push-token', input.value.trim()); } catch (e) {}
     });
   })();
 
-  function getDiscordWebhookUrl() {
-    const input = document.getElementById('discord-webhook-url');
+  function getWorkerAdminToken() {
+    const input = document.getElementById('discord-admin-token');
     if (input && input.value.trim()) return input.value.trim();
-    try { return localStorage.getItem('gccs-discord-webhook-url') || ''; } catch (e) { return ''; }
+    try { return localStorage.getItem('gccs-admin-push-token') || ''; } catch (e) { return ''; }
   }
 
-  function buildDiscordEmbed(ev) {
-    const dateText = ev.tbd ? 'TBD — stay tuned' : (ev.dateDisplay || 'TBD');
-    const fields = [
-      { name: '📅 Date', value: dateText, inline: true },
-      { name: '📍 Location', value: ev.location || 'TBD', inline: true },
-      { name: '💵 Entry', value: ev.entryFree ? 'Free' : (ev.entryFee || 'Unknown'), inline: true },
-    ];
-    if (ev.vendorFee) fields.push({ name: '🏪 Vendor Tables', value: ev.vendorFee, inline: true });
-    if (ev.organizer) fields.push({ name: '🎤 Organizer', value: ev.organizer, inline: true });
+  // Best-effort parse of the free-text "time" field (e.g. "9:00AM to 3:00PM")
+  // into 24-hour start/end hours+minutes. Discord's Scheduled Events API needs
+  // a precise start/end datetime — unlike the .ics export elsewhere on the
+  // site, which only ever uses all-day dates and never had to solve this.
+  // Returns null if the text doesn't match a recognizable "X to Y" range.
+  function parseShowTimeRange(timeStr) {
+    if (!timeStr) return null;
+    const re = /(\d{1,2})(?::(\d{2}))?\s*([AaPp]\.?[Mm]\.?)?\s*(?:-|–|—|to)\s*(\d{1,2})(?::(\d{2}))?\s*([AaPp]\.?[Mm]\.?)?/;
+    const m = re.exec(timeStr);
+    if (!m) return null;
+    let h1 = parseInt(m[1], 10), m1 = m[2] ? parseInt(m[2], 10) : 0, mer1 = m[3] ? m[3][0].toLowerCase() : null;
+    let h2 = parseInt(m[4], 10), m2 = m[5] ? parseInt(m[5], 10) : 0, mer2 = m[6] ? m[6][0].toLowerCase() : null;
+    if (!mer1 && mer2) mer1 = mer2;
+    if (!mer2 && mer1) mer2 = mer1;
+    if (!mer1) mer1 = 'a'; // no meridiem anywhere — assume typical daytime show hours
+    if (!mer2) mer2 = 'p';
+    const to24 = (h, mer) => (h % 12) + (mer === 'p' ? 12 : 0);
+    return { startH: to24(h1, mer1), startM: m1, endH: to24(h2, mer2), endM: m2 };
+  }
 
-    const embed = {
-      title: ev.tbd ? `🎴 New show incoming: ${ev.name || 'Details Coming Soon'}` : `🎴 ${ev.name || 'New show'}`,
-      url: `https://gccardshows.com/index.html?show=${encodeURIComponent(ev.id)}`,
-      color: 0xE53935,
-      fields,
-      footer: { text: 'Gulf Coast Card Shows' },
-      timestamp: new Date().toISOString(),
-    };
+  // Builds the ISO 8601 start/end datetimes a Discord Scheduled Event needs,
+  // from the show's startDate/endDate + (best-effort-parsed or default) time.
+  // Uses this browser's local timezone via the Date constructor, so it comes
+  // out correct as long as this machine's clock/timezone match the Gulf Coast.
+  function computeShowEventTimes(ev) {
+    if (!ev.startDate) return null;
+    const endDateStr = ev.endDate || ev.startDate;
+    const range = (!ev.timeUnknown && ev.time) ? parseShowTimeRange(ev.time) : null;
+    const startH = range ? range.startH : 10, startM = range ? range.startM : 0; // default 10:00 AM
+    const endH = range ? range.endH : 16, endM = range ? range.endM : 0;         // default 4:00 PM
+    const [sy, sm, sd] = ev.startDate.split('-').map(Number);
+    const [ey, em, ed] = endDateStr.split('-').map(Number);
+    const startDt = new Date(sy, sm - 1, sd, startH, startM, 0);
+    const endDt = new Date(ey, em - 1, ed, endH, endM, 0);
+    return { startISO: startDt.toISOString(), endISO: endDt.toISOString(), usedDefaultTime: !range };
+  }
+
+  // Calls the Worker's /discord-event endpoint to create a Guild Scheduled
+  // Event (the server's "Events" tab), gated on having a Worker admin token
+  // AND a confirmed (non-TBD) date, since Discord can't schedule something
+  // with no known time.
+  async function createDiscordCalendarEvent(ev) {
+    const adminToken = getWorkerAdminToken();
+    if (!adminToken) return { skipped: 'no-token' };
+    if (ev.tbd || !ev.startDate) return { skipped: 'no-date' };
+
+    const times = computeShowEventTimes(ev);
+    if (!times) return { skipped: 'no-date' };
+
     const about = ev.details && ev.details.about;
-    if (about) embed.description = about.length > 300 ? about.slice(0, 297) + '…' : about;
-    return embed;
+    const descBase = about || [ev.dateDisplay, ev.location].filter(Boolean).join(' · ');
+    const link = `https://gccardshows.com/index.html?show=${encodeURIComponent(ev.id)}`;
+    const description = `${descBase}\n\nMore info: ${link}`.trim();
+
+    try {
+      const res = await fetch(`${PUSH_API}/discord-event?token=${encodeURIComponent(adminToken)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: ev.name || 'Card Show',
+          description,
+          location: ev.location || '',
+          startISO: times.startISO,
+          endISO: times.endISO,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.error) return { error: data.error || `HTTP ${res.status}` };
+      return { ok: true, url: data.url, usedDefaultTime: times.usedDefaultTime };
+    } catch (e) {
+      return { error: 'Could not reach the Worker — ' + e.message };
+    }
   }
 
   async function postShowToDiscord(ev, btnEl) {
-    const url = getDiscordWebhookUrl();
-    if (!url) {
-      toast('Paste a Discord webhook URL into the panel above first.', true);
-      document.getElementById('discord-webhook-url')?.focus();
+    const adminToken = getWorkerAdminToken();
+    if (!adminToken) {
+      toast('Paste your Worker admin token into the Discord Events panel above first.', true);
+      document.getElementById('discord-admin-token')?.focus();
       return;
     }
-    if (!/^https:\/\/(discord\.com|discordapp\.com)\/api\/webhooks\//.test(url)) {
-      toast("That doesn't look like a Discord webhook URL — check for typos.", true);
+    if (ev.tbd || !ev.startDate) {
+      toast("This show's date is still TBD — set a confirmed date before creating a Discord Event.", true);
       return;
     }
+
     const originalLabel = btnEl ? btnEl.textContent : '';
-    if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'Posting…'; }
-    try {
-      const embed = buildDiscordEmbed(ev);
-      const sep = url.includes('?') ? '&' : '?';
-      const res = await fetch(url + sep + 'wait=true', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ embeds: [embed] }),
-      });
-      if (res.status === 429) {
-        const retryData = await res.json().catch(() => ({}));
-        const wait = Math.ceil(retryData.retry_after || 2);
-        toast(`Discord is rate-limiting posts right now — try again in ${wait}s.`, true);
-      } else if (!res.ok) {
-        toast(`Discord rejected the post (HTTP ${res.status}) — double-check the webhook URL.`, true);
-      } else {
-        toast(`📢 Posted "${ev.name || 'show'}" to Discord!`);
-      }
-    } catch (e) {
-      console.error('Discord post failed:', e);
-      toast('Could not reach Discord — check your connection and the webhook URL.', true);
-    } finally {
-      if (btnEl) { btnEl.disabled = false; btnEl.textContent = originalLabel; }
+    if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'Creating…'; }
+
+    const eventResult = await createDiscordCalendarEvent(ev);
+    let msg, isErr = false;
+    if (eventResult.ok) {
+      msg = `📅 Added "${ev.name || 'show'}" to the server's Events tab!`;
+      if (eventResult.usedDefaultTime) msg += " Used default show hours (10am–4pm) — edit the time on Discord if that's off.";
+    } else if (eventResult.error) {
+      msg = `Couldn't create the Discord Event: ${eventResult.error}`;
+      isErr = true;
+    } else {
+      // Shouldn't normally hit this given the guard clauses above, but cover
+      // it in case createDiscordCalendarEvent's own checks disagree somehow.
+      msg = eventResult.skipped === 'no-token'
+        ? 'Paste your Worker admin token into the Discord Events panel above first.'
+        : "This show's date is still TBD — set a confirmed date before creating a Discord Event.";
+      isErr = true;
     }
+
+    toast(msg, isErr);
+    if (btnEl) { btnEl.disabled = false; btnEl.textContent = originalLabel; }
   }
 
   // ===== List rendering =====
@@ -1073,15 +1204,16 @@ ${itemsXml}
     const summary = document.getElementById('datahealth-summary');
     if (!body) return;
 
-    if (!events.length && !vendors.length) {
+    if (!events.length && !tnEvents.length && !vendors.length) {
       summary.textContent = '';
-      body.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🩺</div><p>Open index.html and/or vendors.html above to check for missing coordinates, broken TBD shows, incomplete vendor listings, and other things worth a second look.</p></div>`;
+      body.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🩺</div><p>Open index.html, trade-nights.html, and/or vendors.html above to check for missing coordinates, broken TBD listings, incomplete vendor listings, and other things worth a second look.</p></div>`;
       return;
     }
 
     const showIssues = events.length ? collectShowIssues() : [];
+    const tnIssues = tnEvents.length ? collectTnIssues() : [];
     const vendorIssues = vendors.length ? collectVendorIssues() : [];
-    const total = showIssues.length + vendorIssues.length;
+    const total = showIssues.length + tnIssues.length + vendorIssues.length;
     summary.textContent = total ? `${total} item${total === 1 ? '' : 's'} worth a look` : '';
 
     function groupHtml(title, issues) {
@@ -1095,10 +1227,10 @@ ${itemsXml}
     }
 
     if (!total) {
-      body.innerHTML = `<div class="health-ok">✅ Nothing flagged — ${[events.length ? `${events.length} show${events.length === 1 ? '' : 's'}` : '', vendors.length ? `${vendors.length} vendor${vendors.length === 1 ? '' : 's'}` : ''].filter(Boolean).join(' and ')} look complete.</div>`;
+      body.innerHTML = `<div class="health-ok">✅ Nothing flagged — ${[events.length ? `${events.length} show${events.length === 1 ? '' : 's'}` : '', tnEvents.length ? `${tnEvents.length} trade night${tnEvents.length === 1 ? '' : 's'}` : '', vendors.length ? `${vendors.length} vendor${vendors.length === 1 ? '' : 's'}` : ''].filter(Boolean).join(', ')} look complete.</div>`;
       return;
     }
-    body.innerHTML = groupHtml('Shows', showIssues) + groupHtml('Vendors', vendorIssues);
+    body.innerHTML = groupHtml('Shows', showIssues) + groupHtml('Trade Nights', tnIssues) + groupHtml('Vendors', vendorIssues);
   }
 
   function renderList() {
@@ -1386,7 +1518,7 @@ ${itemsXml}
 
       <div class="form-actions">
         <button type="button" class="btn-primary" id="f-save">💾 ${isNew ? 'Add Show' : 'Save Changes'}</button>
-        ${!isNew ? `<button type="button" id="f-post-discord" title="Posts this show's current saved details to your Discord webhook">📢 Post to Discord</button>` : ''}
+        ${!isNew ? `<button type="button" id="f-post-discord" title="Creates a Discord Scheduled Event (in the server's Events tab) from this show's current saved details — requires a Worker admin token and a confirmed date">📅 Add to Discord Events</button>` : ''}
         <button type="button" id="f-cancel">Cancel</button>
       </div>
     `;
@@ -1630,6 +1762,821 @@ ${itemsXml}
   function clearFieldErrors() {
     document.querySelectorAll('.field-error').forEach(el => el.classList.remove('field-error'));
   }
+
+  // =====================================================================
+  //  TRADE NIGHT ADMIN (trade-nights.html) — mirrors the Shows admin above:
+  //  same field set, same open/save/download/list/form/Discord flow, just
+  //  pointed at trade-nights.html's TRADE_NIGHTS array (tn- prefixed ids)
+  //  instead of index.html's EVENTS. Per-state pages and RSS/JSON feeds are
+  //  Shows-only and intentionally not duplicated here, since there's only
+  //  one trade-nights.html page. Reuses the shared helpers above as-is
+  //  (formatDateDisplay, autoWebsiteLabel, detectState, escapeHtml,
+  //  todayIsoAdmin, showPreviewMap, toast, markFieldError/clearFieldErrors,
+  //  glanceToText/textToGlance/textToBullets, hasEventPassed,
+  //  getWorkerAdminToken, computeShowEventTimes) since none of those are
+  //  Shows-specific — only the array/DOM-id-specific plumbing is duplicated.
+  // =====================================================================
+  const TN_START_MARKER = '/* ==TRADE_NIGHTS-DATA-START== */';
+  const TN_END_MARKER = '/* ==TRADE_NIGHTS-DATA-END== */';
+
+  let tnFileHandle = null;
+  let tnOriginalText = '';
+  let tnEvents = [];
+  let tnSelectedId = null;
+  let tnDirty = false;
+  let tnShowArchived = false;
+  let lastAddedTnId = null; // set when a new trade night is added via the form — pre-fills the Push panel's "New Trade Night" compose box
+
+  function parseTnFromHtml(text) {
+    const s = text.indexOf(TN_START_MARKER), e = text.indexOf(TN_END_MARKER);
+    if (s === -1 || e === -1) {
+      throw new Error('Could not find the TRADE_NIGHTS data markers in this file. Make sure you selected the trade-nights.html from this site.');
+    }
+    const block = text.slice(s + TN_START_MARKER.length, e);
+    const m = block.match(/const\s+TRADE_NIGHTS\s*=\s*(\[[\s\S]*\]);/);
+    if (!m) throw new Error('Found the markers but could not parse the TRADE_NIGHTS array inside them.');
+    let parsed;
+    try {
+      parsed = new Function('return (' + m[1] + ')')();
+    } catch (err) {
+      throw new Error('The TRADE_NIGHTS array in this file has a syntax error: ' + err.message);
+    }
+    return parsed.map((ev, i) => normalizeTn(ev, i));
+  }
+
+  function normalizeTn(ev, i) {
+    const d = ev.details || {};
+    return {
+      id: ev.id || ('tn-' + String(i + 1).padStart(3, '0')),
+      name: ev.name || '',
+      dateDisplay: ev.dateDisplay || '',
+      startDate: ev.startDate || '',
+      endDate: ev.endDate || '',
+      dateAdded: ev.dateAdded || todayIsoAdmin(),
+      featured: !!ev.featured,
+      time: ev.time || '',
+      timeUnknown: !!ev.timeUnknown,
+      location: ev.location || '',
+      lat: typeof ev.lat === 'number' ? ev.lat : null,
+      lng: typeof ev.lng === 'number' ? ev.lng : null,
+      websiteUrl: ev.websiteUrl || '',
+      websiteLabel: ev.websiteLabel || '',
+      organizer: ev.organizer || '',
+      tbd: !!ev.tbd,
+      details: {
+        about: d.about || '',
+        atAGlance: Array.isArray(d.atAGlance)
+          ? d.atAGlance.filter(x => x && (x.label || x.value)).map(x => ({ label: x.label || '', value: x.value || '' }))
+          : [],
+        whatToExpect: Array.isArray(d.whatToExpect) ? d.whatToExpect.filter(Boolean) : [],
+        locationNotes: d.locationNotes || '',
+      },
+    };
+  }
+
+  function serializeTns(list) {
+    return list.map(ev => `    {
+      id: "${jsStringEscape(ev.id)}",
+      name: "${jsStringEscape(ev.name)}",
+      startDate: "${jsStringEscape(ev.startDate)}", endDate: "${jsStringEscape(ev.endDate)}",
+      dateAdded: "${jsStringEscape(ev.dateAdded)}",
+      featured: ${!!ev.featured},
+      dateDisplay: "${jsStringEscape(ev.dateDisplay)}",
+      time: "${jsStringEscape(ev.time)}",
+      timeUnknown: ${!!ev.timeUnknown},
+      location: "${jsStringEscape(ev.location)}",
+      lat: ${Number.isFinite(ev.lat) ? ev.lat : 'null'}, lng: ${Number.isFinite(ev.lng) ? ev.lng : 'null'},
+      websiteUrl: "${jsStringEscape(ev.websiteUrl)}", websiteLabel: "${jsStringEscape(ev.websiteLabel)}",
+      organizer: "${jsStringEscape(ev.organizer)}",
+      tbd: ${!!ev.tbd},
+${serializeDetails(ev.details)}
+    }`).join(',\n');
+  }
+
+  function writeTnsIntoHtml(text, list) {
+    const s = text.indexOf(TN_START_MARKER), e = text.indexOf(TN_END_MARKER);
+    if (s === -1 || e === -1) throw new Error('TRADE_NIGHTS markers not found — cannot save.');
+    const before = text.slice(0, s + TN_START_MARKER.length);
+    const after = text.slice(e);
+    const body = list.length ? `\n  const TRADE_NIGHTS = [\n${serializeTns(list)}\n  ];\n  ` : `\n  const TRADE_NIGHTS = [];\n  `;
+    return before + body + after;
+  }
+
+  function buildTnOutputHtml() {
+    return writeTnsIntoHtml(tnOriginalText, tnEvents);
+  }
+
+  function setTnFileStatus(msg, cls) {
+    const el = document.getElementById('tn-file-status');
+    if (!el) return;
+    el.textContent = msg;
+    el.className = cls || '';
+  }
+
+  async function openTnFile() {
+    if (supportsFSAccess) {
+      try {
+        const [handle] = await window.showOpenFilePicker({
+          types: [{ description: 'HTML files', accept: { 'text/html': ['.html', '.htm'] } }]
+        });
+        const file = await handle.getFile();
+        const text = await file.text();
+        const parsed = parseTnFromHtml(text);
+        tnFileHandle = handle;
+        tnOriginalText = text;
+        tnEvents = parsed;
+        tnSelectedId = null;
+        tnDirty = false;
+        afterTnLoad(file.name);
+      } catch (err) {
+        if (err.name !== 'AbortError') { toast(err.message, true); }
+      }
+    } else {
+      document.getElementById('tn-file-input-fallback').click();
+    }
+  }
+
+  document.getElementById('tn-file-input-fallback').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const parsed = parseTnFromHtml(text);
+      tnFileHandle = null;
+      tnOriginalText = text;
+      tnEvents = parsed;
+      tnSelectedId = null;
+      tnDirty = false;
+      afterTnLoad(file.name);
+    } catch (err) {
+      toast(err.message, true);
+    }
+    e.target.value = '';
+  });
+
+  function afterTnLoad(name) {
+    setTnFileStatus(`Opened ${name} — ${tnEvents.length} trade night${tnEvents.length === 1 ? '' : 's'} loaded.`, 'ok');
+    document.getElementById('tn-btn-save').disabled = false;
+    document.getElementById('tn-btn-download').disabled = false;
+    document.getElementById('tn-btn-add').disabled = false;
+    const qaBtn = document.getElementById('tn-quickadd-btn');
+    if (qaBtn) qaBtn.disabled = false;
+    renderTnList();
+    renderTnForm(null);
+    toast(`Loaded ${tnEvents.length} trade nights`);
+  }
+
+  async function saveTnFile() {
+    if (!tnOriginalText) { toast('Open trade-nights.html first.', true); return; }
+    let newText;
+    try { newText = buildTnOutputHtml(); }
+    catch (err) { toast(err.message, true); return; }
+
+    if (tnFileHandle) {
+      try {
+        const writable = await tnFileHandle.createWritable();
+        await writable.write(newText);
+        await writable.close();
+        tnOriginalText = newText;
+        tnDirty = false;
+        setTnFileStatus(`Saved ✓ — ${tnEvents.length} trade nights written to trade-nights.html`, 'ok');
+        toast('Saved to trade-nights.html');
+      } catch (err) {
+        toast('Save failed: ' + err.message, true);
+      }
+    } else {
+      downloadTnFile(newText);
+    }
+  }
+
+  function downloadTnFile(text) {
+    const blob = new Blob([text], { type: 'text/html' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'trade-nights.html';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    tnOriginalText = text;
+    tnDirty = false;
+    setTnFileStatus(`Downloaded trade-nights.html (${tnEvents.length} trade nights) — replace your old file with this one.`, 'ok');
+    toast('Downloaded updated trade-nights.html');
+  }
+
+  document.getElementById('tn-btn-open').addEventListener('click', openTnFile);
+  document.getElementById('tn-btn-open-2').addEventListener('click', openTnFile);
+  document.getElementById('tn-btn-save').addEventListener('click', saveTnFile);
+  document.getElementById('tn-btn-download').addEventListener('click', () => {
+    if (!tnOriginalText) { toast('Open trade-nights.html first.', true); return; }
+    try { downloadTnFile(buildTnOutputHtml()); }
+    catch (err) { toast(err.message, true); }
+  });
+
+  window.addEventListener('beforeunload', (e) => {
+    if (tnDirty) { e.preventDefault(); e.returnValue = ''; }
+  });
+
+  // ===== Discord Scheduled Events for trade nights — reuses the Worker's
+  // generic /discord-event endpoint and the same shared admin token field
+  // (getWorkerAdminToken()) as Shows above, just pointed at trade-nights.html.
+  async function createTnDiscordEvent(ev) {
+    const adminToken = getWorkerAdminToken();
+    if (!adminToken) return { skipped: 'no-token' };
+    if (ev.tbd || !ev.startDate) return { skipped: 'no-date' };
+
+    const times = computeShowEventTimes(ev);
+    if (!times) return { skipped: 'no-date' };
+
+    const about = ev.details && ev.details.about;
+    const descBase = about || [ev.dateDisplay, ev.location].filter(Boolean).join(' · ');
+    const link = `https://gccardshows.com/trade-nights.html?tn=${encodeURIComponent(ev.id)}`;
+    const description = `${descBase}\n\nMore info: ${link}`.trim();
+
+    try {
+      const res = await fetch(`${PUSH_API}/discord-event?token=${encodeURIComponent(adminToken)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: ev.name || 'Trade Night',
+          description,
+          location: ev.location || '',
+          startISO: times.startISO,
+          endISO: times.endISO,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.error) return { error: data.error || `HTTP ${res.status}` };
+      return { ok: true, url: data.url, usedDefaultTime: times.usedDefaultTime };
+    } catch (e) {
+      return { error: 'Could not reach the Worker — ' + e.message };
+    }
+  }
+
+  async function postTnToDiscord(ev, btnEl) {
+    const adminToken = getWorkerAdminToken();
+    if (!adminToken) {
+      toast('Paste your Worker admin token into the Discord Events panel above first.', true);
+      document.getElementById('discord-admin-token')?.focus();
+      return;
+    }
+    if (ev.tbd || !ev.startDate) {
+      toast("This trade night's date is still TBD — set a confirmed date before creating a Discord Event.", true);
+      return;
+    }
+
+    const originalLabel = btnEl ? btnEl.textContent : '';
+    if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'Creating…'; }
+
+    const eventResult = await createTnDiscordEvent(ev);
+    let msg, isErr = false;
+    if (eventResult.ok) {
+      msg = `📅 Added "${ev.name || 'trade night'}" to the server's Events tab!`;
+      if (eventResult.usedDefaultTime) msg += " Used default hours (10am–4pm) — edit the time on Discord if that's off.";
+    } else if (eventResult.error) {
+      msg = `Couldn't create the Discord Event: ${eventResult.error}`;
+      isErr = true;
+    } else {
+      msg = eventResult.skipped === 'no-token'
+        ? 'Paste your Worker admin token into the Discord Events panel above first.'
+        : "This trade night's date is still TBD — set a confirmed date before creating a Discord Event.";
+      isErr = true;
+    }
+
+    toast(msg, isErr);
+    if (btnEl) { btnEl.disabled = false; btnEl.textContent = originalLabel; }
+  }
+
+  function collectTnIssues() {
+    const issues = [];
+    const seenIds = new Map();
+    tnEvents.forEach((ev) => {
+      const label = ev.name || '(unnamed trade night)';
+      const fix = `<button type="button" class="btn-sm health-fix" onclick="jumpToTn('${ev.id}')">Fix →</button>`;
+      const row = (sev, msg) => issues.push({ sev, id: ev.id, label, msg, fix });
+
+      if (typeof ev.lat !== 'number' || typeof ev.lng !== 'number' || Number.isNaN(ev.lat) || Number.isNaN(ev.lng)) {
+        row('warn', "No map coordinates — won't appear on the trade-nights.html map. Use \"Find coordinates\" on the form.");
+      }
+      if (!ev.location || !ev.location.trim()) {
+        row('warn', 'No location set at all.');
+      }
+      if (!ev.tbd && (!ev.startDate || !ev.dateDisplay || !ev.dateDisplay.trim())) {
+        row('warn', 'Not marked TBD, but missing a start date or date-display text.');
+      }
+      if (ev.tbd) {
+        const days = daysSince(ev.dateAdded);
+        if (days !== null && days >= 45) {
+          row('info', `Still marked TBD after ${days} days — worth checking if a date's been announced.`);
+        }
+      }
+      if (!ev.websiteUrl) {
+        row('info', 'No website or social link set.');
+      }
+      if (!ev.dateAdded) {
+        row('info', 'No "date added" — default sort order may not work right for this trade night.');
+      }
+      if (seenIds.has(ev.id)) {
+        issues.push({ sev: 'warn', id: ev.id, label, msg: `Duplicate id "${ev.id}" — shared with "${seenIds.get(ev.id)}". Duplicate ids can make edits apply to the wrong trade night.`, fix });
+      } else {
+        seenIds.set(ev.id, label);
+      }
+    });
+    return issues;
+  }
+
+  function jumpToTn(id) {
+    tnSelectedId = id;
+    renderTnList();
+    renderTnForm(id);
+    document.getElementById('tn-form-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  window.jumpToTn = jumpToTn;
+
+  function renderTnList() {
+    renderDataHealth();
+    const pastCountForHeader = tnEvents.filter(hasEventPassed).length;
+    const activeCountForHeader = tnEvents.length - pastCountForHeader;
+    document.getElementById('tn-count').textContent = pastCountForHeader
+      ? `${activeCountForHeader} active · ${pastCountForHeader} archived`
+      : String(activeCountForHeader);
+    const body = document.getElementById('tn-list-body');
+    if (!tnEvents.length) {
+      body.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🔁</div><p>No trade nights yet. Click "+ Add Trade Night" to create the first one.</p></div>`;
+      return;
+    }
+
+    const upcoming = [];
+    const past = [];
+    tnEvents.forEach((ev, i) => { (hasEventPassed(ev) ? past : upcoming).push({ ev, i }); });
+
+    function rowHtml(item, posInGroup, groupLen, isPast) {
+      const { ev, i } = item;
+      const st = detectState(ev.location);
+      return `
+      <div class="event-row${ev.tbd ? ' tbd' : ''}${ev.id === tnSelectedId ? ' selected' : ''}${isPast ? ' archived' : ''}" data-id="${ev.id}">
+        <div class="event-order">
+          <button class="btn-icon" data-action="up" data-id="${ev.id}" ${posInGroup === 0 ? 'disabled' : ''} title="Move up">↑</button>
+          <button class="btn-icon" data-action="down" data-id="${ev.id}" ${posInGroup === groupLen - 1 ? 'disabled' : ''} title="Move down">↓</button>
+        </div>
+        <div class="event-num">#${String(posInGroup + 1).padStart(2, '0')}</div>
+        <div class="event-main" data-action="edit" data-id="${ev.id}">
+          <div class="event-name">${escapeHtml(ev.tbd ? (ev.name || 'Details Coming Soon') : (ev.name || '(unnamed trade night)'))}</div>
+          <div class="event-meta">${escapeHtml(ev.dateDisplay || 'No date set')} · ${st === 'UNK' ? '' : st}</div>
+          ${ev.tbd ? '<span class="event-tag">TBD</span>' : ''}
+          ${ev.featured ? '<span class="event-tag featured-tag">⭐ Featured</span>' : ''}
+          ${isPast ? '<span class="event-tag" style="background:var(--muted);">Archived</span>' : ''}
+        </div>
+        <div class="event-actions">
+          <button class="btn-icon" data-action="edit" data-id="${ev.id}" title="Edit">✏️</button>
+          <button class="btn-icon btn-danger" data-action="delete" data-id="${ev.id}" title="Delete">🗑️</button>
+        </div>
+      </div>`;
+    }
+
+    let html = upcoming.map((item, pos) => rowHtml(item, pos, upcoming.length, false)).join('');
+    if (!upcoming.length) {
+      html += `<div class="empty-state"><div class="empty-state-icon">📭</div><p>No active trade nights. ${past.length ? 'Check the archive below, or add' : 'Add'} a new one.</p></div>`;
+    }
+
+    if (past.length) {
+      html += `<button type="button" class="archive-toggle" id="tn-btn-toggle-archived">
+        <span>${tnShowArchived ? '▾' : '▸'}</span>
+        <span>${tnShowArchived ? 'Hide' : 'Show'} archived trade nights (${past.length} past)</span>
+      </button>`;
+      if (tnShowArchived) {
+        html += `<p class="archive-note">These trade nights have already happened (based on their end date, or start date if no end date was set) and are automatically kept out of the active list above. They still export to the site normally — nothing here is deleted.</p>`;
+        html += past.map((item, pos) => rowHtml(item, pos, past.length, true)).join('');
+      }
+    }
+
+    body.innerHTML = html;
+
+    const toggleBtn = document.getElementById('tn-btn-toggle-archived');
+    if (toggleBtn) toggleBtn.addEventListener('click', () => { tnShowArchived = !tnShowArchived; renderTnList(); });
+
+    renderTnFeaturedPicker();
+  }
+
+  function renderTnFeaturedPicker() {
+    const sel = document.getElementById('tn-featured-select');
+    if (!sel) return;
+    sel.disabled = !tnEvents.length;
+    const current = tnEvents.find(ev => ev.featured);
+    sel.innerHTML = '<option value="">— None —</option>' + tnEvents.map(ev =>
+      `<option value="${ev.id}">${escapeHtml(ev.name || '(unnamed trade night)')} — ${escapeHtml(ev.dateDisplay || 'no date')}</option>`
+    ).join('');
+    sel.value = current ? current.id : '';
+  }
+  document.getElementById('tn-featured-select').addEventListener('change', (e) => {
+    const chosenId = e.target.value;
+    tnEvents.forEach(ev => { ev.featured = (ev.id === chosenId); });
+    tnDirty = true;
+    renderTnList();
+    const chosen = tnEvents.find(ev => ev.id === chosenId);
+    toast(chosen ? `⭐ "${chosen.name || 'Trade Night'}" set as featured — remember to save to trade-nights.html` : 'Featured trade night cleared — remember to save to trade-nights.html');
+  });
+
+  function moveTnWithinGroup(id, dir) {
+    const idx = tnEvents.findIndex(ev => ev.id === id);
+    if (idx === -1) return;
+    const isPast = hasEventPassed(tnEvents[idx]);
+    const groupIdx = tnEvents.map((ev, i) => ({ ev, i })).filter(x => hasEventPassed(x.ev) === isPast).map(x => x.i);
+    const pos = groupIdx.indexOf(idx);
+    const targetPos = pos + dir;
+    if (targetPos < 0 || targetPos >= groupIdx.length) return;
+    const otherIdx = groupIdx[targetPos];
+    [tnEvents[idx], tnEvents[otherIdx]] = [tnEvents[otherIdx], tnEvents[idx]];
+    tnDirty = true;
+    renderTnList();
+  }
+
+  document.getElementById('tn-list-body').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const id = btn.dataset.id;
+    const action = btn.dataset.action;
+    const idx = tnEvents.findIndex(ev => ev.id === id);
+    if (idx === -1) return;
+    if (action === 'edit') { tnSelectedId = id; renderTnList(); renderTnForm(id); }
+    else if (action === 'delete') {
+      if (confirm(`Delete "${tnEvents[idx].name || 'this trade night'}"? This can't be undone here (but you haven't saved yet).`)) {
+        tnEvents.splice(idx, 1);
+        tnDirty = true;
+        if (tnSelectedId === id) { tnSelectedId = null; renderTnForm(null); }
+        renderTnList();
+      }
+    } else if (action === 'up') {
+      moveTnWithinGroup(id, -1);
+    } else if (action === 'down') {
+      moveTnWithinGroup(id, 1);
+    }
+  });
+
+  document.getElementById('tn-btn-add').addEventListener('click', () => {
+    tnSelectedId = '__new__';
+    renderTnList();
+    renderTnForm('__new__');
+  });
+
+  // ===== Form rendering =====
+  function blankTn() {
+    return {
+      id: 'tn-' + Date.now(), name: '', dateDisplay: '', startDate: '', endDate: '',
+      dateAdded: todayIsoAdmin(),
+      featured: false,
+      time: '', timeUnknown: false, location: '', lat: null, lng: null,
+      websiteUrl: '', websiteLabel: '',
+      organizer: '', tbd: false,
+      details: { about: '', atAGlance: [], whatToExpect: [], locationNotes: '' },
+    };
+  }
+
+  function renderTnForm(id) {
+    const panelTitle = document.getElementById('tn-form-title');
+    const body = document.getElementById('tn-form-body');
+    if (!id) {
+      panelTitle.textContent = 'No trade night selected';
+      body.innerHTML = `<div class="empty-state"><div class="empty-state-icon">👈</div><p>Select a trade night on the left to edit it, or add a new one.</p></div>`;
+      return;
+    }
+    const isNew = id === '__new__';
+    const ev = isNew ? blankTn() : tnEvents.find(e => e.id === id);
+    if (!ev) { renderTnForm(null); return; }
+
+    panelTitle.textContent = isNew ? 'Add a new trade night' : `Editing: ${ev.name || '(unnamed trade night)'}`;
+
+    body.innerHTML = `
+      <div class="form-group">
+        <label>Trade Night Name ${ev.tbd ? '<span style="text-transform:none;font-weight:400;">(shown as "TBD" on the card while details are pending)</span>' : '*'}</label>
+        <input type="text" id="tn-f-name" value="${escapeHtml(ev.name)}" placeholder="e.g. Pensacola Monthly Trade Night">
+      </div>
+      <label class="checkbox-row"><input type="checkbox" id="tn-f-tbd" ${ev.tbd ? 'checked' : ''}> Details still TBD (shows a dashed "coming soon" card)</label>
+
+      <div class="section-divider"><div class="section-label">When</div></div>
+      <div class="form-row">
+        <div class="form-group"><label>Start Date *</label><input type="date" id="tn-f-start-date" value="${escapeHtml(ev.startDate)}"></div>
+        <div class="form-group"><label>End Date (if multi-day)</label><input type="date" id="tn-f-end-date" value="${escapeHtml(ev.endDate)}"></div>
+      </div>
+      <div class="hint" id="tn-date-preview">Date display will be generated automatically.</div>
+      <div class="hint" style="margin-top:2px;">📰 Added to site: ${escapeHtml(ev.dateAdded || todayIsoAdmin())} — this determines its default sort order, not the date above.</div>
+      <div class="form-group" style="margin-top:12px;">
+        <label>Time</label>
+        <input type="text" id="tn-f-time" value="${escapeHtml(ev.time)}" placeholder="e.g. 6:00PM to 9:00PM" ${ev.timeUnknown ? 'disabled' : ''}>
+      </div>
+      <label class="checkbox-row"><input type="checkbox" id="tn-f-time-unknown" ${ev.timeUnknown ? 'checked' : ''}> Time not known yet</label>
+
+      <div class="section-divider"><div class="section-label">Where</div></div>
+      <div class="form-group">
+        <label>Venue &amp; Address *</label>
+        <input type="text" id="tn-f-location" value="${escapeHtml(ev.location)}" placeholder="Venue name, street, city, state, ZIP">
+      </div>
+      <div class="geo-row">
+        <button type="button" id="tn-f-geocode" class="btn-sm">📍 Find coordinates</button>
+        <span class="geo-result ${ev.lat != null ? 'ok' : 'pending'}" id="tn-geo-result">${ev.lat != null ? `Set: ${ev.lat.toFixed(4)}, ${ev.lng.toFixed(4)}` : 'Not set yet — click "Find coordinates" after entering the address'}</span>
+      </div>
+      <div id="tn-geo-preview-map"></div>
+      <div class="hint">Needed to place this trade night on the map and to power distance sorting. Uses OpenStreetMap — free, no API key. Check the pin lands on the right venue before saving.</div>
+
+      <div class="section-divider"><div class="section-label">Details</div></div>
+      <div class="form-group">
+        <label>Website / Social Link</label>
+        <input type="url" id="tn-f-website-url" value="${escapeHtml(ev.websiteUrl)}" placeholder="https://...">
+      </div>
+      <div class="form-group">
+        <label>Link Label</label>
+        <input type="text" id="tn-f-website-label" value="${escapeHtml(ev.websiteLabel)}" placeholder="Auto-filled from the URL — edit if you like">
+      </div>
+      <div class="form-group">
+        <label>Organizer</label>
+        <input type="text" id="tn-f-organizer" value="${escapeHtml(ev.organizer)}" placeholder="Name or business running the trade night">
+      </div>
+
+      <div class="section-divider"><div class="section-label">More Details (popup window)</div></div>
+      <div class="hint" style="margin-bottom:12px;">Fill any of these in and the popup on the public site will show it — About, At a Glance, What to Expect, and Location Notes each only appear if you've entered something. Every card is clickable, so it's fine to leave all of this blank too.
+      <div class="form-group">
+        <label>About This Trade Night</label>
+        <textarea id="tn-f-about" rows="4" placeholder="A paragraph describing the trade night — vibe, typical turnout, what makes it worth attending.">${escapeHtml((ev.details && ev.details.about) || '')}</textarea>
+      </div>
+      <div class="form-group">
+        <label>At a Glance (one per line, format: <em>Label: Value</em>)</label>
+        <textarea id="tn-f-glance" rows="6" placeholder="Hours: 6:00 PM – 9:00 PM&#10;Parking: Free on-site&#10;Tables: Usually 10-15 traders">${escapeHtml(glanceToText((ev.details && ev.details.atAGlance) || []))}</textarea>
+        <div class="hint">Each line becomes a labeled cell in the popup. Format: <code>Label: Value</code>.</div>
+      </div>
+      <div class="form-group">
+        <label>What to Expect (one bullet per line)</label>
+        <textarea id="tn-f-expect" rows="5" placeholder="Casual trading, no entry fee&#10;Mostly Pokémon &amp; sports cards&#10;Bring your own binders/boxes to trade">${escapeHtml(((ev.details && ev.details.whatToExpect) || []).join('\n'))}</textarea>
+      </div>
+      <div class="form-group">
+        <label>Location Notes (optional — extra directions/parking info)</label>
+        <textarea id="tn-f-loc-notes" rows="2" placeholder="e.g. Enter through the side door near the food court.">${escapeHtml((ev.details && ev.details.locationNotes) || '')}</textarea>
+      </div>
+
+
+      <div class="form-actions">
+        <button type="button" class="btn-primary" id="tn-f-save">💾 ${isNew ? 'Add Trade Night' : 'Save Changes'}</button>
+        ${!isNew ? `<button type="button" id="tn-f-post-discord" title="Creates a Discord Scheduled Event (in the server's Events tab) from this trade night's current saved details — requires a Worker admin token and a confirmed date">📅 Add to Discord Events</button>` : ''}
+        <button type="button" id="tn-f-cancel">Cancel</button>
+      </div>
+    `;
+
+    wireTnFormEvents(ev, isNew);
+  }
+
+  function wireTnFormEvents(ev, isNew) {
+    const $ = sel => document.getElementById(sel);
+
+    function updateDatePreview() {
+      const s = $('tn-f-start-date').value, e = $('tn-f-end-date').value;
+      const display = formatDateDisplay(s, e);
+      $('tn-date-preview').textContent = display ? `Will display as: "${display}"` : 'Enter a start date to preview.';
+    }
+    $('tn-f-start-date').addEventListener('input', updateDatePreview);
+    $('tn-f-end-date').addEventListener('input', updateDatePreview);
+    updateDatePreview();
+
+    $('tn-f-tbd').addEventListener('change', (e) => {
+      $('tn-f-time').disabled = $('tn-f-time-unknown').checked;
+    });
+    $('tn-f-time-unknown').addEventListener('change', (e) => {
+      $('tn-f-time').disabled = e.target.checked;
+    });
+
+    $('tn-f-website-url').addEventListener('blur', () => {
+      if (!$('tn-f-website-label').value.trim() && $('tn-f-website-url').value.trim()) {
+        $('tn-f-website-label').value = autoWebsiteLabel($('tn-f-website-url').value.trim());
+      }
+    });
+
+    function queryVariants(addr) {
+      const variants = [addr];
+      const parts = addr.split(',').map(s => s.trim()).filter(Boolean);
+      if (parts.length > 2) {
+        const withoutVenue = parts.slice(1).join(', ');
+        if (!variants.includes(withoutVenue)) variants.push(withoutVenue);
+        const withoutZip = withoutVenue.replace(/\s*\d{5}(-\d{4})?\s*$/, '').trim();
+        if (withoutZip && withoutZip !== withoutVenue && !variants.includes(withoutZip)) variants.push(withoutZip);
+      }
+      return variants;
+    }
+    async function geocodeAddress(addr) {
+      for (const q of queryVariants(addr)) {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=us&q=${encodeURIComponent(q)}`;
+        const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+        if (!r.ok) throw new Error(`Nominatim returned HTTP ${r.status}`);
+        const data = await r.json();
+        if (data && data.length) return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon), matchedQuery: q };
+      }
+      return null;
+    }
+    $('tn-f-geocode').addEventListener('click', async () => {
+      const addr = $('tn-f-location').value.trim();
+      const resultEl = $('tn-geo-result');
+      if (!addr) { resultEl.textContent = 'Enter an address first.'; resultEl.className = 'geo-result err'; return; }
+      resultEl.textContent = 'Looking up…';
+      resultEl.className = 'geo-result pending';
+      try {
+        const found = await geocodeAddress(addr);
+        if (!found) {
+          resultEl.textContent = "Couldn't find that address — double-check the street, city, and state, or try without the venue name.";
+          resultEl.className = 'geo-result err';
+          return;
+        }
+        ev._foundLat = found.lat;
+        ev._foundLng = found.lng;
+        ev._geocodedFor = addr;
+        const note = found.matchedQuery !== addr ? ' (matched on address only, without the venue name)' : '';
+        resultEl.textContent = `Found: ${ev._foundLat.toFixed(4)}, ${ev._foundLng.toFixed(4)} ✓${note}`;
+        resultEl.className = 'geo-result ok';
+        showPreviewMap(ev._foundLat, ev._foundLng, 'tn-geo-preview-map');
+      } catch (err) {
+        resultEl.textContent = 'Lookup failed — check your internet connection and try again in a moment.';
+        resultEl.className = 'geo-result err';
+      }
+    });
+    ev._foundLat = ev.lat;
+    ev._foundLng = ev.lng;
+    ev._geocodedFor = ev.location || '';
+    if (ev._foundLat != null && ev._foundLng != null) showPreviewMap(ev._foundLat, ev._foundLng, 'tn-geo-preview-map');
+
+    $('tn-f-location').addEventListener('input', () => {
+      const addr = $('tn-f-location').value.trim();
+      if (addr === ev._geocodedFor) return;
+      ev._foundLat = null;
+      ev._foundLng = null;
+      const resultEl = $('tn-geo-result');
+      resultEl.textContent = '⚠️ Address changed — click "Find coordinates" again before saving.';
+      resultEl.className = 'geo-result stale';
+      const map = $('tn-geo-preview-map');
+      if (map) map.classList.remove('visible');
+    });
+
+    $('tn-f-cancel').addEventListener('click', () => {
+      tnSelectedId = null;
+      renderTnList();
+      renderTnForm(null);
+    });
+
+    const discordBtn = $('tn-f-post-discord');
+    if (discordBtn) {
+      discordBtn.addEventListener('click', () => postTnToDiscord(ev, discordBtn));
+    }
+
+    $('tn-f-save').addEventListener('click', () => {
+      const name = $('tn-f-name').value.trim();
+      const tbd = $('tn-f-tbd').checked;
+      const startDate = $('tn-f-start-date').value;
+      const location = $('tn-f-location').value.trim();
+
+      let hasError = false;
+      clearFieldErrors();
+      if (!name && !tbd) { markFieldError('tn-f-name', 'Give this trade night a name, or check "Details still TBD".'); hasError = true; }
+      if (!startDate) { markFieldError('tn-f-start-date', 'Start date is required.'); hasError = true; }
+      if (!location) { markFieldError('tn-f-location', 'Venue/address is required (needed for the map).'); hasError = true; }
+      if (ev._foundLat == null || ev._foundLng == null) {
+        markFieldError('tn-f-geocode', null);
+        $('tn-geo-result').textContent = 'Click "Find coordinates" before saving.';
+        $('tn-geo-result').className = 'geo-result err';
+        hasError = true;
+      }
+      if (hasError) { toast('Please fix the highlighted fields.', true); return; }
+
+      const endDate = $('tn-f-end-date').value;
+
+      const updated = {
+        id: ev.id,
+        name: name,
+        startDate, endDate,
+        dateDisplay: formatDateDisplay(startDate, endDate),
+        time: $('tn-f-time-unknown').checked ? '' : $('tn-f-time').value.trim(),
+        timeUnknown: $('tn-f-time-unknown').checked,
+        location,
+        lat: ev._foundLat, lng: ev._foundLng,
+        websiteUrl: $('tn-f-website-url').value.trim(),
+        websiteLabel: $('tn-f-website-label').value.trim() || autoWebsiteLabel($('tn-f-website-url').value.trim()),
+        organizer: $('tn-f-organizer').value.trim() || (tbd ? 'Unknown' : ''),
+        tbd,
+        details: {
+          about: $('tn-f-about').value.trim(),
+          atAGlance: textToGlance($('tn-f-glance').value),
+          whatToExpect: textToBullets($('tn-f-expect').value),
+          locationNotes: $('tn-f-loc-notes').value.trim(),
+        },
+      };
+
+      (function checkDuplicate() {
+        function normName(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); }
+        function datesOverlap(aStart, aEnd, bStart, bEnd) {
+          if (!aStart || !bStart) return false;
+          const as = aStart, ae = aEnd || aStart, bs = bStart, be = bEnd || bStart;
+          return as <= be && bs <= ae;
+        }
+        const nName = normName(updated.name);
+        if (!nName) return;
+        const dup = tnEvents.find(other => {
+          if (other.id === updated.id) return false;
+          const on = normName(other.name);
+          if (!on) return false;
+          const nameMatch = on === nName || on.includes(nName) || nName.includes(on);
+          if (!nameMatch) return false;
+          return datesOverlap(updated.startDate, updated.endDate, other.startDate, other.endDate);
+        });
+        if (dup) {
+          const proceed = confirm(
+            `⚠️ Possible duplicate:\n\n"${dup.name}" is already listed on ${dup.dateDisplay || dup.startDate}.\n\nContinue anyway?`
+          );
+          if (!proceed) { window.__tnDupCancel = true; return; }
+        }
+        window.__tnDupCancel = false;
+      })();
+      if (window.__tnDupCancel) { toast('Cancelled — not saved.', true); return; }
+
+      if (isNew) {
+        tnEvents.push(Object.assign({}, ev, updated));
+        lastAddedTnId = updated.id;
+        toast('Trade night added — remember to save to trade-nights.html');
+      } else {
+        const idx = tnEvents.findIndex(e2 => e2.id === ev.id);
+        tnEvents[idx] = Object.assign({}, ev, updated);
+        toast('Trade night updated — remember to save to trade-nights.html');
+      }
+      tnDirty = true;
+      tnSelectedId = updated.id;
+      renderTnList();
+      renderTnForm(updated.id);
+      if (pushPanelLoaded) renderPushResults();
+    });
+  }
+
+  // ===== Quick Add from Facebook Post — Trade Nights variant. Shares the
+  // Worker's /extract-show route and the admin token with the Shows Quick
+  // Add above; the extracted JSON has the same generic shape (name, date,
+  // location, fee, organizer, about), so it pre-fills a new Trade Night form
+  // just as well as a new Show form. =====
+  (function initTnQuickAdd() {
+    const tokenInput = document.getElementById('tn-quickadd-admin-token');
+    const textInput = document.getElementById('tn-quickadd-text');
+    const btn = document.getElementById('tn-quickadd-btn');
+    if (!tokenInput || !textInput || !btn) return;
+
+    const saved = localStorage.getItem('gccs-admin-push-token');
+    if (saved) tokenInput.value = saved;
+
+    btn.addEventListener('click', async () => {
+      const token = tokenInput.value.trim();
+      const text = textInput.value.trim();
+      if (!token) { toast('Enter your Worker admin token first.', true); return; }
+      if (!text) { toast('Paste some post text first.', true); return; }
+      try { localStorage.setItem('gccs-admin-push-token', token); } catch (e) {}
+
+      const originalLabel = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = '✨ Extracting…';
+      try {
+        const r = await fetch(`${PUSH_API}/extract-show?token=${encodeURIComponent(token)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text }),
+        });
+        const data = await r.json().catch(() => ({}));
+        if (r.status === 401 || r.status === 403) throw new Error('Token rejected — check the ADMIN_TOKEN set on your Worker.');
+        if (!r.ok || !data.ok) throw new Error(data.error || `Worker returned an error (${r.status}).`);
+        applyTnQuickAddResult(data.extracted || {});
+        textInput.value = '';
+        toast('✨ Pre-filled the "Add a new trade night" form below — review everything before saving!');
+      } catch (err) {
+        toast('Extraction failed: ' + err.message, true);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalLabel;
+      }
+    });
+
+    function applyTnQuickAddResult(extracted) {
+      tnSelectedId = '__new__';
+      renderTnList();
+      renderTnForm('__new__');
+
+      const $ = (id) => document.getElementById(id);
+      const fire = (el, type) => { if (el) el.dispatchEvent(new Event(type, { bubbles: true })); };
+
+      if (extracted.name) $('tn-f-name').value = extracted.name;
+      if (extracted.tbd) { $('tn-f-tbd').checked = true; fire($('tn-f-tbd'), 'change'); }
+      if (extracted.startDate) { $('tn-f-start-date').value = extracted.startDate; fire($('tn-f-start-date'), 'input'); }
+      if (extracted.endDate) { $('tn-f-end-date').value = extracted.endDate; fire($('tn-f-end-date'), 'input'); }
+      if (extracted.time && !extracted.tbd) $('tn-f-time').value = extracted.time;
+      if (extracted.location) { $('tn-f-location').value = extracted.location; fire($('tn-f-location'), 'input'); }
+      if (extracted.organizer) $('tn-f-organizer').value = extracted.organizer;
+      if (extracted.websiteUrl) { $('tn-f-website-url').value = extracted.websiteUrl; fire($('tn-f-website-url'), 'blur'); }
+      if (extracted.about) $('tn-f-about').value = extracted.about;
+
+      if (extracted.location) {
+        setTimeout(() => { const geoBtn = $('tn-f-geocode'); if (geoBtn) geoBtn.click(); }, 50);
+      }
+
+      const panel = document.getElementById('tn-form-panel');
+      if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  })();
 
   // =====================================================================
   //  VENDOR DIRECTORY ADMIN (vendors.html)
@@ -2112,31 +3059,65 @@ ${itemsXml}
       </div>`;
   }
 
+  // Trade-night twin of newShowAnnouncementSectionHtml() above — same
+  // "standing list" pattern, keyed by 'new-trade-nights' instead of
+  // 'new-shows', pre-filled from lastAddedTnId / tnEvents instead of
+  // lastAddedShowId / events, and pointed at trade-nights.html.
+  function newTnAnnouncementSectionHtml() {
+    const count = pushSubscriberData['new-trade-nights'] || 0;
+    const ev = lastAddedTnId && typeof tnEvents !== 'undefined' ? tnEvents.find((e2) => e2.id === lastAddedTnId) : null;
+    const defaultTitle = ev ? `New trade night added: ${ev.name || 'Trade Night'}!` : '';
+    const defaultBody = ev
+      ? (`${ev.dateDisplay ? ev.dateDisplay + ' — ' : ''}${ev.location || ''}`.trim() || 'Check it out on the site!')
+      : '';
+    const targetUrl = ev ? `https://gccardshows.com/trade-nights.html?tn=${encodeURIComponent(ev.id)}` : 'https://gccardshows.com/trade-nights.html';
+    return `
+      <div class="event-row" style="cursor:default; align-items:flex-start; border-color:var(--blue,#2563EB);">
+        <div class="event-main" style="cursor:default;">
+          <div class="event-name">🆕 New Trade Night Announcement</div>
+          <div class="event-sub" style="font-size:12px;color:var(--muted);">Standing list — subscribers stay on it after each send · ${count} subscriber${count === 1 ? '' : 's'}</div>
+          ${ev ? `<div class="event-sub" style="font-size:12px;color:var(--muted);margin-top:2px;">Pre-filled from the trade night you just added: <strong>${escapeHtml(ev.name || '(unnamed)')}</strong></div>` : ''}
+          <div class="push-compose" id="push-compose-new-trade-nights" style="margin-top:10px; display:flex; flex-direction:column; gap:8px;">
+            <input type="text" class="push-title-input" placeholder="Notification title" value="${escapeHtml(defaultTitle)}" style="padding:8px 10px; border:1px solid var(--border,#E5E0D5); border-radius:8px;">
+            <input type="text" class="push-body-input" placeholder="Short message (shown under the title)" value="${escapeHtml(defaultBody)}" style="padding:8px 10px; border:1px solid var(--border,#E5E0D5); border-radius:8px;">
+            <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+              <button type="button" class="btn-sm btn-primary push-send-btn" data-id="new-trade-nights" data-url="${escapeHtml(targetUrl)}" data-keep="true" ${count ? '' : 'disabled'}>📣 Send to ${count} subscriber${count === 1 ? '' : 's'}</button>
+              <span class="hint">Opens ${escapeHtml(targetUrl.replace('https://', ''))} when tapped</span>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }
+
   function renderPushResults() {
     const body = document.getElementById('push-panel-body');
-    const showIds = Object.keys(pushSubscriberData || {}).filter((id) => id !== 'new-shows' && pushSubscriberData[id] > 0);
+    const showIds = Object.keys(pushSubscriberData || {}).filter((id) => id !== 'new-shows' && id !== 'new-trade-nights' && pushSubscriberData[id] > 0);
 
-    let html = newShowAnnouncementSectionHtml();
+    let html = newShowAnnouncementSectionHtml() + newTnAnnouncementSectionHtml();
 
     if (!showIds.length) {
-      html += `<div class="empty-state"><div class="empty-state-icon">📣</div><p>No TBD-show subscribers yet — once a visitor taps "Notify Me" on a specific TBD show, it'll show up here too.</p></div>`;
+      html += `<div class="empty-state"><div class="empty-state-icon">📣</div><p>No TBD subscribers yet — once a visitor taps "Notify Me" on a specific TBD show or trade night, it'll show up here too.</p></div>`;
     } else {
       const totalSubs = showIds.reduce((sum, id) => sum + pushSubscriberData[id], 0);
-      html += `<div style="margin:16px 0 12px;"><span class="hint">${showIds.length} TBD show${showIds.length === 1 ? '' : 's'} · ${totalSubs} total subscriber${totalSubs === 1 ? '' : 's'}</span></div>`;
+      html += `<div style="margin:16px 0 12px;"><span class="hint">${showIds.length} TBD listing${showIds.length === 1 ? '' : 's'} · ${totalSubs} total subscriber${totalSubs === 1 ? '' : 's'}</span></div>`;
       html += showIds.map((id) => {
-        const ev = (typeof events !== 'undefined') ? events.find((e2) => e2.id === id) : null;
+        const isTn = id.startsWith('tn-');
+        const ev = isTn
+          ? ((typeof tnEvents !== 'undefined') ? tnEvents.find((e2) => e2.id === id) : null)
+          : ((typeof events !== 'undefined') ? events.find((e2) => e2.id === id) : null);
         const label = ev ? (ev.name || id) : id;
+        const targetUrl = isTn ? `https://gccardshows.com/trade-nights.html?tn=${encodeURIComponent(id)}` : `https://gccardshows.com/#${id}`;
         return `
         <div class="event-row" style="cursor:default; align-items:flex-start;">
           <div class="event-main" style="cursor:default;">
             <div class="event-name">${escapeHtml(label)}</div>
             <div class="event-sub" style="font-size:12px;color:var(--muted);">${escapeHtml(id)} · ${pushSubscriberData[id]} subscriber${pushSubscriberData[id] === 1 ? '' : 's'}</div>
             <div class="push-compose" id="push-compose-${escapeHtml(id)}" style="margin-top:10px; display:flex; flex-direction:column; gap:8px;">
-              <input type="text" class="push-title-input" placeholder="Notification title" value="${escapeHtml(ev ? `${ev.name || 'Show'} just got a date!` : '')}" style="padding:8px 10px; border:1px solid var(--border,#E5E0D5); border-radius:8px;">
+              <input type="text" class="push-title-input" placeholder="Notification title" value="${escapeHtml(ev ? `${ev.name || (isTn ? 'Trade Night' : 'Show')} just got a date!` : '')}" style="padding:8px 10px; border:1px solid var(--border,#E5E0D5); border-radius:8px;">
               <input type="text" class="push-body-input" placeholder="Short message (shown under the title)" value="${escapeHtml(ev && ev.dateDisplay ? `It's happening ${ev.dateDisplay}.` : '')}" style="padding:8px 10px; border:1px solid var(--border,#E5E0D5); border-radius:8px;">
               <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-                <button type="button" class="btn-sm btn-primary push-send-btn" data-id="${escapeHtml(id)}" data-url="https://gccardshows.com/#${escapeHtml(id)}" data-keep="false">📣 Send to ${pushSubscriberData[id]} subscriber${pushSubscriberData[id] === 1 ? '' : 's'}</button>
-                <span class="hint">Opens gccardshows.com/#${escapeHtml(id)} when tapped</span>
+                <button type="button" class="btn-sm btn-primary push-send-btn" data-id="${escapeHtml(id)}" data-url="${escapeHtml(targetUrl)}" data-keep="false">📣 Send to ${pushSubscriberData[id]} subscriber${pushSubscriberData[id] === 1 ? '' : 's'}</button>
+                <span class="hint">Opens ${escapeHtml(targetUrl.replace('https://', ''))} when tapped</span>
               </div>
             </div>
           </div>
@@ -2195,6 +3176,7 @@ ${itemsXml}
         }
         if (!keepSubscribers) delete pushSubscriberData[id];
         if (id === 'new-shows') lastAddedShowId = null; // clear the pre-fill now that it's been sent
+        else if (id === 'new-trade-nights') lastAddedTnId = null;
         renderPushResults();
       } catch (err) {
         console.error('push-send failed:', err);
